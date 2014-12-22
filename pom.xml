@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <project.version>0.1-SNAPSHOT</project.version>
+        <log4j.version>1.7.6</log4j.version>
+        <easymock.version>3.0</easymock.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <groupId>io.confluent</groupId>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
@@ -16,23 +23,16 @@
         <module>utils</module>
     </modules>
 
-    <properties>
-        <log4j.version>1.7.6</log4j.version>
-        <easymock.version>3.0</easymock.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>io.confluent</groupId>
+            <artifactId>common-metrics</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
+            <groupId>io.confluent</groupId>
+            <artifactId>common-config</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

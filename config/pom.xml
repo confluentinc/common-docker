@@ -4,22 +4,23 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.confluent</groupId>
-        <artifactId>common</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </parent>
-
     <groupId>io.confluent</groupId>
-    <artifactId>config</artifactId>
+    <artifactId>common-config</artifactId>
     <packaging>jar</packaging>
     <name>config</name>
+    <version>0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>utils</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
