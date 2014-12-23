@@ -5,21 +5,28 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
+        <groupId>io.confluent</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>io.confluent</groupId>
-    <artifactId>metrics</artifactId>
+    <artifactId>common-metrics</artifactId>
     <packaging>jar</packaging>
     <name>metrics</name>
+    <version>0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>io.confluent</groupId>
-            <artifactId>utils</artifactId>
+            <artifactId>common-utils</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
