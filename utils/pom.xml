@@ -5,6 +5,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <artifactId>common</artifactId>
+        <groupId>io.confluent</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
     <properties>
         <junit.version>4.11</junit.version>
         <log4j.version>1.7.6</log4j.version>

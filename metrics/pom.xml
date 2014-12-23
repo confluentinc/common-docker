@@ -4,6 +4,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <artifactId>common</artifactId>
+        <groupId>io.confluent</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
     <groupId>io.confluent</groupId>
     <artifactId>common-metrics</artifactId>
     <packaging>jar</packaging>
@@ -13,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>io.confluent</groupId>
-            <artifactId>utils</artifactId>
+            <artifactId>common-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
