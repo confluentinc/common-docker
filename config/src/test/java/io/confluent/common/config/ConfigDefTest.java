@@ -68,6 +68,33 @@ public class ConfigDefTest {
     assertEquals(true, vals.get("i"));
   }
 
+  @Test
+  public void testOverride() {
+    ConfigDef def = new ConfigDef()
+        .define("a", INT, 0, ConfigDef.Range.between(0, 0),
+                        ConfigDef.Importance.HIGH, "doc")
+        .define("b", STRING, "original", ConfigDef.Importance.HIGH, "doc")
+        .define("c", STRING, ConfigDef.ValidString.in(Arrays.asList("", "foo")),
+                ConfigDef.Importance.HIGH, "doc")
+        .define("d", STRING, ConfigDef.Importance.HIGH, "doc")
+        .defineOverride("a", INT, 4, ConfigDef.Range.between(0, 14),
+                    ConfigDef.Importance.HIGH, "doc")
+        .defineOverride("b", STRING, "override", ConfigDef.Importance.HIGH, "doc")
+        .defineOverride("c", STRING, ConfigDef.ValidString.in(Arrays.asList("", "bar")),
+                        ConfigDef.Importance.HIGH, "doc")
+        .defineOverride("d", STRING, ConfigDef.Importance.HIGH, "doc");
+
+    Properties props = new Properties();
+    props.put("c", "bar");
+    props.put("d", "foo");
+
+    Map<String,Object> vals = def.parse(props);
+    assertEquals(4, vals.get("a"));
+    assertEquals("override", vals.get("b"));
+    assertEquals("bar", vals.get("c"));
+    assertEquals("foo", vals.get("d"));
+  }
+
   @Test(expected = ConfigException.class)
   public void testInvalidDefault() {
     new ConfigDef().define("a", Type.INT, "hello", ConfigDef.Importance.HIGH, "docs");
@@ -88,6 +115,11 @@ public class ConfigDefTest {
   public void testDefinedTwice() {
     new ConfigDef().define("a", Type.STRING, ConfigDef.Importance.HIGH, "docs")
         .define("a", Type.INT, ConfigDef.Importance.HIGH, "docs");
+  }
+
+  @Test(expected = ConfigException.class)
+  public void testOverrideNotPreviouslyDefined() {
+    new ConfigDef().defineOverride("a", Type.STRING, ConfigDef.Importance.HIGH, "docs");
   }
 
   @Test
