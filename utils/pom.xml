@@ -13,6 +13,7 @@
 
     <properties>
         <junit.version>4.11</junit.version>
+        <zkclient.version>0.3</zkclient.version>
         <log4j.version>1.7.6</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -29,6 +30,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+            <version>${zkclient.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
