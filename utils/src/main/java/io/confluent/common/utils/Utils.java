@@ -12,11 +12,14 @@
  */
 package io.confluent.common.utils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -319,4 +322,22 @@ public class Utils {
            ? "[" + host + "]:" + port // IPv6
            : host + ":" + port;
   }
+
+  /**
+   * Read a properties file from the given path
+   * @param filename The path of the file to read
+   */
+  public static Properties loadProps(String filename) throws IOException {
+    Properties props = new Properties();
+    InputStream propStream = null;
+    try {
+      propStream = new FileInputStream(filename);
+      props.load(propStream);
+    } finally {
+      if(propStream != null)
+        propStream.close();
+    }
+    return props;
+  }
+
 }
