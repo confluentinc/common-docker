@@ -468,30 +468,7 @@ public class ConfigDef {
   }
 
   public String toHtmlTable() {
-    // sort first required fields, then by importance, then name
-    List<ConfigDef.ConfigKey>
-        configs =
-        new ArrayList<ConfigDef.ConfigKey>(this.configKeys.values());
-    Collections.sort(configs, new Comparator<ConfigDef.ConfigKey>() {
-      public int compare(ConfigDef.ConfigKey k1, ConfigDef.ConfigKey k2) {
-        // first take anything with no default value
-        if (!k1.hasDefault() && k2.hasDefault()) {
-          return -1;
-        } else if (!k2.hasDefault() && k1.hasDefault()) {
-          return 1;
-        }
-
-        // then sort by importance
-        int cmp = k1.importance.compareTo(k2.importance);
-        if (cmp == 0)
-        // then sort in alphabetical order
-        {
-          return k1.name.compareTo(k2.name);
-        } else {
-          return cmp;
-        }
-      }
-    });
+    List<ConfigDef.ConfigKey> configs = sortedConfigs();
     StringBuilder b = new StringBuilder();
     b.append("<table>\n");
     b.append("<tr>\n");
@@ -522,5 +499,72 @@ public class ConfigDef {
     }
     b.append("</table>");
     return b.toString();
+  }
+
+  /**
+   * Get the configs formatted with reStructuredText, suitable for embedding in Sphinx
+   * documentation.
+   */
+  public String toRst() {
+    List<ConfigDef.ConfigKey> configs = sortedConfigs();
+    StringBuilder b = new StringBuilder();
+
+    for (ConfigKey def : configs) {
+      b.append("``");
+      b.append(def.name);
+      b.append("``\n");
+      for(String docLine : def.documentation.split("\n")) {
+        if (docLine.length() == 0) {
+          continue;
+        }
+        b.append("  ");
+        b.append(docLine);
+        b.append("\n\n");
+      }
+      b.append("  * Type: ");
+      b.append(def.type.toString().toLowerCase());
+      b.append("\n");
+      if (def.defaultValue != null) {
+        b.append("  * Default: ");
+        b.append(def.defaultValue);
+        b.append("\n");
+      }
+      b.append("  * Importance: ");
+      b.append(def.importance.toString().toLowerCase());
+      b.append("\n\n");
+    }
+    return b.toString();
+  }
+
+  /**
+   * Get a list of configs sorted into "natural" order: listing required fields first, then
+   * ordering by importance, and finally by name.
+   */
+  private List<ConfigDef.ConfigKey> sortedConfigs() {
+    // sort first required fields, then by importance, then name
+    List<ConfigDef.ConfigKey>
+        configs =
+        new ArrayList<ConfigDef.ConfigKey>(this.configKeys.values());
+    Collections.sort(configs, new Comparator<ConfigDef.ConfigKey>() {
+      public int compare(ConfigDef.ConfigKey k1, ConfigDef.ConfigKey k2) {
+        // first take anything with no default value
+        if (!k1.hasDefault() && k2.hasDefault()) {
+          return -1;
+        } else if (!k2.hasDefault() && k1.hasDefault()) {
+          return 1;
+        }
+
+        // then sort by importance
+        int cmp = k1.importance.compareTo(k2.importance);
+        if (cmp == 0)
+        // then sort in alphabetical order
+        {
+          return k1.name.compareTo(k2.name);
+        } else {
+          return cmp;
+        }
+      }
+    });
+    return configs;
   }
 }
