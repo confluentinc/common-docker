@@ -23,8 +23,13 @@ public abstract class AbstractPerformanceTest {
 
   protected PerformanceStats stats;
 
+  public AbstractPerformanceTest(long numEvents, int reportingInterval) {
+    stats = new PerformanceStats(numEvents, reportingInterval);
+  }
+
+  /** Constructor which provides a 'reasonable default' reportingInterval. */
   public AbstractPerformanceTest(long numEvents) {
-    stats = new PerformanceStats(numEvents, 5000);
+    this(numEvents, 5000);
   }
 
   /**
@@ -38,9 +43,9 @@ public abstract class AbstractPerformanceTest {
   protected abstract boolean finished(int iteration);
 
   /**
-   * Returns true if the test is running slower than its target pace.
+   * Returns true if the test is running faster than its target pace.
    */
-  protected abstract boolean runningSlow(int iteration, float elapsed);
+  protected abstract boolean runningFast(int iteration, float elapsed);
 
   protected void run(long iterationsPerSec) throws InterruptedException {
     long sleepTime = NS_PER_SEC / iterationsPerSec;
@@ -58,7 +63,7 @@ public abstract class AbstractPerformanceTest {
        */
       if (iterationsPerSec > 0) {
         float elapsed = (sendStart - start) / 1000.f;
-        if (elapsed > 0 && runningSlow(i, elapsed)) {
+        if (elapsed > 0 && runningFast(i, elapsed)) {
           sleepDeficitNs += sleepTime;
           if (sleepDeficitNs >= MIN_SLEEP_NS) {
             long sleepMs = sleepDeficitNs / 1000000;
