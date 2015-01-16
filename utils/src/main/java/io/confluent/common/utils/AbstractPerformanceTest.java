@@ -24,7 +24,7 @@ public abstract class AbstractPerformanceTest {
 
   protected PerformanceStats stats;
 
-  protected long rate = 0;
+  protected long targetIterationRate = 0;
 
   public AbstractPerformanceTest(long numEvents, int reportingInterval) {
     stats = new PerformanceStats(numEvents, reportingInterval);
@@ -57,20 +57,20 @@ public abstract class AbstractPerformanceTest {
    * constant, e.g. throughput.
    * @return the target number of iterations, or 0 if there should be no limit
    */
-  protected float targetRate(int iteration, float elapsed) {
-    return rate;
+  protected float getTargetIterationRate(int iteration, float elapsed) {
+    return targetIterationRate;
   }
 
   /**
-   * Run the performance test, trying to achieve the target rate returned by {@link #targetRate
-   * (int, float)}.
+   * Run the performance test, trying to achieve the target rate returned by
+   * {@link #getTargetIterationRate(int, float)}.
    * @throws InterruptedException
    */
   protected void run() throws InterruptedException {
     long sleepDeficitNs = 0;
     long start = System.currentTimeMillis();
     long targetRateUpdated = start;
-    float currentTargetRate = targetRate(0, 0);
+    float currentTargetRate = getTargetIterationRate(0, 0);
     long sleepTime = (long)(NS_PER_SEC / currentTargetRate);
     for (int i = 0; !finished(i); i++) {
       long sendStart = System.currentTimeMillis();
@@ -90,7 +90,7 @@ public abstract class AbstractPerformanceTest {
       if (currentTargetRate > 0) {
         float elapsed = (sendStart - start) / 1000.f;
         if (i == 1 || (i > 1 && sendStart - targetRateUpdated > TARGET_RATE_UPDATE_PERIOD_MS)) {
-          currentTargetRate = targetRate(i, elapsed);
+          currentTargetRate = getTargetIterationRate(i, elapsed);
           sleepTime = (long)(NS_PER_SEC / currentTargetRate);
           targetRateUpdated = sendStart;
         }
@@ -115,12 +115,12 @@ public abstract class AbstractPerformanceTest {
 
   /**
    * Run the performance test and try to hit a fixed target rate. If you use this method, you
-   * should not override the {@link #targetRate(int, float)} method.
+   * should not override the {@link #getTargetIterationRate(int, float)} method.
    * @param iterationsPerSec target number of iterations per second
    * @throws InterruptedException
    */
   protected void run(long iterationsPerSec) throws InterruptedException {
-    rate = iterationsPerSec;
+    targetIterationRate = iterationsPerSec;
     run();
   }
 }
