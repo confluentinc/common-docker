@@ -22,14 +22,9 @@ package io.confluent.common.metrics;
 public interface Metric {
 
   /**
-   * A unique name for this metric
+   * A name for this metric
    */
-  public String name();
-
-  /**
-   * A description of what is measured...this will be "" if no description was given
-   */
-  public String description();
+  public MetricName metricName();
 
   /**
    * The value of the metric

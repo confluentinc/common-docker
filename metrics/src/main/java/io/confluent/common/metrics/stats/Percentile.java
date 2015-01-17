@@ -16,29 +16,21 @@
  */
 package io.confluent.common.metrics.stats;
 
+import io.confluent.common.metrics.MetricName;
+
 public class Percentile {
 
-  private final String name;
-  private final String description;
+  private final MetricName name;
   private final double percentile;
 
-  public Percentile(String name, double percentile) {
-    this(name, "", percentile);
-  }
-
-  public Percentile(String name, String description, double percentile) {
+  public Percentile(MetricName name, double percentile) {
     super();
     this.name = name;
-    this.description = description;
     this.percentile = percentile;
   }
 
-  public String name() {
+  public MetricName name() {
     return this.name;
-  }
-
-  public String description() {
-    return this.description;
   }
 
   public double percentile() {
