@@ -22,7 +22,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <binaries>
-                <outputDirectory>share/confluent-common/</outputDirectory>
+                <outputDirectory>share/java/confluent-common/</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>
