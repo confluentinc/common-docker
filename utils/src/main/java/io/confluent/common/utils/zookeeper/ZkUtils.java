@@ -14,14 +14,19 @@
  * limitations under the License.
  **/
 
-package io.confluent.common.utils;
+package io.confluent.common.utils.zookeeper;
 
 import org.I0Itec.zkclient.ZkClient;
+import org.I0Itec.zkclient.exception.ZkBadVersionException;
 import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZkUtils {
+
+  private static final Logger log = LoggerFactory.getLogger(ZkUtils.class);
 
   /**
    * Make sure a persistent path exists in ZK. Create the path if it does not exist.
@@ -81,5 +86,44 @@ public class ZkUtils {
     Stat stat = new Stat();
     String data = client.readData(path, stat);
     return new ZkData(data, stat);
+  }
+
+  /**
+   * Conditional update the persistent path data, return (true, newVersion) if it succeeds,
+   * otherwise (the path doesn't exist, the current version is not the expected version, etc.)
+   * return (false, -1)
+   *
+   * When there is a ConnectionLossException during the conditional update, zkClient will retry the
+   * update and may fail since the previous update may have succeeded (but the stored zkVersion no
+   * longer matches the expected one). In this case, we will run the optionalChecker to further
+   * check if the previous write did indeed succeeded.
+   */
+  public static int conditionalUpdatePersistentPath(ZkClient client,
+                                             String path,
+                                             String data,
+                                             int expectedVersion,
+                                             ConditionalUpdateCallback customConditionCallback) {
+    try {
+      Stat stat = client.writeDataReturnStat(path, data, expectedVersion);
+      log.debug(
+          "Conditional update of path %s with value %s and expected version %d succeeded, returning the new version: %d"
+              .format(path, data, expectedVersion, stat.getVersion()));
+      return stat.getVersion();
+    } catch (ZkBadVersionException bve) {
+      if (customConditionCallback != null) {
+        return customConditionCallback.checker(client, path, data);
+      } else {
+        log.debug("Custom conditional update callback is not specified. Skipping zkData match");
+      }
+      log.warn("Conditional update of path %s with data %s and expected version %d failed due to %s"
+                   .format(path, data,
+                           expectedVersion, bve.getMessage()));
+      return -1;
+    } catch (Exception e) {
+      log.warn("Conditional update of path %s with data %s and expected version %d failed due to %s"
+                   .format(path, data,
+                           expectedVersion, e.getMessage()));
+      return -1;
+    }
   }
 }

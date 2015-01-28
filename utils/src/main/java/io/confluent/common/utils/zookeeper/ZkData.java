@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-package io.confluent.common.utils;
+package io.confluent.common.utils.zookeeper;
 
 import org.apache.zookeeper.data.Stat;
 
