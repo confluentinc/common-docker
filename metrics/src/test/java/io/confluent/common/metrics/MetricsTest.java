@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.confluent.common.metrics.stats.Avg;
 import io.confluent.common.metrics.stats.Count;
+import io.confluent.common.metrics.stats.Gauge;
 import io.confluent.common.metrics.stats.Max;
 import io.confluent.common.metrics.stats.Min;
 import io.confluent.common.metrics.stats.Percentile;
@@ -264,6 +265,24 @@ public class MetricsTest {
     assertEquals(0.0, p75.value(), 1.0);
   }
 
+  @Test
+  public void testGauge() {
+
+    ConstantMeasurable measurable = new ConstantMeasurable();
+
+    metrics.addMetric(
+        new MetricName("direct.measurable", "grp1",
+                       ""), measurable);
+    Sensor s = metrics.sensor("test.sensor");
+    s.add(new MetricName("test.gauge", "grp1"), new Gauge(10.0));
+
+    assertEquals("Sensor should reflect last recorded value", 10.0,
+                 metrics.metrics().get(new MetricName("test.gauge", "grp1")).value(), EPS);
+    s.record(11.0);
+    assertEquals("Sensor should reflect last recorded value", 11.0,
+                 metrics.metrics().get(new MetricName("test.gauge", "grp1")).value(), EPS);
+  }
+  
   public static class ConstantMeasurable implements Measurable {
 
     public double value = 0.0;

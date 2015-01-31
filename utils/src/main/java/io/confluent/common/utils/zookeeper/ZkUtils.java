@@ -99,10 +99,10 @@ public class ZkUtils {
    * check if the previous write did indeed succeeded.
    */
   public static int conditionalUpdatePersistentPath(ZkClient client,
-                                             String path,
-                                             String data,
-                                             int expectedVersion,
-                                             ConditionalUpdateCallback customConditionCallback) {
+                                                    String path,
+                                                    String data,
+                                                    int expectedVersion,
+                                                    ConditionalUpdateCallback customConditionCallback) {
     try {
       Stat stat = client.writeDataReturnStat(path, data, expectedVersion);
       log.debug(
@@ -113,12 +113,16 @@ public class ZkUtils {
       if (customConditionCallback != null) {
         return customConditionCallback.checker(client, path, data);
       } else {
-        log.debug("Custom conditional update callback is not specified. Skipping zkData match");
+        log.warn(("Conditional update of path %s with data %s and expected version %d failed due to " 
+                  + "%s. When there is a ConnectionLossException during the conditional update, " 
+                  + "ZkClient will retry the update and may fail since the previous update may have " 
+                  + "succeeded (but the stored zkVersion no longer matches the expected one). " 
+                  + "In this case, the customConditionCallback is required to further check if the " 
+                  + "previous write did indeed succeed, but was not passed in here.")
+                     .format(path, data,
+                             expectedVersion, bve.getMessage()));
+        return -1;
       }
-      log.warn("Conditional update of path %s with data %s and expected version %d failed due to %s"
-                   .format(path, data,
-                           expectedVersion, bve.getMessage()));
-      return -1;
     } catch (Exception e) {
       log.warn("Conditional update of path %s with data %s and expected version %d failed due to %s"
                    .format(path, data,
