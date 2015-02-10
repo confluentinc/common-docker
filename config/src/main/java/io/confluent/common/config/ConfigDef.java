@@ -544,7 +544,13 @@ public class ConfigDef {
       b.append("\n");
       if (def.defaultValue != null) {
         b.append("  * Default: ");
-        b.append(def.defaultValue);
+        if (def.type == Type.STRING) {
+          b.append("\"");
+          b.append(def.defaultValue);
+          b.append("\"");
+        } else {
+          b.append(def.defaultValue);
+        }
         b.append("\n");
       }
       b.append("  * Importance: ");
