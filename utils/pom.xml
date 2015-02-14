@@ -24,7 +24,7 @@
     <parent>
         <artifactId>common</artifactId>
         <groupId>io.confluent</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <properties>
@@ -33,8 +33,6 @@
         <log4j.version>1.7.6</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <version>0.1-SNAPSHOT</version>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-utils</artifactId>

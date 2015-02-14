@@ -23,14 +23,13 @@
     <parent>
         <artifactId>common</artifactId>
         <groupId>io.confluent</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-metrics</artifactId>
     <packaging>jar</packaging>
     <name>metrics</name>
-    <version>0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
