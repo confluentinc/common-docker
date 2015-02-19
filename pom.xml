@@ -31,6 +31,29 @@
     <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
     <name>common</name>
+    <organization>
+        <name>Confluent, Inc.</name>
+        <url>http://confluent.io</url>
+    </organization>
+    <url>http://confluent.io</url>
+    <description>
+        Common utilities, including metrics and config.
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/confluentinc/common.git</connection>
+        <developerConnection>scm:git:git@github.com:confluentinc/common.git</developerConnection>
+        <url>https://github.com/confluentinc/common</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <modules>
         <module>metrics</module>
