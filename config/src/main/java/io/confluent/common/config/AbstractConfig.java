@@ -193,7 +193,7 @@ public class AbstractConfig {
     return objects;
   }
 
-  protected static Properties getPropsFromFile(String propsFile) throws ConfigException {
+  public static Properties getPropsFromFile(String propsFile) throws ConfigException {
     Properties props = new Properties();
     if (propsFile == null) {
       return props;
