@@ -29,7 +29,7 @@
 
     <properties>
         <junit.version>4.11</junit.version>
-        <zkclient.version>0.3</zkclient.version>
+        <zkclient.version>0.5</zkclient.version>
         <log4j.version>1.7.6</log4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
