@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -114,10 +115,29 @@ public class AbstractConfig {
     return (Class<?>) get(key);
   }
 
+  public void ignore(String key) {
+    used.add(key);
+  }
+
   public Set<String> unused() {
     Set<String> keys = new HashSet<String>(originals.keySet());
     keys.removeAll(used);
     return keys;
+  }
+
+  /**
+   * Gets all original settings with the given prefix, stripping the prefix before adding it to the output.
+   *
+   * @param prefix the prefix to use as a filter
+   * @return a Map containing the settings with the prefix
+   */
+  public Map<String, Object> originalsWithPrefix(String prefix) {
+    Map<String, Object> result = new RecordingMap<>(prefix);
+    for (Map.Entry<String, ?> entry : originals.entrySet()) {
+      if (entry.getKey().startsWith(prefix) && entry.getKey().length() > prefix.length())
+        result.put(entry.getKey().substring(prefix.length()), entry.getValue());
+    }
+    return result;
   }
 
   private void logAll() {
@@ -207,4 +227,43 @@ public class AbstractConfig {
     return props;
   }
 
+  /**
+   * Marks keys retrieved via `get` as used. This is needed because `Configurable.configure` takes a `Map` instead
+   * of an `AbstractConfig` and we can't change that without breaking public API like `Partitioner`.
+   */
+  private class RecordingMap<V> extends HashMap<String, V> {
+
+    private final String prefix;
+
+    RecordingMap() {
+      this("");
+    }
+
+    RecordingMap(String prefix) {
+      this.prefix = prefix;
+    }
+
+    RecordingMap(Map<String, ? extends V> m) {
+      this(m, "");
+    }
+
+    RecordingMap(Map<String, ? extends V> m, String prefix) {
+      super(m);
+      this.prefix = prefix;
+    }
+
+    @Override
+    public V get(Object key) {
+      if (key instanceof String) {
+        String keyWithPrefix;
+        if (prefix.isEmpty()) {
+          keyWithPrefix = (String) key;
+        } else {
+          keyWithPrefix = prefix + key;
+        }
+        ignore(keyWithPrefix);
+      }
+      return super.get(key);
+    }
+  }
 }
