@@ -132,8 +132,22 @@ public class AbstractConfig {
    * @return a Map containing the settings with the prefix
    */
   public Map<String, Object> originalsWithPrefix(String prefix) {
-    Map<String, Object> result = new RecordingMap<>(prefix);
-    for (Map.Entry<String, ?> entry : originals.entrySet()) {
+    return withPrefix(prefix, originals);
+  }
+
+  /**
+   * Gets all values with the given prefix, stripping the prefix before adding it to the output.
+   *
+   * @param prefix the prefix to use as a filter
+   * @return a Map containing the settings with the prefix
+   */
+  public Map<String, Object> valuesWithPrefix(String prefix) {
+    return withPrefix(prefix, values);
+  }
+
+  protected Map<String, Object> withPrefix(String prefix, Map<String, ?> map) {
+    Map<String, Object> result = new RecordingMap<>();
+    for (Map.Entry<String, ?> entry : map.entrySet()) {
       if (entry.getKey().startsWith(prefix) && entry.getKey().length() > prefix.length())
         result.put(entry.getKey().substring(prefix.length()), entry.getValue());
     }
