@@ -20,12 +20,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <properties>
-        <log4j.version>1.7.6</log4j.version>
-        <easymock.version>3.0</easymock.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <groupId>io.confluent</groupId>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
@@ -48,6 +42,14 @@
         </license>
     </licenses>
 
+    <properties>
+        <slf4j.version>1.7.21</slf4j.version>
+        <zkclient.version>0.5</zkclient.version>
+        <junit.version>4.11</junit.version>
+        <easymock.version>3.0</easymock.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <scm>
         <connection>scm:git:git://github.com/confluentinc/common.git</connection>
         <developerConnection>scm:git:git@github.com:confluentinc/common.git</developerConnection>
@@ -62,25 +64,20 @@
         <module>package</module>
     </modules>
 
-    <dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>common-metrics</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>common-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>common-utils</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
