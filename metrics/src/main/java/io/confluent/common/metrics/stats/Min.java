@@ -40,7 +40,7 @@ import io.confluent.common.metrics.MetricConfig;
 public class Min extends SampledStat {
 
   public Min() {
-    super(Double.MIN_VALUE);
+    super(Double.MAX_VALUE);
   }
 
   @Override
