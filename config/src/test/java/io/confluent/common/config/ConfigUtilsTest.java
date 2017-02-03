@@ -39,9 +39,16 @@ public class ConfigUtilsTest {
         { "cow", "beef", "heifer", "steer" }
     });
     assertEquals("baz", newProps.getProperty("foo.bar"));
+    assertEquals(null, newProps.getProperty("foo.bar.deprecated"));
     assertEquals("1", newProps.getProperty("chicken"));
+    assertEquals(null, newProps.getProperty("rooster"));
+    assertEquals(null, newProps.getProperty("hen"));
     assertEquals("moo", newProps.getProperty("cow"));
+    assertEquals(null, newProps.getProperty("beef"));
+    assertEquals(null, newProps.getProperty("heifer"));
+    assertEquals(null, newProps.getProperty("steer"));
     assertEquals(null, props.getProperty("cow"));
+    assertEquals("blah", props.getProperty("blah"));
     assertEquals("blah", newProps.getProperty("blah"));
   }
 }

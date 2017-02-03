@@ -19,20 +19,56 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class ConfigUtils {
   private final static Logger log = LoggerFactory.getLogger(ConfigUtils.class);
 
-  public static Properties translateDeprecated(Properties props, String[][] keyArray) {
-    Properties newProps = new Properties(props);
-    for (String[] keyInfo: keyArray) {
-      String target = keyInfo[0];
+  /**
+   * Handle deprecated properties by translating them into their non-deprecated
+   * equivalents.<p/>
+   *
+   * Given a Properties object, create a new Properties object
+   *
+   * @param props           The input Properties object.
+   * @param synonymGroups   An array of arrays of synonyms.  Each synonym array begins with the
+   *                        non-deprecated synonym.
+   *                        For example, new String[][] { { a, b }, { c, d, e} } would declare
+   *                        b as a deprecated synonym for a, and d and e as deprecated synonyms
+   *                        for c.
+   * @return                A new Properties object with deprecated  keys translated to their
+   *                        non-deprecated equivalents.
+   */
+  public static Properties translateDeprecated(Properties props, String[][] synonymGroups) {
+    // Copy the Properties which are not part of a synonym group into a new
+    // Properties object.
+    HashSet<String> synonymSet = new HashSet<>();
+    for (String[] synonymGroup: synonymGroups) {
+      for (String synonym : synonymGroup) {
+        synonymSet.add(synonym);
+      }
+    }
+    // Properties is a very old Java class which uses Enumeration to iterate through keys rather
+    // than an iterator.  The keys are always String, but we have to deal with an
+    // Enumeration<Object> anyway, probably for historical purposes.
+    Properties newProps = new Properties();
+    for (Enumeration<String> keyEnumerator = (Enumeration<String>) props.propertyNames();
+         keyEnumerator.hasMoreElements(); ) {
+      String key = keyEnumerator.nextElement();
+      if (!synonymSet.contains(key))
+        newProps.setProperty(key, props.getProperty(key));
+    }
+    // Process each synonym group.
+    for (String[] synonymGroup: synonymGroups) {
+      String target = synonymGroup[0];
       List<String> deprecated = new ArrayList<>();
-      for (int i = 1; i < keyInfo.length; i++) {
-        if (props.containsKey(keyInfo[i])) {
-          deprecated.add(keyInfo[i]);
+      for (int i = 1; i < synonymGroup.length; i++) {
+        if (props.containsKey(synonymGroup[i])) {
+          deprecated.add(synonymGroup[i]);
         }
       }
       if (deprecated.isEmpty()) {
@@ -44,9 +80,10 @@ public class ConfigUtils {
         synonymString += ", " + deprecated.get(i);
       }
       if (props.containsKey(target)) {
+        // Ignore the deprecated key(s) because the actual key was set.
         log.error(target + " was configured, as well as the deprecated synonym(s) " +
           synonymString + ".  Using the value of " + target);
-        // Ignore the deprecated key(s) because the actual key was set.
+        newProps.setProperty(target, props.getProperty(target));
       } else if (deprecated.size() > 1) {
         log.error("The configuration keys " + synonymString + " are deprecated and may be " +
           "removed in the future.  Additionally, this configuration is ambigous because " +
