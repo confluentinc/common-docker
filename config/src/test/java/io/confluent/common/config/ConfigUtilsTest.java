@@ -33,6 +33,7 @@ public class ConfigUtilsTest {
     props.setProperty("hen", "3");
     props.setProperty("heifer", "moo");
     props.setProperty("blah", "blah");
+    props.put("unexpected.non.string.object", new Integer(42));
     Properties newProps = ConfigUtils.translateDeprecated(props, new String[][]{
         { "foo.bar", "foo.bar.deprecated" },
         { "chicken", "rooster", "hen" },
@@ -50,5 +51,15 @@ public class ConfigUtilsTest {
     assertEquals(null, props.getProperty("cow"));
     assertEquals("blah", props.getProperty("blah"));
     assertEquals("blah", newProps.getProperty("blah"));
+
+    // The java.util.Properties class was intended to store only String values.
+    // However, because of a design mistake, it can actually store arbitrary Objects.
+    // They are not returned when Properties#getProperty is invoked, but they are
+    // returned when Properties#get is invoked.
+    // Here, we test that ConfigUtils passes through these objects unchanged.
+    assertEquals(null, newProps.getProperty("unexpected.non.string.object"));
+    assertEquals(new Integer(42), newProps.get("unexpected.non.string.object"));
+    assertEquals(null, props.getProperty("unexpected.non.string.object"));
+    assertEquals(new Integer(42), props.get("unexpected.non.string.object"));
   }
 }
