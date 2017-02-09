@@ -59,8 +59,9 @@ public class ConfigUtils {
     for (Enumeration<String> keyEnumerator = (Enumeration<String>) props.propertyNames();
          keyEnumerator.hasMoreElements(); ) {
       String key = keyEnumerator.nextElement();
-      if (!synonymSet.contains(key))
-        newProps.setProperty(key, props.getProperty(key));
+      if (!synonymSet.contains(key)) {
+        newProps.put(key, props.get(key));
+      }
     }
     // Process each synonym group.
     for (String[] synonymGroup: synonymGroups) {
@@ -83,17 +84,17 @@ public class ConfigUtils {
         // Ignore the deprecated key(s) because the actual key was set.
         log.error(target + " was configured, as well as the deprecated synonym(s) " +
           synonymString + ".  Using the value of " + target);
-        newProps.setProperty(target, props.getProperty(target));
+        newProps.put(target, props.get(target));
       } else if (deprecated.size() > 1) {
         log.error("The configuration keys " + synonymString + " are deprecated and may be " +
           "removed in the future.  Additionally, this configuration is ambigous because " +
           "these configuration keys are all synonyms for " + target + ".  Please update " +
           "your configuration to have only " + target + " set.");
-        newProps.setProperty(target, props.getProperty(deprecated.get(0)));
+        newProps.put(target, props.get(deprecated.get(0)));
       } else {
         log.warn("Configuration key " + deprecated.get(0) + " is deprecated and may be removed " +
           "in the future.  Please update your configuration to use " + target + " instead.");
-        newProps.setProperty(target, props.getProperty(deprecated.get(0)));
+        newProps.put(target, props.get(deprecated.get(0)));
       }
     }
     return newProps;
