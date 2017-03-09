@@ -66,7 +66,7 @@ import java.util.Set;
  */
 public class ConfigDef {
 
-  private static final Object NO_DEFAULT_VALUE = "";
+  private static final Object NO_DEFAULT_VALUE = new Object();
 
   private final Map<String, ConfigKey> configKeys = new HashMap<String, ConfigKey>();
 
@@ -122,7 +122,7 @@ public class ConfigDef {
                                 " is defined as an override but does not exist.");
     }
     Object parsedDefault =
-        defaultValue == NO_DEFAULT_VALUE ? NO_DEFAULT_VALUE : parseType(name, defaultValue, type);
+            NO_DEFAULT_VALUE.equals(defaultValue) ? NO_DEFAULT_VALUE : parseType(name, defaultValue, type);
     configKeys
         .put(name, new ConfigKey(name, type, parsedDefault, validator, importance, documentation));
     return this;
@@ -473,14 +473,14 @@ public class ConfigDef {
       this.defaultValue = defaultValue;
       this.validator = validator;
       this.importance = importance;
-      if (this.validator != null) {
+      if (this.validator != null && !NO_DEFAULT_VALUE.equals(defaultValue)) {
         this.validator.ensureValid(name, defaultValue);
       }
       this.documentation = documentation;
     }
 
     public boolean hasDefault() {
-      return this.defaultValue != NO_DEFAULT_VALUE;
+      return !NO_DEFAULT_VALUE.equals(this.defaultValue);
     }
 
   }
