@@ -48,7 +48,10 @@ public class ConfigUtils {
     HashSet<String> synonymSet = new HashSet<>();
     for (String[] synonymGroup: synonymGroups) {
       for (String synonym : synonymGroup) {
-        synonymSet.add(synonym);
+        if (!synonymSet.add(synonym)) {
+          // TODO: we should consider doing more formal validations around this
+          log.warn("reused synonym={}", synonym);
+        }
       }
     }
     // Properties is a very old Java class which uses Enumeration to iterate through keys rather
@@ -73,6 +76,9 @@ public class ConfigUtils {
       }
       if (deprecated.isEmpty()) {
         // No deprecated key(s) found.
+        if (props.containsKey(target)) {
+          newProps.put(target, props.get(target));
+        }
         continue;
       }
       StringBuilder synonymString = new StringBuilder(deprecated.get(0));
