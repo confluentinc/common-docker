@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  **/
-package io.confluent.common;
+package io.confluent.common.utils;
 
 /**
  *  Marker interface for use with Junit Categories to separate Integration Tests
