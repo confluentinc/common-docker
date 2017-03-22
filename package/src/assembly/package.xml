@@ -36,13 +36,12 @@
             </includes>
         </fileSet>
     </fileSets>
-    <moduleSets>
-        <moduleSet>
-            <useAllReactorProjects>true</useAllReactorProjects>
-            <binaries>
-                <outputDirectory>share/java/confluent-common/</outputDirectory>
-                <unpack>false</unpack>
-            </binaries>
-        </moduleSet>
-    </moduleSets>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>share/java/confluent-common/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
 </assembly>
