@@ -218,7 +218,6 @@
         </module>
         <module name="ClassDataAbstractionCoupling"/>
         <module name="BooleanExpressionComplexity"/>
-        <module name="ClassFanOutComplexity"/>
         <module name="CyclomaticComplexity"/>
         <module name="JavaNCSS" />
         <module name="NPathComplexity"/>
