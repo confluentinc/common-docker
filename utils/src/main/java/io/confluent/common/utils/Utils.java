@@ -30,12 +30,19 @@
  */
 package io.confluent.common.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -356,4 +363,36 @@ public class Utils {
     return props;
   }
 
+  /**
+   * Recursively delete the given file/directory and any subfiles (if any exist)
+   *
+   * @param file The root file at which to begin deleting
+   */
+  public static void delete(final File file) throws IOException {
+    if (file == null) {
+      return;
+    }
+    Files.walkFileTree(file.toPath(), new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFileFailed(Path path, IOException exc) throws IOException {
+        // If the root path did not exist, ignore the error; otherwise throw it.
+        if (exc instanceof NoSuchFileException && path.toFile().equals(file)) {
+          return FileVisitResult.TERMINATE;
+        }
+        throw exc;
+      }
+
+      @Override
+      public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+        Files.delete(path);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path path, IOException exc) throws IOException {
+        Files.delete(path);
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
 }
