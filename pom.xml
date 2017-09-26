@@ -66,7 +66,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4j.version>1.7.25</slf4j.version>
         <zkclient.version>0.10</zkclient.version>
-        <zookeeper.version>3.4.8</zookeeper.version>
+        <zookeeper.version>3.4.10</zookeeper.version>
     </properties>
 
     <scm>
