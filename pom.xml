@@ -228,6 +228,8 @@
                                 <DOCKER_UPSTREAM_REGISTRY>${docker.upstream-registry}</DOCKER_UPSTREAM_REGISTRY>
                                 <DOCKER_UPSTREAM_TAG>${docker.upstream-tag}</DOCKER_UPSTREAM_TAG>
                                 <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                <BUILD_NUMBER>-1</BUILD_NUMBER>
+                                <GIT_COMMIT>unknown</GIT_COMMIT>
                             </buildArgs>
                             <skip>${docker.skip-build}</skip>
                             <tag>${docker.tag}</tag>
