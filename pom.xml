@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>io.confluent</groupId>
-    <artifactId>common-docker-parent</artifactId>
+    <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
 
     <name>Common Docker POM</name>
