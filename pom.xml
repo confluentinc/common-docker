@@ -36,6 +36,8 @@
     </pluginRepositories>
 
     <properties>
+        <GIT_COMMIT>unknown</GIT_COMMIT>
+        <BUILD_NUMBER>-1</BUILD_NUMBER>
         <docker.skip-build>true</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
         <docker.registry>docker.io/</docker.registry>  <!-- Registry for this build. Must specify registry, or exec plugin throws NPE :((( -->
@@ -223,13 +225,13 @@
                         <configuration>
                             <buildArgs>
                                 <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
                                 <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
                                 <DOCKER_TAG>${docker.tag}</DOCKER_TAG>
                                 <DOCKER_UPSTREAM_REGISTRY>${docker.upstream-registry}</DOCKER_UPSTREAM_REGISTRY>
                                 <DOCKER_UPSTREAM_TAG>${docker.upstream-tag}</DOCKER_UPSTREAM_TAG>
+                                <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
                                 <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
-                                <BUILD_NUMBER>-1</BUILD_NUMBER>
-                                <GIT_COMMIT>unknown</GIT_COMMIT>
                             </buildArgs>
                             <skip>${docker.skip-build}</skip>
                             <tag>${docker.tag}</tag>
