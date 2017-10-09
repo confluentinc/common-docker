@@ -16,7 +16,7 @@
 FROM azul/zulu-openjdk-alpine:8
 
 # Remember where we came from
-LABEL io.confluent.docker.git.repo="common-docker"
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
 
 ARG COMMIT_ID=unknown
 LABEL io.confluent.docker.git.id=$COMMIT_ID
