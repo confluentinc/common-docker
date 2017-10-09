@@ -19,6 +19,7 @@
 
     <modules>
         <module>assembly-plugin-boilerplate</module>
+        <module>base</module>
     </modules>
     
     <repositories>
