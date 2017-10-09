@@ -10,8 +10,7 @@ setuptools.setup(
     version='4.0.0',
  
     author="Confluent, Inc.",
-    author_email="partner-support@confluent.io",
- 
+
     description='Docker image tests',
  
     url="https://github.com/confluentinc/common-docker",
