@@ -26,8 +26,8 @@ class BaseImageTest(unittest.TestCase):
         self.assertTrue(expected in output)
 
     def test_dub_exists(self):
-        self.assertTrue(utils.path_exists_in_image(self.image, "/usr/bin/dub"))
-        self.assertTrue(utils.path_exists_in_image(self.image, "/usr/bin/cub"))
+        self.assertTrue(utils.path_exists_in_image(self.image, "/usr/local/bin/dub"))
+        self.assertTrue(utils.path_exists_in_image(self.image, "/usr/local/bin/cub"))
 
 
 if __name__ == '__main__':

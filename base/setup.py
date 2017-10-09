@@ -7,7 +7,7 @@ remote_requirements = '\n'.join(str(r.req) for r in parse_requirements("requirem
  
 setuptools.setup(
     name='common-docker-tests',
-    version='0.0.1',
+    version='4.0.0',
  
     author="Confluent, Inc.",
     author_email="partner-support@confluent.io",

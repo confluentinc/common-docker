@@ -35,7 +35,7 @@ COPY requirements.txt .
 
 RUN apk update \
     && apk add bash curl git wget netcat-openbsd python2 py2-pip \
-    && pip install --upgrade -rrequirements.txt \
+    && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && rm requirements.txt \
     && mkdir -p /etc/confluent/docker \
 
