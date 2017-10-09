@@ -31,7 +31,11 @@ LABEL io.confluent.docker=true
 # base image that supports it
 ENV LANG="C.UTF-8"
 
+COPY requirements.txt .
+
 RUN apk update \
     && apk add bash curl git wget netcat-openbsd python2 py2-pip \
-    && pip install --upgrade git+https://github.com/confluentinc/confluent-docker-utils@v0.0.10 \
-    && mkdir -p /etc/confluent/docker
+    && pip install --upgrade -rrequirements.txt \
+    && rm requirements.txt \
+    && mkdir -p /etc/confluent/docker \
+
