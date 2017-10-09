@@ -27,10 +27,12 @@
     </parent>
 
     <artifactId>cp-base</artifactId>
-    <description>Confluent base Docker image</description>
+
+    <description>Base for Confluent Docker images</description>
     <name>${project.artifactId}</name>
 
     <properties>
         <docker.skip-build>false</docker.skip-build>
+        <docker.skip-test>false</docker.skip-test>
     </properties>
 </project>

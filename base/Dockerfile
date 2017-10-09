@@ -15,8 +15,12 @@
 
 FROM azul/zulu-openjdk-alpine:8
 
+# Remember where we came from
+LABEL io.confluent.docker.git.repo="common-docker"
+
 ARG COMMIT_ID=unknown
 LABEL io.confluent.docker.git.id=$COMMIT_ID
+
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
@@ -28,6 +32,6 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 
 RUN apk update \
-    && apk add curl git wget netcat-openbsd python2 py2-pip \
-    && pip install --upgrade git+https://github.com/confluentinc/confluent-docker-utils@v0.0.7 \
+    && apk add bash curl git wget netcat-openbsd python2 py2-pip \
+    && pip install --upgrade git+https://github.com/confluentinc/confluent-docker-utils@v0.0.10 \
     && mkdir -p /etc/confluent/docker

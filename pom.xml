@@ -14,7 +14,7 @@
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
 
-    <name>Common Docker POM</name>
+    <name>${project.artifactId}</name>
     <description>Common POM with Docker image support</description>
 
     <modules>
