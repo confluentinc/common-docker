@@ -24,7 +24,7 @@ LABEL io.confluent.docker.git.id=$COMMIT_ID
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
-MAINTAINER partner-support@confluent.io
+MAINTAINER tools@confluent.io
 LABEL io.confluent.docker=true
 
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
