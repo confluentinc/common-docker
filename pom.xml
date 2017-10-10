@@ -315,13 +315,37 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${maven-deploy.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
                 <inherited>true</inherited>
                 <configuration>
                     <source>7</source>
@@ -331,9 +355,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>@{argLine} -Djava.awt.headless=true</argLine>
+                    <excludedGroups>io.confluent.common.utils.IntegrationTest</excludedGroups>
                 </configuration>
                 <executions>
                     <execution>
@@ -341,26 +365,47 @@
                         <goals>
                             <goal>test</goal>
                         </goals>
-                        <configuration>
-                            <excludedGroups>io.confluent.common.utils.IntegrationTest</excludedGroups>
-                        </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -Djava.awt.headless=true</argLine>
+                    <groups>io.confluent.common.utils.IntegrationTest</groups>
+                    <!-- by default failsafe only includes class names that start or end in IT,
+                         we use regular test class names with @Category and the group above -->
+                    <includes>
+                        <!-- defaults copied from maven-surefire-plugin -->
+                        <include>**/Test*.java</include>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/*TestCase.java</include>
+                        <!-- maven-failsafe-plugin defaults -->
+                        <include>**/IT*.java</include>
+                        <include>**/*IT.java</include>
+                        <include>**/*ITCase.java</include>
+                    </includes>
+                </configuration>
+                <executions>
                     <execution>
                         <id>integration-test</id>
-                        <phase>integration-test</phase>
                         <goals>
-                            <goal>test</goal>
+                            <goal>integration-test</goal>
                         </goals>
-                        <configuration>
-                            <groups>io.confluent.common.utils.IntegrationTest</groups>
-                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -385,7 +430,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven-enforcer-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
