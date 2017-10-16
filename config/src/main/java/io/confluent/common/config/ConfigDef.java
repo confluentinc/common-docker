@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.confluent.common.config.types.Password;
+
 /**
  * This class is used for specifying the set of expected configurations, their type, their defaults,
  * their documentation, and any special validation logic used for checking the correctness of the
@@ -288,6 +290,13 @@ public class ConfigDef {
                                       "Expected value to be a string, but it was a " + value
                                           .getClass().getName());
           }
+        case PASSWORD:
+          if (value instanceof Password)
+            return value;
+          else if (value instanceof String)
+            return new Password(trimmed);
+          else
+            throw new ConfigException(name, value, "Expected value to be a string, but it was a " + value.getClass().getName());
         case INT:
           if (value instanceof Integer) {
             return (Integer) value;
@@ -349,7 +358,7 @@ public class ConfigDef {
    * The config types
    */
   public enum Type {
-    BOOLEAN, STRING, INT, LONG, DOUBLE, LIST, CLASS;
+    BOOLEAN, STRING, INT, LONG, DOUBLE, LIST, CLASS, PASSWORD
   }
 
   public enum Importance {
