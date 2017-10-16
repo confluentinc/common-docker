@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import io.confluent.common.config.types.Password;
+
 import static io.confluent.common.config.ConfigDef.Type;
 import static io.confluent.common.config.ConfigDef.Type.BOOLEAN;
 import static io.confluent.common.config.ConfigDef.Type.CLASS;
@@ -62,7 +64,8 @@ public class ConfigDefTest {
         .define("f", CLASS, ConfigDef.Importance.HIGH, "docs")
         .define("g", BOOLEAN, ConfigDef.Importance.HIGH, "docs")
         .define("h", Type.BOOLEAN, ConfigDef.Importance.HIGH, "docs")
-        .define("i", Type.BOOLEAN, ConfigDef.Importance.HIGH, "docs");
+        .define("i", Type.BOOLEAN, ConfigDef.Importance.HIGH, "docs")
+        .define("j", Type.PASSWORD, ConfigDef.Importance.HIGH, "docs");
 
     Properties props = new Properties();
     props.put("a", "1   ");
@@ -73,6 +76,7 @@ public class ConfigDefTest {
     props.put("g", "true");
     props.put("h", "FalSE");
     props.put("i", "TRUE");
+    props.put("j", "password");
 
     Map<String, Object> vals = def.parse(props);
     assertEquals(1, vals.get("a"));
@@ -84,6 +88,7 @@ public class ConfigDefTest {
     assertEquals(true, vals.get("g"));
     assertEquals(false, vals.get("h"));
     assertEquals(true, vals.get("i"));
+    assertEquals(new Password("password"), vals.get("j"));
   }
 
   @Test

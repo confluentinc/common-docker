@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.confluent.common.Configurable;
+import io.confluent.common.config.types.Password;
 import io.confluent.common.utils.Utils;
 
 /**
@@ -110,6 +111,10 @@ public class AbstractConfig {
 
   public String getString(String key) {
     return (String) get(key);
+  }
+
+  public Password getPassword(String key) {
+    return (Password) get(key);
   }
 
   public Class<?> getClass(String key) {
