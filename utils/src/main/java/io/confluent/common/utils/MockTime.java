@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MockTime implements Time {
 
-  private long nanos = 0;
+  private long nanos;
 
   public MockTime() {
     this.nanos = System.nanoTime();
@@ -56,6 +56,10 @@ public class MockTime implements Time {
   @Override
   public void sleep(long ms) {
     this.nanos += TimeUnit.NANOSECONDS.convert(ms, TimeUnit.MILLISECONDS);
+  }
+
+  public void reset(long ms) {
+    this.nanos = ms;
   }
 
 }
