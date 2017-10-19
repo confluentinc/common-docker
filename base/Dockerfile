@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM azul/zulu-openjdk-alpine:8
+FROM azul/zulu-openjdk-debian:8
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
@@ -33,10 +33,11 @@ ENV LANG="C.UTF-8"
 
 COPY requirements.txt .
 
-RUN apk update \
-    && apk add bash curl git wget netcat-openbsd python2 py2-pip \
+RUN apt update \
+    && apt install -y bash curl git wget netcat-openbsd python python-pip \
     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-    && apk del git py2-pip \
+    && apt remove --purge -y git python-pip \
+    && apt autoremove -y \
+    && rm -rf /var/lib/apt/lists/*     \
     && rm requirements.txt \
     && mkdir -p /etc/confluent/docker
-
