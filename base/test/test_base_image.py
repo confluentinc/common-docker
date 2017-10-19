@@ -21,7 +21,7 @@ class BaseImageTest(unittest.TestCase):
 
     def test_java_install(self):
         cmd = "java -version"
-        expected = 'OpenJDK Runtime Environment (Zulu 8.23.0.3-linux64) (build 1.8.0_144-b01)'
+        expected = 'OpenJDK Runtime Environment (Zulu 8.'
         output = utils.run_docker_command(image=self.image, command=cmd)
         self.assertTrue(expected in output)
 
