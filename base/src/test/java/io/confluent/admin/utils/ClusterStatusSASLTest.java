@@ -15,6 +15,7 @@
  */
 package io.confluent.admin.utils;
 
+import javax.security.auth.login.Configuration;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
@@ -41,6 +42,8 @@ public class ClusterStatusSASLTest {
 
   @BeforeClass
   public static void setup() throws IOException {
+    Configuration.setConfiguration(null);
+
     kafka = new EmbeddedKafkaCluster(3, 3, true);
     kafka.start();
   }

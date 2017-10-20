@@ -3,13 +3,6 @@ import unittest
 
 import confluent.docker_utils as utils
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_DIR = os.environ.get("IMAGE_DIR") or os.path.join(CURRENT_DIR, "..")
-
-
-def get_dockerfile_path(image_dir):
-    return os.path.join(IMAGE_DIR, image_dir)
-
 
 class BaseImageTest(unittest.TestCase):
 
