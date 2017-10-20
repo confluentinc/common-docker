@@ -41,7 +41,7 @@
         <BUILD_NUMBER>-1</BUILD_NUMBER>
         <docker.skip-build>true</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
-        <docker.registry>docker.io/</docker.registry>  <!-- Registry for this build. Must specify registry, or exec plugin throws NPE :((( -->
+        <docker.registry>placeholder/</docker.registry>  <!-- Registry for this build. Must specify a value, or exec plugin throws NPE :((( -->
         <docker.tag>${project.version}</docker.tag>  <!-- Tag for this build -->
         <docker.upstream-registry>${docker.registry}</docker.upstream-registry>  <!-- Registry for base images -->
         <docker.upstream-tag>${docker.tag}</docker.upstream-tag>  <!-- Tag for base images -->
