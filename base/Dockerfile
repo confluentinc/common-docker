@@ -15,6 +15,9 @@
 
 FROM azul/zulu-openjdk-debian:8
 
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
+
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
 
@@ -34,10 +37,13 @@ ENV LANG="C.UTF-8"
 COPY requirements.txt .
 
 RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip \
+    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*     \
     && rm requirements.txt \
     && mkdir -p /etc/confluent/docker
+
+ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/

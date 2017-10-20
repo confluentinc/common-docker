@@ -153,7 +153,7 @@
                         <executions>
                             <execution>
                                 <id>create-licenses</id>
-                                <phase>prepare-package</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
