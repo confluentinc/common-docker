@@ -14,11 +14,12 @@
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
 
-    <name>Common Docker POM</name>
+    <name>${project.artifactId}</name>
     <description>Common POM with Docker image support</description>
 
     <modules>
         <module>assembly-plugin-boilerplate</module>
+        <module>base</module>
     </modules>
     
     <repositories>
@@ -40,7 +41,7 @@
         <BUILD_NUMBER>-1</BUILD_NUMBER>
         <docker.skip-build>true</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
-        <docker.registry>docker.io/</docker.registry>  <!-- Registry for this build. Must specify registry, or exec plugin throws NPE :((( -->
+        <docker.registry>placeholder/</docker.registry>  <!-- Registry for this build. Must specify a value, or exec plugin throws NPE :((( -->
         <docker.tag>${project.version}</docker.tag>  <!-- Tag for this build -->
         <docker.upstream-registry>${docker.registry}</docker.upstream-registry>  <!-- Registry for base images -->
         <docker.upstream-tag>${docker.tag}</docker.upstream-tag>  <!-- Tag for base images -->
@@ -52,24 +53,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Every child project uses slf4j/log4j for logging, might as well just include them here automatically -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>assembly-plugin-boilerplate</artifactId>
@@ -120,142 +103,142 @@
             </activation>
 
             <build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>unpack-assembly-plugin-boilerplate</id>
-								<goals>
-									<goal>unpack-dependencies</goal>
-								</goals>
-								<phase>process-sources</phase>
-								<configuration>
-									<includeArtifactIds>assembly-plugin-boilerplate</includeArtifactIds>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-assembly-plugin-boilerplate</id>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                                <configuration>
+                                    <includeArtifactIds>assembly-plugin-boilerplate</includeArtifactIds>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<descriptors>
-								<descriptor>target/dependency/assembly-plugin-boilerplate-4.0.0-SNAPSHOT/package.xml</descriptor>
-							</descriptors>
-							<archive>
-								<manifest>
-									<mainClass>${main-class}</mainClass>
-								</manifest>
-							</archive>
-							<attach>false</attach>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>target/dependency/assembly-plugin-boilerplate-${project.version}/package.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${main-class}</mainClass>
+                                </manifest>
+                            </archive>
+                            <attach>false</attach>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>${exec-maven-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>create-licenses</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>java</goal>
-								</goals>
-								<configuration>
-									<mainClass>io.confluent.licenses.LicenseFinder</mainClass>
-									<arguments>
-										<!-- Note use of development instead of package so we pick up all dependencies.
-											 This assumes both subprojects will be packaged together. -->
-										<argument>-i ${project.build.directory}/${project.build.finalName}-package/share/java/${project.artifactId}</argument>
-										<argument>-f</argument>
-										<argument>-h ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses.html</argument>
-										<argument>-l ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses</argument>
-										<argument>-n ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/notices</argument>
-										<argument>-x licenses-${project.version}.jar</argument>
-									</arguments>
-								</configuration>
-							</execution>
-							<execution>
-								<id>python-docker-tests</id>
-								<phase>integration-test</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<skip>${docker.skip-test}</skip>
-									<environmentVariables>
-										<TOX_TESTENV_PASSENV>DOCKER_REGISTRY DOCKER_TAG DOCKER_TEST_REGISTRY DOCKER_TEST_TAG DOCKER_HOST</TOX_TESTENV_PASSENV>
-										<DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
-										<DOCKER_TAG>${docker.tag}</DOCKER_TAG>
-										<DOCKER_TEST_REGISTRY>${docker.test-registry}</DOCKER_TEST_REGISTRY>
-										<DOCKER_TEST_TAG>${docker.test-tag}</DOCKER_TEST_TAG>
-									</environmentVariables>
-									<executable>tox</executable>
-								</configuration>
-							</execution>
-						</executions>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>create-licenses</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>io.confluent.licenses.LicenseFinder</mainClass>
+                                    <arguments>
+                                        <!-- Note use of development instead of package so we pick up all dependencies.
+                                             This assumes both subprojects will be packaged together. -->
+                                        <argument>-i ${project.build.directory}/${project.build.finalName}-package/share/java/${project.artifactId}</argument>
+                                        <argument>-f</argument>
+                                        <argument>-h ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses.html</argument>
+                                        <argument>-l ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses</argument>
+                                        <argument>-n ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/notices</argument>
+                                        <argument>-x licenses-${project.version}.jar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>python-docker-tests</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${docker.skip-test}</skip>
+                                    <environmentVariables>
+                                        <TOX_TESTENV_PASSENV>DOCKER_REGISTRY DOCKER_TAG DOCKER_TEST_REGISTRY DOCKER_TEST_TAG DOCKER_HOST</TOX_TESTENV_PASSENV>
+                                        <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                                        <DOCKER_TAG>${docker.tag}</DOCKER_TAG>
+                                        <DOCKER_TEST_REGISTRY>${docker.test-registry}</DOCKER_TEST_REGISTRY>
+                                        <DOCKER_TEST_TAG>${docker.test-tag}</DOCKER_TEST_TAG>
+                                    </environmentVariables>
+                                    <executable>tox</executable>
+                                </configuration>
+                            </execution>
+                        </executions>
 
-						<configuration>
-							<includeProjectDependencies>true</includeProjectDependencies>
-							<includePluginDependencies>true</includePluginDependencies>
-							<executableDependency>
-								<groupId>io.confluent</groupId>
-								<artifactId>licenses</artifactId>
-							</executableDependency>
-						</configuration>
-						<dependencies>
-							<dependency>
-								<groupId>io.confluent</groupId>
-								<artifactId>licenses</artifactId>
-								<version>${licenses.version}</version>
-							</dependency>
-						</dependencies>
-					</plugin>
+                        <configuration>
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>io.confluent</groupId>
+                                <artifactId>licenses</artifactId>
+                            </executableDependency>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.confluent</groupId>
+                                <artifactId>licenses</artifactId>
+                                <version>${licenses.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
 
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
-						<version>${dockerfile-maven-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>package</id>
-								<goals>
-									<goal>build</goal>
-								</goals>
-								<configuration>
-									<buildArgs>
-										<ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
-										<BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
-										<DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
-										<DOCKER_TAG>${docker.tag}</DOCKER_TAG>
-										<DOCKER_UPSTREAM_REGISTRY>${docker.upstream-registry}</DOCKER_UPSTREAM_REGISTRY>
-										<DOCKER_UPSTREAM_TAG>${docker.upstream-tag}</DOCKER_UPSTREAM_TAG>
-										<GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
-										<PROJECT_VERSION>${project.version}</PROJECT_VERSION>
-									</buildArgs>
-									<skip>${docker.skip-build}</skip>
-									<tag>${docker.tag}</tag>
-									<repository>${docker.registry}confluentinc/${project.artifactId}</repository>
-									<pullNewerImage>false</pullNewerImage>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>${dockerfile-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>package</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <buildArgs>
+                                        <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                        <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
+                                        <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                                        <DOCKER_TAG>${docker.tag}</DOCKER_TAG>
+                                        <DOCKER_UPSTREAM_REGISTRY>${docker.upstream-registry}</DOCKER_UPSTREAM_REGISTRY>
+                                        <DOCKER_UPSTREAM_TAG>${docker.upstream-tag}</DOCKER_UPSTREAM_TAG>
+                                        <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                        <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                    </buildArgs>
+                                    <skip>${docker.skip-build}</skip>
+                                    <tag>${docker.tag}</tag>
+                                    <repository>${docker.registry}confluentinc/${project.artifactId}</repository>
+                                    <pullNewerImage>false</pullNewerImage>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
