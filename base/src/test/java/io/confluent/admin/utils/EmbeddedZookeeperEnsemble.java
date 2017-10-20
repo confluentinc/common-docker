@@ -75,9 +75,10 @@ public class EmbeddedZookeeperEnsemble {
       int portLE = basePort++;
 
       peers.put(Long.valueOf(i), new QuorumPeer.QuorumServer(
-          Long.valueOf(i),
-          new InetSocketAddress(LOCAL_ADDR, port + 1000),
-          new InetSocketAddress(LOCAL_ADDR, portLE + 1000),
+          Long.valueOf(i).longValue(),
+          LOCAL_ADDR,
+          port + 1000,
+          portLE + 1000,
           QuorumPeer.LearnerType.PARTICIPANT
       ));
     }
