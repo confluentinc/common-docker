@@ -62,7 +62,7 @@
         <mockito-all.version>1.10.19</mockito-all.version>
         <os-maven-plugin.version>1.5.0.Final</os-maven-plugin.version>
         <!-- Using beta for Java 9 support -->
-        <powermock.version>2.0.0-beta5</powermock.version>
+        <powermock.version>2.0.0-beta.5</powermock.version>
         <slf4j.version>1.7.25</slf4j.version>
         <zkclient.version>0.10</zkclient.version>
         <zookeeper.version>3.4.10</zookeeper.version>
