@@ -34,6 +34,9 @@ LABEL io.confluent.docker=true
 # base image that supports it
 ENV LANG="C.UTF-8"
 
+# Set the classpath for JARs required by `cub`
+ENV CUB_CLASSPATH='"/usr/share/java/cp-base/*"'
+
 COPY requirements.txt .
 
 RUN apt update \
