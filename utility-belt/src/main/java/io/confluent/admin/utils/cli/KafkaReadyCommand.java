@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Confluent Inc.
+ * Copyright 2017 Confluent Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,14 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  * accept
  * requests.
  * where:
- * <config>                 : path to properties with client config.
- * <min-expected-brokers>   : minimum brokers to wait for.
- * <timeout>                : timeout in ms for all operations. This includes looking up metadata in
+ * config                 : path to properties with client config.
+ * min-expected-brokers   : minimum brokers to wait for.
+ * timeout                : timeout in ms for all operations. This includes looking up metadata in
  * Zookeeper or fetching metadata for the brokers.
- * (<bootstrap-brokers>
+ * (bootstrap-brokers
  * or
- * <zookeeper-connect>)     : Either a bootstrap broker list or zookeeper connect string
- * <security-protocol>      : Security protocol to use to connect to the broker.
+ * zookeeper-connect)     : Either a bootstrap broker list or zookeeper connect string
+ * security-protocol      : Security protocol to use to connect to the broker.
  */
 public class KafkaReadyCommand {
 
@@ -112,8 +112,8 @@ public class KafkaReadyCommand {
 
       Map<String, String> workerProps = new HashMap<>();
 
-      if (res.getString("config") == null &&
-          !(res.getString("security_protocol").equals("PLAINTEXT"))) {
+      if (res.getString("config") == null
+          && !(res.getString("security_protocol").equals("PLAINTEXT"))) {
         log.error("config is required for all protocols except PLAINTEXT");
         success = false;
       } else {
@@ -139,8 +139,8 @@ public class KafkaReadyCommand {
           String bootstrapBroker = endpoints.get(res.getString("security_protocol"));
           if (bootstrapBroker == null) {
             throw new RuntimeException(
-                "No endpoints found for security protocol [" +
-                res.getString("security_protocol")
+                "No endpoints found for security protocol ["
+                + res.getString("security_protocol")
                 + "]. Endpoints found in ZK [" + endpoints + "]"
             );
           }
