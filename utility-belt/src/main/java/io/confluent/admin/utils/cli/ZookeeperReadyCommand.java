@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Confluent Inc.
+ * Copyright 2017 Confluent Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
 /**
  * This command checks if the zookeeper cluster is ready to accept requests.
  * where:
- * <zookeeper_connect>  : Zookeeper connect string
- * <timeout>            : timeout in millisecs for all operations.
+ * zookeeper_connect  : Zookeeper connect string
+ * timeout            : timeout in millisecs for all operations.
  */
 public class ZookeeperReadyCommand {
 

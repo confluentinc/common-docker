@@ -1,6 +1,7 @@
 /**
- * Copyright 2016-2017 Confluent Inc.
+ * Copyright 2017 Confluent Inc.
  */
+
 package io.confluent.kafkaensure.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,9 +26,9 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
 /**
  * This command ensures that a topic exists and has valid config.
  * where:
- * <config>                 : path to properties with client config.
- * <file>                   : file with topic spec.
- * <timeout>                : timeout in ms for all operations.
+ * config                 : path to properties with client config.
+ * file                   : file with topic spec.
+ * timeout                : timeout in ms for all operations.
  */
 public class TopicEnsureCommand {
 
@@ -80,7 +81,10 @@ public class TopicEnsureCommand {
 
       TopicEnsure topicEnsure = new TopicEnsure(Utils.loadProps(res.getString("config")));
       ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-      TopicSpec.Topics topics = mapper.readValue(new File(res.getString("file")), TopicSpec.Topics.class);
+      TopicSpec.Topics topics = mapper.readValue(
+          new File(res.getString("file")), TopicSpec.Topics.class
+      );
+
       for (TopicSpec spec : topics.topics()) {
         success = topicEnsure.topicExists(spec, res.getInt("timeout"));
         System.err.printf("Topic [ %s ] exists ? %s\n", spec.name(), success);

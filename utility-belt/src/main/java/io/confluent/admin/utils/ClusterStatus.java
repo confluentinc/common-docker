@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Confluent Inc.
+ * Copyright 2017 Confluent Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -70,16 +69,16 @@ public class ClusterStatus {
 
       CountDownLatch waitForConnection = new CountDownLatch(1);
 
-      boolean isSASLEnabled = false;
+      boolean isSaslEnabled = false;
       if (System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG, null) != null) {
-        isSASLEnabled = true;
+        isSaslEnabled = true;
         log.info(
             "SASL is enabled. java.security.auth.login.config={}",
             System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG)
         );
       }
       ZookeeperConnectionWatcher connectionWatcher =
-          new ZookeeperConnectionWatcher(waitForConnection, isSASLEnabled);
+          new ZookeeperConnectionWatcher(waitForConnection, isSaslEnabled);
       zookeeper = new ZooKeeper(zkConnectString, timeoutMs, connectionWatcher);
 
       boolean timedOut = !waitForConnection.await(timeoutMs, TimeUnit.MILLISECONDS);
@@ -142,8 +141,8 @@ public class ClusterStatus {
     Collection<Node> brokers = new ArrayList<>();
     while (remainingWaitMs > 0) {
 
-      // describeCluster does not wait for all brokers to be ready before returning the brokers. So, wait until
-      // expected brokers are present or the time out expires.
+      // describeCluster does not wait for all brokers to be ready before returning the brokers.
+      // So, wait until expected brokers are present or the time out expires.
       try {
         brokers = adminClient.describeCluster(new DescribeClusterOptions().timeoutMs(
                 (int) Math.min(Integer.MAX_VALUE, remainingWaitMs))).nodes().get();
@@ -368,12 +367,12 @@ public class ClusterStatus {
 
     CountDownLatch waitForConnection = new CountDownLatch(1);
     ZooKeeper zookeeper;
-    boolean isSASLEnabled = false;
+    boolean isSaslEnabled = false;
     if (System.getProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG, null) != null) {
-      isSASLEnabled = true;
+      isSaslEnabled = true;
     }
     ZookeeperConnectionWatcher connectionWatcher =
-        new ZookeeperConnectionWatcher(waitForConnection, isSASLEnabled);
+        new ZookeeperConnectionWatcher(waitForConnection, isSaslEnabled);
     int zkSessionTimeoutMs = timeoutMs;
     zookeeper = new ZooKeeper(zkConnectString, zkSessionTimeoutMs, connectionWatcher);
 

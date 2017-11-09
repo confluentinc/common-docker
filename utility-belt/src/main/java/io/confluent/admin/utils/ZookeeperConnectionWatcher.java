@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Confluent Inc.
+ * Copyright 2017 Confluent Inc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Waits for SyncConnected. When SASL is enabled, waits for both SyncConnected and
  * SaslAuthenticated events.
- * <p>
  * In case of an AuthFailed event, isSuccessful is set to false. This should be verified in the
  * code using this class and failure message should be logged.
  */
@@ -33,11 +32,11 @@ public class ZookeeperConnectionWatcher implements Watcher {
   private CountDownLatch connectSignal;
   private boolean isSuccessful = true;
   private String failureMessage = null;
-  private boolean isSASLEnabled = false;
+  private boolean isSaslEnabled = false;
 
-  public ZookeeperConnectionWatcher(CountDownLatch connectSignal, boolean isSASLEnabled) {
+  public ZookeeperConnectionWatcher(CountDownLatch connectSignal, boolean isSaslEnabled) {
     this.connectSignal = connectSignal;
-    this.isSASLEnabled = isSASLEnabled;
+    this.isSaslEnabled = isSaslEnabled;
   }
 
   public boolean isSuccessful() {
@@ -54,7 +53,7 @@ public class ZookeeperConnectionWatcher implements Watcher {
       switch (event.getState()) {
         case SyncConnected:
           // If SASL is enabled, we want to wait for the SaslAuthenticated event.
-          if (!isSASLEnabled) {
+          if (!isSaslEnabled) {
             connectSignal.countDown();
           }
           break;
@@ -75,6 +74,8 @@ public class ZookeeperConnectionWatcher implements Watcher {
           break;
         case SaslAuthenticated:
           connectSignal.countDown();
+          break;
+        default:
           break;
       }
     }
