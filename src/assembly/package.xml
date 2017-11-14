@@ -44,9 +44,9 @@
                  dependencies happen to be missing in the assembly you may want to
                  disable transitive filtering. -->
             <useTransitiveFiltering>true</useTransitiveFiltering>
-            <excludes>
+            <!-- <excludes>
                 <exclude>com.google.guava:guava</exclude>
-            </excludes>
+            </excludes> -->
         </dependencySet>
     </dependencySets>
 </assembly>
