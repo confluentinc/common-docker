@@ -50,7 +50,7 @@
         <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
         <junit.version>4.12</junit.version>
-        <kafka.version>0.11.0.2-SNAPSHOT</kafka.version>
+        <kafka.version>0.11.0.3-SNAPSHOT</kafka.version>
         <kafka.scala.version>2.11</kafka.scala.version>
         <maven-assembly.version>2.6</maven-assembly.version>
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
