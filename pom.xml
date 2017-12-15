@@ -132,17 +132,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>target/dependency/assembly-plugin-boilerplate-${project.version}/package.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <mainClass>${main-class}</mainClass>
-                                </manifest>
-                            </archive>
-                            <attach>false</attach>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>make-assembly</id>
@@ -150,6 +139,17 @@
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>target/dependency/assembly-plugin-boilerplate-${project.version}/package.xml</descriptor>
+                                    </descriptors>
+                                    <archive>
+                                        <manifest>
+                                            <mainClass>${main-class}</mainClass>
+                                        </manifest>
+                                    </archive>
+                                    <attach>false</attach>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
