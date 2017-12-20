@@ -29,10 +29,10 @@ import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 public class TopicEnsure {
 
@@ -70,11 +70,10 @@ public class TopicEnsure {
     Config config = resultMap.get(configResource);
 
     // Create actual TopicSpec.
-    Map<String, String> actualConfig = spec.config().entrySet().stream()
-        .collect(Collectors.toMap(
-            e -> e.getKey(),
-            e -> config.get(e.getKey()).value()
-        ));
+    Map<String, String> actualConfig = new HashMap<>();
+    for (Map.Entry<String, String> entry : spec.config().entrySet()) {
+      actualConfig.put(entry.getKey(), config.get(entry.getKey()).value());
+    }
 
     TopicSpec actualSpec = new TopicSpec(
         topic.name(), topic.partitions().size(),
