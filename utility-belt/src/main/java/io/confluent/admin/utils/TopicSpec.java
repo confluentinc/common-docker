@@ -87,6 +87,10 @@ public class TopicSpec {
         && Objects.equals(config, topicSpec.config);
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, partitions, replicationFactor, config);
+  }
 
   @Override
   public String toString() {
