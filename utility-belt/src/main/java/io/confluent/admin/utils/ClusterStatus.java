@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -203,7 +204,8 @@ public class ClusterStatus {
       List<String> brokerMetadata = new ArrayList<>();
       for (String broker : brokers) {
         String brokerIdPath = String.format("%s/%s", BROKERS_IDS_PATH, broker);
-        brokerMetadata.add(new String(zookeeper.getData(brokerIdPath, false, null)));
+        byte[] brokerIdBytes = zookeeper.getData(brokerIdPath, false, null);
+        brokerMetadata.add(new String(brokerIdBytes, StandardCharsets.UTF_8));
       }
       return brokerMetadata;
     } finally {
