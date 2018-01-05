@@ -86,7 +86,7 @@
             <id>docker</id>
             <activation>
                 <property>
-                    <name>env.BUILD_NUMBER</name>
+                    <name>env.DOCKER_HOST</name>
                 </property>
             </activation>
 
