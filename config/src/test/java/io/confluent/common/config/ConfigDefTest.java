@@ -33,6 +33,7 @@ package io.confluent.common.config;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -65,7 +66,9 @@ public class ConfigDefTest {
         .define("g", BOOLEAN, ConfigDef.Importance.HIGH, "docs")
         .define("h", Type.BOOLEAN, ConfigDef.Importance.HIGH, "docs")
         .define("i", Type.BOOLEAN, ConfigDef.Importance.HIGH, "docs")
-        .define("j", Type.PASSWORD, ConfigDef.Importance.HIGH, "docs");
+        .define("j", Type.PASSWORD, ConfigDef.Importance.HIGH, "docs")
+        .define("k", Type.MAP, ConfigDef.Importance.HIGH, "docs")
+        .define("l", Type.MAP, ConfigDef.Importance.HIGH, "docs");
 
     Properties props = new Properties();
     props.put("a", "1   ");
@@ -77,6 +80,8 @@ public class ConfigDefTest {
     props.put("h", "FalSE");
     props.put("i", "TRUE");
     props.put("j", "password");
+    props.put("k", "k1:v1,k2:v2");
+    props.put("l", "k1:v1");
 
     Map<String, Object> vals = def.parse(props);
     assertEquals(1, vals.get("a"));
@@ -89,6 +94,19 @@ public class ConfigDefTest {
     assertEquals(false, vals.get("h"));
     assertEquals(true, vals.get("i"));
     assertEquals(new Password("password"), vals.get("j"));
+    Map expectedMap = new HashMap(){
+      {
+        put("k1","v1");
+        put("k2","v2");
+      }
+    };
+    assertEquals(expectedMap, vals.get("k"));
+    expectedMap = new HashMap(){
+      {
+        put("k1","v1");
+      }
+    };
+    assertEquals(expectedMap, vals.get("l"));
   }
 
   @Test
@@ -161,6 +179,7 @@ public class ConfigDefTest {
     testBadInputs(Type.STRING, new Object());
     testBadInputs(Type.LIST, 53, new Object());
     testBadInputs(Type.BOOLEAN, "hello", "truee", "fals");
+    testBadInputs(Type.MAP, "test", new Object());
   }
 
   private void testBadInputs(Type type, Object... values) {
