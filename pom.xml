@@ -315,7 +315,7 @@
             <version>${confluent.version}</version>
             <classifier>resources</classifier>
             <type>zip</type>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -712,6 +712,7 @@
                                     <goal>single</goal>
                                 </goals>
                                 <configuration>
+                                    <skipAssembly>${docker.skip-build}</skipAssembly>
                                     <descriptors>
                                         <descriptor>target/dependency/assembly-plugin-boilerplate-${project.version}/common-docker-package.xml</descriptor>
                                     </descriptors>
