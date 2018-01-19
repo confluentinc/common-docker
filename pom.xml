@@ -61,7 +61,7 @@
             <version>${confluent.version}</version>
             <classifier>resources</classifier>
             <type>zip</type>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
