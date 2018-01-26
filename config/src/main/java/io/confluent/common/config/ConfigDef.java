@@ -361,7 +361,11 @@ public class ConfigDef {
           if (value instanceof Class) {
             return (Class<?>) value;
           } else if (value instanceof String) {
-            return Class.forName(trimmed);
+            if (Thread.currentThread().getContextClassLoader() != null) {
+              return Class.forName(trimmed, true, Thread.currentThread().getContextClassLoader());
+            } else {
+              return Class.forName(trimmed);
+            }
           } else {
             throw new ConfigException(name, value, "Expected a Class instance or class name.");
           }
