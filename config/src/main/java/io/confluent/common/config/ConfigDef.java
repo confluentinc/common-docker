@@ -70,7 +70,15 @@ public class ConfigDef {
 
   private static final Object NO_DEFAULT_VALUE = new Object();
 
-  private final Map<String, ConfigKey> configKeys = new HashMap<String, ConfigKey>();
+  private final Map<String, ConfigKey> configKeys;
+
+  public ConfigDef() {
+    configKeys = new HashMap<>();
+  }
+
+  public ConfigDef(ConfigDef baseConfigDef) {
+    configKeys = new HashMap<>(baseConfigDef.configKeys);
+  }
 
   /**
    * Returns unmodifiable set of properties names defined in this {@linkplain ConfigDef}

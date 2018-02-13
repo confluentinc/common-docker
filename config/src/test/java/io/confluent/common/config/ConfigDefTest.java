@@ -52,9 +52,38 @@ import static io.confluent.common.config.ConfigDef.Type.LONG;
 import static io.confluent.common.config.ConfigDef.Type.STRING;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 public class ConfigDefTest {
+
+  @Test
+  public void testCopyConstructor() {
+    ConfigDef original = new ConfigDef().define("a", INT, ConfigDef.Importance.LOW, "docs")
+        .define("b", STRING, ConfigDef.Importance.HIGH, "docs");
+
+    ConfigDef copy = new ConfigDef(original);
+
+    Properties props = new Properties();
+    props.put("a", "5");
+    props.put("b", "foo");
+    props.put("c", "true");
+
+    // Ensure the copied ConfigDef contains all the definitions of the original
+    Map<String, Object> originalParsedProps = original.parse(props);
+    Map<String, Object> copyParsedProps = copy.parse(props);
+    assertEquals(originalParsedProps, copyParsedProps);
+    assertFalse(copyParsedProps.containsKey("c"));
+
+    copy.define("c", BOOLEAN, ConfigDef.Importance.MEDIUM, "docs");
+
+    // Ensure that mutating the copied ConfigDef doesn't also mutate the original
+    originalParsedProps = original.parse(props);
+    copyParsedProps = copy.parse(props);
+    assertNotEquals(originalParsedProps, copyParsedProps);
+    assertEquals(true, copyParsedProps.get("c"));
+  }
 
   @Test
   public void testBasicTypes() {
