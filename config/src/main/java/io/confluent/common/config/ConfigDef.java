@@ -68,7 +68,7 @@ import io.confluent.common.config.types.Password;
  */
 public class ConfigDef {
 
-  private static final Object NO_DEFAULT_VALUE = new Object();
+  protected static final Object NO_DEFAULT_VALUE = new Object();
 
   private final Map<String, ConfigKey> configKeys;
 
