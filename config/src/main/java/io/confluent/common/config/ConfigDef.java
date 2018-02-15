@@ -76,8 +76,8 @@ public class ConfigDef {
     configKeys = new HashMap<>();
   }
 
-  public ConfigDef(ConfigDef baseConfigDef) {
-    configKeys = new HashMap<>(baseConfigDef.configKeys);
+  public ConfigDef(ConfigDef configDef) {
+    configKeys = new HashMap<>(configDef.configKeys);
   }
 
   /**
