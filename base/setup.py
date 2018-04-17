@@ -1,11 +1,7 @@
-#!/usr/bin/env python
+from setuptools import setup
 
-from pip.req import parse_requirements
-import setuptools
 
-remote_requirements = '\n'.join(str(r.req) for r in parse_requirements("requirements.txt", session='dummy') if r.req)
-
-setuptools.setup(
+setup(
     name='common-tests',
     version='4.1.0',
 
@@ -15,7 +11,7 @@ setuptools.setup(
 
     url="https://github.com/confluentinc/common",
 
-    install_requires=remote_requirements,
+    dependency_links=open('requirements.txt').read().split("\n"),
 
     packages=['test'],
 
