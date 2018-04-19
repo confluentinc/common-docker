@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-
-from pip.req import parse_requirements
 import setuptools
 
-remote_requirements = '\n'.join(str(r.req) for r in parse_requirements("requirements.txt", session='dummy') if r.req)
 
 setuptools.setup(
     name='common-docker-tests',
@@ -15,7 +11,7 @@ setuptools.setup(
 
     url="https://github.com/confluentinc/common-docker",
 
-    install_requires=remote_requirements,
+    dependency_links=open('requirements.txt').read().split("\n"),
 
     packages=['test'],
 
