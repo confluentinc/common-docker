@@ -53,7 +53,7 @@
         <licenses.version>${project.version}</licenses.version>
         <slf4j-api.version>${slf4j.version}</slf4j-api.version>
     </properties>
-
+ 
     <dependencies>
         <dependency>
             <groupId>io.confluent</groupId>
