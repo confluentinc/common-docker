@@ -6,7 +6,7 @@ docker_oraclejdk8 {
     upstreamProjects = ['kafka-trunk', 'confluentinc/confluent-docker-utils']
     dockerRegistry = '368821881613.dkr.ecr.us-west-2.amazonaws.com/'
     dockerRepos = ['confluentinc/cp-base']
-    slackChannel = '#clients-eng'
+    slackChannel = '#kafka-core-eng'
     nodeLabel = 'docker-oraclejdk7'
     dockerPush = true
 }
