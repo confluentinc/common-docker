@@ -427,6 +427,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>${maven-project-info-reports-plugin.version}</version>
+                    <configuration>
+                        <!-- 
+                        Disable dependency locations for latest maven-plugin-info-reports to eliminate blacklisting
+                        warnings: "The repository url '...' is invalid - Repository '...' will be blacklisted."
+                        -->
+                        <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
