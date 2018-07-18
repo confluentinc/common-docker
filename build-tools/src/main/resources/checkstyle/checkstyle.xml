@@ -221,6 +221,12 @@
         <module name="JavaNCSS" />
         <module name="NPathComplexity"/>
 
+        <module name="HideUtilityClassConstructor">
+            <property name="severity"
+                      value="${checkstyle.hideutilityclassconstructor.severity}"
+                      default="ignore"/>
+        </module>
+
         <module name="RedundantModifier">
             <property name="severity"
                       value="${checkstyle.redundantmodifier.severity}"
