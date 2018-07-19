@@ -221,6 +221,12 @@
         <module name="JavaNCSS" />
         <module name="NPathComplexity"/>
 
+        <module name="FinalParameters">
+            <property name="severity"
+                      value="${checkstyle.finalparameters.severity}"
+                      default="ignore"/>
+        </module>
+
         <module name="FinalLocalVariable">
             <property name="severity"
                       value="${checkstyle.finallocalvariable.severity}"
@@ -232,19 +238,19 @@
                       value="${checkstyle.finalclass.severity}"
                       default="ignore"/>
         </module>
-      
+
         <module name="HideUtilityClassConstructor">
             <property name="severity"
                       value="${checkstyle.hideutilityclassconstructor.severity}"
                       default="ignore"/>
         </module>
-        
+
         <module name="RedundantModifier">
             <property name="severity"
                       value="${checkstyle.redundantmodifier.severity}"
                       default="ignore"/>
         </module>
-      
+
         <module name="RedundantImport">
             <property name="severity"
                       value="${checkstyle.redundantimport.severity}"
