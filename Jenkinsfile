@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-common {
+dockerfile {
     dockerPush = true
     dockerRepos = ['confluentinc/cp-base']
     nodeLabel = 'docker-oraclejdk7'
