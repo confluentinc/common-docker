@@ -7,7 +7,7 @@ import confluent.docker_utils as utils
 class BaseImageTest(unittest.TestCase):
 
     def setUp(self):
-        self.image = "{0}confluentinc/cp-base:{1}".format(os.environ["DOCKER_REGISTRY"], os.environ["DOCKER_TAG"])
+        self.image = "{0}confluentinc/cp-base-new:{1}".format(os.environ["DOCKER_REGISTRY"], os.environ["DOCKER_TAG"])
 
     def test_image_build(self):
         self.assertTrue(utils.image_exists(self.image))
