@@ -15,6 +15,10 @@
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
-    <description>(Deprecated) Common POM with Docker image support</description>
+    <description>Common Docker utilities, and new cp-base image</description>
 
+    <modules>
+        <module>utility-belt</module>
+        <module>base</module>
+    </modules>
 </project>
