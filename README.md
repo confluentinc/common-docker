@@ -1,3 +1,3 @@
-# Confluent Commons + Docker
+# Common Docker Utilities
 
-Deprecated. Just use common!
+See [base image](./base/README.md), [utility belt](./utility-belt/README.md)
