@@ -28,7 +28,7 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base</artifactId>
+    <artifactId>cp-base-new</artifactId>
 
     <description>Base for Confluent Docker images</description>
     <name>${project.artifactId}</name>
