@@ -2,8 +2,7 @@
 
 dockerfile {
     dockerPush = true
-    dockerRepos = ['confluentinc/cp-base']
-    nodeLabel = 'docker-oraclejdk8'
+    dockerRepos = ['confluentinc/cp-base-new']
     slackChannel = '#tools-eng'
     upstreamProjects = ['confluentinc/confluent-docker-utils', 'confluentinc/common']
 }
