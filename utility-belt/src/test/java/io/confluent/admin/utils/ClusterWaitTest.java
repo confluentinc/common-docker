@@ -87,7 +87,7 @@ public class ClusterWaitTest {
       config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaWait.getBootstrapBroker
           (SecurityProtocol.PLAINTEXT));
 
-      assertThat(ClusterStatus.isKafkaReady(config, 3, 10000))
+      assertThat(ClusterStatus.isKafkaReady(config, 3, 20000))
           .isTrue();
     } catch (Exception e) {
       e.printStackTrace();
@@ -139,7 +139,7 @@ public class ClusterWaitTest {
       Map<String, String> config = new HashMap<>();
       config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrap_broker);
 
-      assertThat(ClusterStatus.isKafkaReady(config, 3, 10000))
+      assertThat(ClusterStatus.isKafkaReady(config, 3, 20000))
           .isTrue();
     } catch (Exception e) {
       fail("Unexpected error." + e.getMessage());
