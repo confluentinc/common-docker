@@ -35,7 +35,7 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 
 # Set the classpath for JARs required by `cub`
-ENV CUB_CLASSPATH='"/usr/share/java/cp-base/*"'
+ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 COPY requirements.txt .
 
