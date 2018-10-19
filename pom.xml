@@ -52,16 +52,16 @@
         <easymock.version>3.6</easymock.version>
         <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
         <spotbugs.version>3.1.7</spotbugs.version>
-        <spotbugs.maven.plugin.version>3.1.6</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version>3.1.7</spotbugs.maven.plugin.version>
         <java.version>8</java.version>
         <jackson.version>2.9.6</jackson.version>
-        <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
         <junit.version>4.12</junit.version>
         <kafka.version>2.2.0-SNAPSHOT</kafka.version>
         <kafka.scala.version>2.11</kafka.scala.version>
         <licenses.version>${project.version}</licenses.version>
         <maven-assembly.version>3.0.0</maven-assembly.version>
-        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <maven-deploy.version>2.8.2</maven-deploy.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
@@ -100,7 +100,7 @@
         <docker.upstream-tag>${docker.tag}</docker.upstream-tag>  <!-- Tag for base images -->
         <docker.test-registry>${docker.upstream-registry}</docker.test-registry>  <!-- Registry for integration test dependencies -->
         <docker.test-tag>${docker.upstream-tag}</docker.test-tag>  <!-- Tag for integration test dependencies -->
-        <dockerfile-maven-plugin.version>1.4.0</dockerfile-maven-plugin.version>
+        <dockerfile-maven-plugin.version>1.4.7</dockerfile-maven-plugin.version>
     </properties>
 
     <scm>
@@ -831,21 +831,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                        <dependencies>
-                            <!-- required to run the plugin with JDK 10 -->
-                            <dependency>
-                                <groupId>javax.activation</groupId>
-                                <artifactId>activation</artifactId>
-                                <version>1.1.1</version>
-                            </dependency>
-                            <!-- use latest client version to work with aws ecr get-login -->
-                            <dependency>
-                                <groupId>com.spotify</groupId>
-                                <artifactId>docker-client</artifactId>
-                                <classifier>shaded</classifier>
-                                <version>8.11.2</version>
-                            </dependency>
-                        </dependencies>
                     </plugin>
                 </plugins>
             </build>
