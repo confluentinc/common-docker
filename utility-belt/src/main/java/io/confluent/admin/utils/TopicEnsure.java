@@ -18,6 +18,7 @@ package io.confluent.kafkaensure;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.admin.CreateTopicsOptions;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.DescribeConfigsResult;
@@ -72,7 +73,10 @@ public class TopicEnsure {
     // Create actual TopicSpec.
     Map<String, String> actualConfig = new HashMap<>();
     for (Map.Entry<String, String> entry : spec.config().entrySet()) {
-      actualConfig.put(entry.getKey(), config.get(entry.getKey()).value());
+      ConfigEntry actualConfigEntry = config.get(entry.getKey());
+      if (actualConfigEntry != null) {
+        actualConfig.put(entry.getKey(), actualConfigEntry.value());
+      }
     }
 
     TopicSpec actualSpec = new TopicSpec(
@@ -83,7 +87,7 @@ public class TopicEnsure {
     boolean isTopicValid = actualSpec.equals(spec);
     if (!isTopicValid) {
       System.err.printf(
-          "Invalid topic [ %s ] ! Expected %s but got %s", spec.name(), spec, actualSpec
+          "Invalid topic [ %s ] ! Expected %s but got %s\n", spec.name(), spec, actualSpec
       );
     }
 
