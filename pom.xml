@@ -116,8 +116,6 @@
         <module>config</module>
         <module>utils</module>
         <module>package</module>
-        <module>utility-belt</module>
-        <module>base</module>
         <module>parent</module>
     </modules>
 
@@ -278,7 +276,7 @@
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito</artifactId>
+                <artifactId>powermock-api-mockito2</artifactId>
                 <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
