@@ -610,10 +610,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-              <groupId>org.owasp</groupId>
-              <artifactId>dependency-check-maven</artifactId>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -672,6 +668,10 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                      <groupId>org.owasp</groupId>
+                      <artifactId>dependency-check-maven</artifactId>
                     </plugin>
                 </plugins>
             </build>
