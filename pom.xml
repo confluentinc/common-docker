@@ -494,10 +494,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-              <groupId>org.owasp</groupId>
-              <artifactId>dependency-check-maven</artifactId>
-            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -575,6 +571,10 @@
                           <version>6.19</version>
                         </dependency>
                       </dependencies>
+                    </plugin>
+                    <plugin>
+                      <groupId>org.owasp</groupId>
+                      <artifactId>dependency-check-maven</artifactId>
                     </plugin>
                 </plugins>
             </build>
