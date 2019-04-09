@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-docker_oraclejdk8 {
+dockerfile {
     upstreamProjects = ['confluentinc/common']
     dockerRegistry = '368821881613.dkr.ecr.us-west-2.amazonaws.com/'
     dockerRepos = ['confluentinc/cp-base']
