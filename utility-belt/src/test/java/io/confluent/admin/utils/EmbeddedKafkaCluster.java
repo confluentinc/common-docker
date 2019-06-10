@@ -71,6 +71,8 @@ public class EmbeddedKafkaCluster {
   private static final boolean ENABLE_SSL = false;
   private static final int SSL_PORT = 0;
   private static final int SASL_SSL_PORT_BASE = 49092;
+  private static final int NUM_PARTITIONS = 1;
+  private static final short DEFAULT_REPLICATION_FACTOR = 1;
   private static Option<Properties> brokerSaslProperties = Option$.MODULE$.<Properties>empty();
   private static MiniKdc kdc;
   private static File trustStoreFile;
@@ -349,7 +351,9 @@ public class EmbeddedKafkaCluster {
             SASL_SSL_PORT_BASE + brokerId,
             Option.<String>empty(),
             1,
-            false
+            false,
+            NUM_PARTITIONS,
+            DEFAULT_REPLICATION_FACTOR
         );
 
     KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), new MockTime());
