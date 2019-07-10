@@ -435,11 +435,19 @@ public class ClusterStatus {
     }.getType();
     Map<String, Object> parsedBroker = gson.fromJson(broker, type);
 
+    Map<String, String> securityProtocolMap =
+        (Map<String, String>) parsedBroker.get("listener_security_protocol_map");
     for (String rawEndpoint : (List<String>) parsedBroker.get("endpoints")) {
       String[] protocolAddress = rawEndpoint.split("://");
 
       String protocol = protocolAddress[0];
       String address = protocolAddress[1];
+
+      // If the security protocol map is available, map the listener name to its protocol
+      if (securityProtocolMap != null) {
+        protocol = securityProtocolMap.get(protocol);
+      }
+
       endpointMap.put(protocol, address);
     }
     return endpointMap;
