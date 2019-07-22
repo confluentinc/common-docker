@@ -40,7 +40,7 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 COPY requirements.txt .
 
 RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
+    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
