@@ -52,7 +52,16 @@
         <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
         <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
         <findbugs-annotations.version>3.0.1</findbugs-annotations.version>
+        <!--
+         jackson artifacts have both an overall version, and potentially individual versions for artifacts that
+         rev hotfix versions independent of the overall version
+         -->
         <jackson.version>2.9.9</jackson.version>
+        <!-- The following property should default to jackson.version unless there's an independent hotfix version.
+        If so, then once the next version of jackson is released, it should get reset to the default -->
+        <!-- <jackson-databind.version>${jackson.version}</jackson-databind.version> -->
+        <jackson-databind.version>2.9.9.1</jackson-databind.version>
+
         <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
         <junit.version>4.12</junit.version>
         <kafka.version>1.1.2-SNAPSHOT</kafka.version>
@@ -169,6 +178,13 @@
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${findbugs-annotations.version}</version>
+            </dependency>
+
+            <!-- Jackson artifacts with individual versioning as necessary -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
             </dependency>
 
             <!-- Kafka Deps -->
