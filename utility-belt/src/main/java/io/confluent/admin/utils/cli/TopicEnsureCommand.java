@@ -68,6 +68,13 @@ public class TopicEnsureCommand {
         .setDefault(false)
         .help("Create topic if it does not exist.");
 
+    topicEnsure.addArgument("--validate-topic")
+            .action(store())
+            .type(Boolean.class)
+            .setDefault(true)
+            .required(false)
+            .help("Validate the topic configuration.");
+
     return topicEnsure;
   }
 
@@ -88,7 +95,7 @@ public class TopicEnsureCommand {
       for (TopicSpec spec : topics.topics()) {
         success = topicEnsure.topicExists(spec, res.getInt("timeout"));
         System.err.printf("Topic [ %s ] exists ? %s\n", spec.name(), success);
-        if (success) {
+        if (success && res.getBoolean("validate-topic")) {
           success = topicEnsure.validateTopic(spec, res.getInt("timeout"));
           System.err.printf("Topic spec [ %s ] valid ? %s\n", spec, success);
         } else if (res.getBoolean("create_if_not_exists")) {
