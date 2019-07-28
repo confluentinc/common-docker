@@ -69,6 +69,9 @@ public class EmbeddedZookeeperEnsemble {
   }
 
   private void initialize() throws IOException {
+    // org.apache.zookeeper.test.ClientBase relies on 4lw and the whitelist only contains `srvr`
+    // in ZooKeeper 3.5.3 and later (it was less restrictive in previous versions)
+    System.setProperty("zookeeper.4lw.commands.whitelist", "*");
     HashMap peers = new HashMap();
     for (int i = 0; i < numNodes; i++) {
 
@@ -119,6 +122,7 @@ public class EmbeddedZookeeperEnsemble {
       s.start();
     }
 
+    System.out.println("Checking ports " + hostPort);
     log.info("Checking ports " + hostPort);
 
     for (String hp : hostPort.split(",")) {
