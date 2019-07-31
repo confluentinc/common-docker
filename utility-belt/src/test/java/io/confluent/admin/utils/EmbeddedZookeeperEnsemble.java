@@ -122,7 +122,6 @@ public class EmbeddedZookeeperEnsemble {
       s.start();
     }
 
-    System.out.println("Checking ports " + hostPort);
     log.info("Checking ports " + hostPort);
 
     for (String hp : hostPort.split(",")) {
