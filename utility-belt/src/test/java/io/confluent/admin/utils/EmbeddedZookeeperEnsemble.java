@@ -16,6 +16,7 @@
 package io.confluent.admin.utils;
 
 import org.apache.zookeeper.client.FourLetterWordMain;
+import org.apache.zookeeper.common.X509Exception.SSLContextException;
 import org.apache.zookeeper.server.quorum.Election;
 import org.apache.zookeeper.server.quorum.QuorumPeer;
 import org.apache.zookeeper.test.ClientBase;
@@ -68,6 +69,9 @@ public class EmbeddedZookeeperEnsemble {
   }
 
   private void initialize() throws IOException {
+    // org.apache.zookeeper.test.ClientBase relies on 4lw and the whitelist only contains `srvr`
+    // in ZooKeeper 3.5.3 and later (it was less restrictive in previous versions)
+    System.setProperty("zookeeper.4lw.commands.whitelist", "*");
     HashMap peers = new HashMap();
     for (int i = 0; i < numNodes; i++) {
 
@@ -76,9 +80,8 @@ public class EmbeddedZookeeperEnsemble {
 
       peers.put(Long.valueOf(i), new QuorumPeer.QuorumServer(
           Long.valueOf(i).longValue(),
-          LOCAL_ADDR,
-          port + 1000,
-          portLE + 1000,
+          new InetSocketAddress(LOCAL_ADDR, port + 1000),
+          new InetSocketAddress(LOCAL_ADDR, portLE + 1000),
           QuorumPeer.LearnerType.PARTICIPANT
       ));
     }
@@ -132,7 +135,7 @@ public class EmbeddedZookeeperEnsemble {
       log.info(hp + " is accepting client connections");
       try {
         log.info(send4LW(hp, CONNECTION_TIMEOUT, "stat"));
-      } catch (TimeoutException e) {
+      } catch (TimeoutException | SSLContextException e) {
         log.error(e.getMessage(), e);
       }
 
@@ -142,12 +145,12 @@ public class EmbeddedZookeeperEnsemble {
     isRunning = true;
   }
 
-  public String send4LW(String hp, long timeout, String FourLW) throws TimeoutException {
+  public String send4LW(String hp, long timeout, String FourLW) throws TimeoutException, SSLContextException {
     long start = System.currentTimeMillis();
 
     while (true) {
       try {
-        HostPort e = (HostPort) parseHostPortList(hp).get(0);
+        HostPort e = parseHostPortList(hp).get(0);
         String result = FourLetterWordMain.send4LetterWord(e.host, e.port, FourLW);
         return result;
       } catch (IOException var7) {
