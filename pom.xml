@@ -19,6 +19,7 @@
 
     <modules>
         <module>utility-belt</module>
-        <module>base</module>
+        <!-- <module>base</module> -->
+        <module>base-ubi</module>
     </modules>
 </project>

@@ -13,20 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM azul/zulu-openjdk-debian:8
+FROM registry.access.redhat.com/ubi7:latest
 
+ENV COMPONENT=cp-ubi-base-new
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
-
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common"
-
 ARG COMMIT_ID=unknown
 LABEL io.confluent.docker.git.id=$COMMIT_ID
-
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
-
 LABEL maintainer="tools@confluent.io"
 LABEL io.confluent.docker=true
 
@@ -35,17 +32,24 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 
 # Set the classpath for JARs required by `cub`
-ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
+ENV CUB_CLASSPATH='"/usr/share/java/cp-ubi-base-new/*"'
 
 COPY requirements.txt .
 
-RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
+RUN echo "===> install yum packages ....." \
+    && yum update -y \
+    && yum install -y bash curl git nc python wget \
+                      python-setuptools rh-python36 gcc libffi-devel python-devel openssl-devel make \
+    && echo "===> Installing python packages ..."  \
+    && wget https://bootstrap.pypa.io/get-pip.py \
+    && python get-pip.py \
+    && pip install --upgrade setuptools \
     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-    && apt remove --purge -y git python-pip \
-    && apt autoremove -y \
-    && rm -rf /var/lib/apt/lists/*     \
-    && rm requirements.txt \
+    && yum remove -y git \
+    && yum clean all \
+    && rm -rf /tmp/* \
+    && rm -f requirements.txt \
+    && rm -f get-pip.py \
     && mkdir -p /etc/confluent/docker
 
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
