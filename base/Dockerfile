@@ -49,15 +49,6 @@ RUN microdnf install yum \
     && rm -f requirements.txt \
     && mkdir -p /etc/confluent/docker
 
-# RUN apt update \
-#     && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
-#     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-#     && apt remove --purge -y git python-pip \
-#     && apt autoremove -y \
-#     && rm -rf /var/lib/apt/lists/*     \
-#     && rm requirements.txt \
-#     && mkdir -p /etc/confluent/docker
-
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
