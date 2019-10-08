@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM centos:6.6
+FROM centos:6
 
 ARG COMMIT_ID=unknown
 LABEL io.confluent.docker.git.id=$COMMIT_ID
@@ -22,7 +22,9 @@ LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 LABEL io.confluent.docker=true
 
 # EPEL
-RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+RUN yum install -y wget
+RUN cd /tmp && wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+RUN rpm -ivh /tmp/epel-release-latest-6.noarch.rpm
 
 # kerberos
 RUN yum install -y krb5-server krb5-libs krb5-auth-dialog krb5-workstation
