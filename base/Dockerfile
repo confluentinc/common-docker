@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM azul/zulu-openjdk-debian:8
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -39,14 +39,24 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 COPY requirements.txt .
 
-RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
-    && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-    && apt remove --purge -y git python-pip \
-    && apt autoremove -y \
-    && rm -rf /var/lib/apt/lists/*     \
-    && rm requirements.txt \
+RUN microdnf install yum \
+    && yum update -y \
+    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make\
+    && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
+    && yum remove -y git \
+    && yum clean all \
+    && rm -rf /tmp/* \
+    && rm -f requirements.txt \
     && mkdir -p /etc/confluent/docker
+
+# RUN apt update \
+#     && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
+#     && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
+#     && apt remove --purge -y git python-pip \
+#     && apt autoremove -y \
+#     && rm -rf /var/lib/apt/lists/*     \
+#     && rm requirements.txt \
+#     && mkdir -p /etc/confluent/docker
 
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
