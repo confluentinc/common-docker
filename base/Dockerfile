@@ -38,17 +38,19 @@ ENV LANG="C.UTF-8"
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 # Zulu openJDK
-ENV ZULU_OPENJDK_VERSION="8-8.17.0.3"
+ENV ZULU_OPENJDK="zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz"
 
 COPY requirements.txt .
 
 RUN microdnf install yum \
-    && rpm --import https://confluent-packaging-tools.s3-us-west-2.amazonaws.com/RPM-GPG-KEY-azulsystems \
     && yum update -q -y \
-    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make \
-                    libX11 libXext libXi libXrender libXtst alsa-lib \
-    && rpm -i https://cdn.azul.com/zulu/bin/zulu8.40.0.25-ca-jdk8.0.222-linux.x86_64.rpm \
+    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make tar \
     && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
+    && mkdir -p /usr/lib/jvm \
+    && cd /usr/lib/jvm \
+    && curl -O https://cdn.azul.com/zulu/bin/ZULU_OPENJDK \
+    && tar -xzvf ZULU_OPENJDK \
+    && cd / \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
