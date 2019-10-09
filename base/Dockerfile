@@ -48,9 +48,40 @@ RUN microdnf install yum \
     && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && mkdir -p /usr/lib/jvm \
     && cd /usr/lib/jvm \
-    && curl -O https://cdn.azul.com/zulu/bin/ZULU_OPENJDK \
-    && tar -xzvf ZULU_OPENJDK \
+    && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK} \
+    && tar -xzvf ${ZULU_OPENJDK} \
     && cd / \
+    && echo "===> Adding confluent repository...${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}" && \
+    if [ "x${ALLOW_UNSIGNED}" = "xtrue" ]; then \
+        echo "===> GPG signatures are disabled for SNAPSHOT builds..." \
+        && printf "[Confluent.dist] \n\
+name=Confluent repository (dist) \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
+gpgcheck=0 \n\
+enabled=1 \n\
+\n\
+[Confluent] \n\
+name=Confluent repository \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
+gpgcheck=0 \n\
+enabled=1 " > /etc/yum.repos.d/confluent.repo; \
+    else \
+        echo "===> Using Confluent's archive.key..." \
+        && rpm --import ${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \
+        && printf "[Confluent.dist] \n\
+name=Confluent repository (dist) \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
+gpgcheck=1 \n\
+gpgkey=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \n\
+enabled=1 \n\
+\n\
+[Confluent] \n\
+name=Confluent repository \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
+gpgcheck=1 \n\
+gpgkey=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \n\
+enabled=1 " > /etc/yum.repos.d/confluent.repo; \
+    fi \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
