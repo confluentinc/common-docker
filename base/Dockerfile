@@ -58,7 +58,9 @@ RUN microdnf install yum \
     && cd /usr/lib/jvm \
     && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK} \
     && tar -xzvf ${ZULU_OPENJDK} \
+    && rm -rf ${ZULU_OPENJDK}.tar.gz \
     && cd / \
+    && ln -s /usr/lib/jvm/${ZULU_OPENJDK}/bin/java /usr/bin/java \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
