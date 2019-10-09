@@ -30,14 +30,6 @@ LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 LABEL maintainer="tools@confluent.io"
 LABEL io.confluent.docker=true
 
-# package args
-ARG CONFLUENT_VERSION
-ARG CONFLUENT_PACKAGES_REPO
-ARG CONFLUENT_PLATFORM_LABEL
-ARG CONFLUENT_DEB_VERSION
-ARG ALLOW_UNSIGNED
-ARG SCALA_VERSION
-
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
