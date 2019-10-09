@@ -38,7 +38,7 @@ ENV LANG="C.UTF-8"
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 # Zulu openJDK
-ENV ZULU_OPENJDK="zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz"
+ENV ZULU_OPENJDK="zulu8.40.0.25-ca-jdk8.0.222-linux_x64"
 
 COPY requirements.txt .
 
@@ -48,8 +48,8 @@ RUN microdnf install yum \
     && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && mkdir -p /usr/lib/jvm \
     && cd /usr/lib/jvm \
-    && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK} \
-    && tar -xzvf ${ZULU_OPENJDK} \
+    && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK}.tar.gz \
+    && tar -xzvf ${ZULU_OPENJDK}.tar.gz \
     && rm -rf ${ZULU_OPENJDK}.tar.gz \
     && cd / \
     && ln -s /usr/lib/jvm/${ZULU_OPENJDK}/bin/java /usr/bin/java \
