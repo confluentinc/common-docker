@@ -30,6 +30,14 @@ LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 LABEL maintainer="tools@confluent.io"
 LABEL io.confluent.docker=true
 
+# package args
+ARG CONFLUENT_VERSION
+ARG CONFLUENT_PACKAGES_REPO
+ARG CONFLUENT_PLATFORM_LABEL
+ARG CONFLUENT_DEB_VERSION
+ARG ALLOW_UNSIGNED
+ARG SCALA_VERSION
+
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
@@ -51,37 +59,6 @@ RUN microdnf install yum \
     && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK} \
     && tar -xzvf ${ZULU_OPENJDK} \
     && cd / \
-    && echo "===> Adding confluent repository...${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}" && \
-    if [ "x${ALLOW_UNSIGNED}" = "xtrue" ]; then \
-        echo "===> GPG signatures are disabled for SNAPSHOT builds..." \
-        && printf "[Confluent.dist] \n\
-name=Confluent repository (dist) \n\
-baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
-gpgcheck=0 \n\
-enabled=1 \n\
-\n\
-[Confluent] \n\
-name=Confluent repository \n\
-baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
-gpgcheck=0 \n\
-enabled=1 " > /etc/yum.repos.d/confluent.repo; \
-    else \
-        echo "===> Using Confluent's archive.key..." \
-        && rpm --import ${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \
-        && printf "[Confluent.dist] \n\
-name=Confluent repository (dist) \n\
-baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
-gpgcheck=1 \n\
-gpgkey=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \n\
-enabled=1 \n\
-\n\
-[Confluent] \n\
-name=Confluent repository \n\
-baseurl=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/ \n\
-gpgcheck=1 \n\
-gpgkey=${CONFLUENT_PACKAGES_REPO}/rpm/${CONFLUENT_MAJOR_VERSION}.${CONFLUENT_MINOR_VERSION}/archive.key \n\
-enabled=1 " > /etc/yum.repos.d/confluent.repo; \
-    fi \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
