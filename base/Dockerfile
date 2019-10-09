@@ -53,6 +53,8 @@ RUN microdnf install yum \
     && rm -rf ${ZULU_OPENJDK}.tar.gz \
     && cd / \
     && ln -s /usr/lib/jvm/${ZULU_OPENJDK}/bin/java /usr/bin/java \
+    && export JAVA_HOME=/usr/lib/jvm/${ZULU_OPENJDK} \
+    && export PATH=$JAVA_HOME/bin:$PATH \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
