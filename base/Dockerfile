@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM azul/zulu-openjdk-debian:8
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -27,7 +27,7 @@ LABEL io.confluent.docker.git.id=$COMMIT_ID
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
-MAINTAINER tools@confluent.io
+LABEL maintainer="tools@confluent.io"
 LABEL io.confluent.docker=true
 
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
@@ -37,15 +37,28 @@ ENV LANG="C.UTF-8"
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
+# Zulu openJDK
+ENV ZULU_OPENJDK="zulu8.40.0.25-ca-jdk8.0.222-linux_x64"
+
 COPY requirements.txt .
 
-RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 build-essential libssl-dev libffi-dev python-dev\
-    && pip install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-    && apt remove --purge -y git python-pip \
-    && apt autoremove -y \
-    && rm -rf /var/lib/apt/lists/*     \
-    && rm requirements.txt \
+RUN microdnf install yum \
+    && yum update -q -y \
+    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make tar \
+    && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
+    && mkdir -p /usr/lib/jvm \
+    && cd /usr/lib/jvm \
+    && curl -O https://cdn.azul.com/zulu/bin/${ZULU_OPENJDK}.tar.gz \
+    && tar -xzvf ${ZULU_OPENJDK}.tar.gz \
+    && rm -rf ${ZULU_OPENJDK}.tar.gz \
+    && cd / \
+    && ln -s /usr/lib/jvm/${ZULU_OPENJDK}/bin/java /usr/bin/java \
+    && export JAVA_HOME=/usr/lib/jvm/${ZULU_OPENJDK} \
+    && export PATH=$JAVA_HOME/bin:$PATH \
+    && yum remove -y git \
+    && yum clean all \
+    && rm -rf /tmp/* \
+    && rm -f requirements.txt \
     && mkdir -p /etc/confluent/docker
 
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
