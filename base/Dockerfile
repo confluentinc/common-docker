@@ -44,7 +44,7 @@ COPY requirements.txt .
 
 RUN microdnf install yum \
     && yum update -q -y \
-    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make tar \
+    && yum install -y git wget nc python3 gcc libffi-devel redhat-rpm-config python3-devel openssl-devel make tar procps \
     && pip3 install --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     && mkdir -p /usr/lib/jvm \
     && cd /usr/lib/jvm \
