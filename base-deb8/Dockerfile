@@ -89,4 +89,4 @@ RUN echo "===> Updating debian ....." \
 
 ENV CUB_CLASSPATH=/etc/confluent/docker/docker-utils.jar
 COPY include/etc/confluent/docker /etc/confluent/docker
-COPY target/docker-utils-${PROJECT_VERSION}-jar-with-dependencies.jar /etc/confluent/docker/docker-utils.jar
+COPY target/docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar /etc/confluent/docker/docker-utils.jar

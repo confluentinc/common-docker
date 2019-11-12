@@ -72,7 +72,7 @@
                                 <resource>
                                     <directory>${basedir}/../docker-utils/target</directory>
                                     <includes>
-                                        <include>docker-utils-${project.version}-jar-with-dependencies.jar</include>
+                                        <include>docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar</include>
                                     </includes>
                                 </resource>
                             </resources>

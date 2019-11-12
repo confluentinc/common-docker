@@ -47,7 +47,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven-assembly.version}</version>
                 <configuration>
-                    <finalName>docker-utils-${project.version}</finalName>
+                    <finalName>docker-utils-${CONFLUENT_VERSION}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
