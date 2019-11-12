@@ -34,6 +34,7 @@
     <name>${project.artifactId}</name>
 
     <properties>
+        <!-- change back to false when done testing -->
         <docker.skip-build>true</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
     </properties>
@@ -67,10 +68,13 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>include/etc/confluent/docker</outputDirectory>
+                            <outputDirectory>target</outputDirectory>
                             <resources>
                                 <resource>
-                                    <file>${basedir}/../docker-utils/target/docker-utils-jar-with-dependencies.jar</file>
+                                    <directory>${basedir}/../docker-utils/target</directory>
+                                    <includes>
+                                        <include>docker-utils-${project.version}-jar-with-dependencies.jar</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
