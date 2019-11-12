@@ -34,10 +34,11 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <docker.skip-build>false</docker.skip-build>
+        <docker.skip-build>true</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
     </properties>
 
+    <!-- not sure i need these dependencies-->
     <dependencies>
         <dependency>
             <groupId>io.confluent</groupId>
@@ -51,4 +52,31 @@
             <version>${slf4j-api.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>include/etc/confluent/docker</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <file>${basedir}/../docker-utils/target/docker-utils-jar-with-dependencies.jar</file>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
