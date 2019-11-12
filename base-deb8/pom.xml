@@ -34,8 +34,7 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <!-- change back to false when done testing -->
-        <docker.skip-build>true</docker.skip-build>
+        <docker.skip-build>false</docker.skip-build>
         <docker.skip-test>true</docker.skip-test>
     </properties>
 
