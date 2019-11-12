@@ -28,23 +28,12 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base</artifactId>
+    <artifactId>docker-utils</artifactId>
 
-    <description>Base for Confluent Docker images</description>
+    <description>Confluent docker utils</description>
     <name>${project.artifactId}</name>
 
-    <properties>
-        <docker.skip-build>false</docker.skip-build>
-        <docker.skip-test>true</docker.skip-test>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>utility-belt</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -52,7 +41,7 @@
         </dependency>
     </dependencies>
 
-<!--     <build>
+    <build>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -117,5 +106,5 @@
                 </executions>
             </plugin>
         </plugins>
-    </build> -->
+    </build>
 </project>
