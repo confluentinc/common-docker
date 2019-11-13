@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 
 dockerfile {
+    nodeLabel = 'docker-oraclejdk8-compose'
     dockerPush = true
     usePackages = true
     dockerRepos = ['confluentinc/cp-base-new', 'confluentinc/cp-base',
