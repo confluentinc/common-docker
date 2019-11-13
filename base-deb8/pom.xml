@@ -38,18 +38,17 @@
         <docker.skip-test>true</docker.skip-test>
     </properties>
 
-    <!-- not sure i need these dependencies-->
     <dependencies>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>utility-belt</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
