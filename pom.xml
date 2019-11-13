@@ -19,7 +19,9 @@
 
     <modules>
         <module>utility-belt</module>
+        <module>docker-utils</module>
         <module>base</module>
+        <module>base-deb8</module>
         <module>jmxterm</module>
         <module>kerberos</module>
     </modules>
