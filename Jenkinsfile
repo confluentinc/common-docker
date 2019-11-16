@@ -6,4 +6,5 @@ dockerfile {
       'confluentinc/cp-kerberos']
     slackChannel = '#tools-notifications'
     upstreamProjects = ['confluentinc/confluent-docker-utils', 'confluentinc/common']
+    mvnSkipDeploy = true
 }
