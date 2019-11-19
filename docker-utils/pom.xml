@@ -26,12 +26,28 @@
         <version>5.5.0-SNAPSHOT</version>
     </parent>
 
-    <packaging>jar</packaging>
+    <organization>
+        <name>Confluent, Inc.</name>
+        <url>http://confluent.io</url>
+    </organization>
+    <url>http://confluent.io</url>
+    <description>
+        Docker utilities for CP.
+    </description>
 
+    <groupId>io.confluent</groupId>
     <artifactId>docker-utils</artifactId>
+    <packaging>jar</packaging>
+    <name>docker-utils</name>
+    <version>${confluent.version}</version>
 
-    <description>Confluent docker utils</description>
-    <name>${project.artifactId}</name>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>
