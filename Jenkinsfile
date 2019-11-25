@@ -7,7 +7,6 @@ dockerfile {
     dockerRepos = ['confluentinc/cp-base-new', 'confluentinc/cp-base',
       'confluentinc/cp-jmxterm', 'confluentinc/cp-kerberos']
     slackChannel = '#tools-notifications'
-    upstreamProjects = ['confluentinc/confluent-docker-utils', 'confluentinc/common']
     mvnSkipDeploy = true
     cron = ''
 }
