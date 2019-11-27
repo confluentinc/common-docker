@@ -9,4 +9,5 @@ dockerfile {
     slackChannel = '#tools-notifications'
     upstreamProjects = ['confluentinc/confluent-docker-utils', 'confluentinc/common']
     mvnSkipDeploy = true
+    cron = ''
 }
