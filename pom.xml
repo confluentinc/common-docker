@@ -21,8 +21,16 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
-        <module>base-deb8</module>
+        <!-- Disabling these modules since they are not used right now -->
+        <!--
         <module>jmxterm</module>
         <module>kerberos</module>
+        -->
     </modules>
+
+    <properties>
+        <docker.os_type>deb8</docker.os_type>
+        <docker.file>Dockerfile.${docker.os_type}</docker.file>
+        <docker.tag>${project.version}-${docker.os_type}</docker.tag>
+    </properties>
 </project>
