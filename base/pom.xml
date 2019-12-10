@@ -58,4 +58,35 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+      <!-- This jar is only used by the deb8 base image and does not get added to the other images. -->
+      <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../docker-utils/target</directory>
+                                    <includes>
+                                        <include>docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,9 +1,0 @@
-commit be5c85e96ffeaed8e7ce8a490c97acd9a79a5e37
-Merge: 53ce9b2 9fd3d48
-Author: Arjun Satish <wicknicks@users.noreply.github.com>
-Date:   Mon Jan 29 12:59:17 2018 -0800
-
-    Merge pull request #99 from wicknicks/CC-1444
-    
-    CC-1444: Use current thread's classloader if available
-
