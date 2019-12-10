@@ -6,7 +6,6 @@ dockerfile {
     usePackages = true
     dockerRepos = ['confluentinc/cp-base-new']
     slackChannel = '#tools-notifications'
-    mvnSkipDeploy = true
     cron = ''
     cpImages = true
     osTypes = ['deb8', 'deb9', 'rhel8']
