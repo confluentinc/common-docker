@@ -406,6 +406,7 @@
                         <skipSystemScope>true</skipSystemScope>
                         <skipProvidedScope>true</skipProvidedScope>
                         <skipTestScope>true</skipTestScope>
+                        <format>xml</format>
                     </configuration>
                     <executions>
                         <execution>
