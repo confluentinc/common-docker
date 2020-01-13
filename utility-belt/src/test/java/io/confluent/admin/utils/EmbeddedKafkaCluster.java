@@ -64,13 +64,11 @@ public class EmbeddedKafkaCluster {
       (SecurityProtocol.PLAINTEXT);
   private static final boolean ENABLE_CONTROLLED_SHUTDOWN = true;
   private static final boolean ENABLE_DELETE_TOPIC = false;
-  private static final int BROKER_PORT_BASE = 39092;
   private static final boolean ENABLE_PLAINTEXT = true;
   private static final boolean ENABLE_SASL_PLAINTEXT = false;
   private static final int SASL_PLAINTEXT_PORT = 0;
   private static final boolean ENABLE_SSL = false;
   private static final int SSL_PORT = 0;
-  private static final int SASL_SSL_PORT_BASE = 49092;
   private static final int NUM_PARTITIONS = 1;
   private static final short DEFAULT_REPLICATION_FACTOR = 1;
   private static Option<Properties> brokerSaslProperties = Option$.MODULE$.<Properties>empty();
@@ -338,7 +336,7 @@ public class EmbeddedKafkaCluster {
             zkConnectString,
             ENABLE_CONTROLLED_SHUTDOWN,
             ENABLE_DELETE_TOPIC,
-            BROKER_PORT_BASE + brokerId,
+            0,
             INTER_BROKER_SECURITY_PROTOCOL,
             this.brokerTrustStoreFile,
             this.brokerSaslProperties,
@@ -348,7 +346,7 @@ public class EmbeddedKafkaCluster {
             ENABLE_SSL,
             SSL_PORT,
             this.enableSASLSSL,
-            SASL_SSL_PORT_BASE + brokerId,
+            0,
             Option.<String>empty(),
             1,
             false,
@@ -375,17 +373,7 @@ public class EmbeddedKafkaCluster {
   }
 
   public String getBootstrapBroker(SecurityProtocol securityProtocol) {
-
-    switch (securityProtocol) {
-      case PLAINTEXT:
-        // The first broker will always listen on this port.
-        return "localhost:" + BROKER_PORT_BASE;
-      case SASL_SSL:
-        // The first broker will always listen on this port.
-        return "localhost:" + SASL_SSL_PORT_BASE;
-      default:
-        throw new RuntimeException(securityProtocol.name() + " is not supported.");
-    }
+    return TestUtils.getBrokerListStrFromServers(JavaConversions.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
   }
 
   public boolean isRunning() {
