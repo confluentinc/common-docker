@@ -19,15 +19,20 @@ ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 
 # Remember where we came from
-LABEL io.confluent.docker.git.repo="confluentinc/common"
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
 
-ARG COMMIT_ID=unknown
-LABEL io.confluent.docker.git.id=$COMMIT_ID
+ARG GIT_COMMIT
+LABEL io.confluent.docker.git.id=$GIT_COMMIT
 
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
 LABEL maintainer="tools@confluent.io"
+LABEL vendor="Confluent"
+LABEL version=$GIT_COMMIT
+LABEL release=$PROJECT_VERSION
+LABEL name=$ARTIFACT_ID
+LABEL summary="Common base image for Confluent's Docker images."
 LABEL io.confluent.docker=true
 
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
