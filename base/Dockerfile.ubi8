@@ -67,5 +67,8 @@ ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/sha
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 
+RUN mkdir /licenses
+COPY license.txt /licenses
+
 USER appuser
 WORKDIR /home/appuser
