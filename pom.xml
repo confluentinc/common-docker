@@ -452,6 +452,8 @@
                         <skipProvidedScope>true</skipProvidedScope>
                         <skipTestScope>true</skipTestScope>
                         <format>xml</format>
+                        <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                        <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
                     </configuration>
                     <executions>
                         <execution>
