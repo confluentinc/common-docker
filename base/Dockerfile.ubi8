@@ -59,9 +59,9 @@ RUN microdnf install yum \
     && yum clean all \
     && rm -rf /tmp/* \
     && rm -f requirements.txt \
-    && mkdir -p /etc/confluent/docker \
+    && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
-    && chown appuser:appuser -R /etc/confluent/
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
