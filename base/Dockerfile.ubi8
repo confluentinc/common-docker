@@ -43,7 +43,7 @@ ENV LANG="C.UTF-8"
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 # Zulu openJDK
-ENV ZULU_OPENJDK="zulu-8-8.40.0.25"
+ENV ZULU_OPENJDK="zulu-11-11.37+17-1"
 
 COPY requirements.txt .
 
