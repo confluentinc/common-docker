@@ -56,7 +56,7 @@
         <spotbugs.maven.plugin.version>3.1.7</spotbugs.maven.plugin.version>
         <java.version>8</java.version>
         <jackson.version>2.9.10</jackson.version>
-        <jackson.bom.version>2.9.10.20200103</jackson.bom.version>
+        <jackson.bom.version>2.9.10.20200223</jackson.bom.version>
 
         <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
         <junit.version>4.12</junit.version>
