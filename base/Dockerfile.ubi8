@@ -45,6 +45,8 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 # Zulu openJDK
 ENV ZULU_OPENJDK="zulu-8-8.40.0.25"
 
+ENV PYTHON_VERSION="36-3.6.8"
+
 COPY requirements.txt .
 
 RUN microdnf install yum \
