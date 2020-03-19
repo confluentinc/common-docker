@@ -36,6 +36,7 @@
     <properties>
         <docker.skip-build>false</docker.skip-build>
         <docker.skip-test>false</docker.skip-test>
+        <docker.pull-image>true</docker.pull-image>
     </properties>
 
     <dependencies>
