@@ -11,3 +11,4 @@ dockerfile {
     cpImages = true
     osTypes = ['deb8', 'deb9', 'ubi8']
 }
+
