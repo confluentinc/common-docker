@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM azul/zulu-openjdk-debian:8
+FROM azul/zulu-openjdk-debian:8u242
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
