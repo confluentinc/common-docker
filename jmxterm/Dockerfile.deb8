@@ -27,4 +27,4 @@ LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
 WORKDIR /opt
 
-RUN wget http://downloads.sourceforge.net/project/cyclops-group/jmxterm/1.0-alpha-4/jmxterm-1.0-alpha-4-uber.jar -O /opt/jmxterm-1.0-alpha-4-uber.jar
+RUN curl -s -L "https://s3-us-west-2.amazonaws.com/confluent-packaging-tools/jmxterm-1.0-alpha-4-uber.jar" -o /opt/jmxterm-1.0-alpha-4-uber.jar

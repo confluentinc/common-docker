@@ -21,11 +21,8 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
-        <!-- Disabling these modules since they are not used right now -->
-        <!--
         <module>jmxterm</module>
-        <module>kerberos</module>
-        -->
+        <!-- <module>kerberos</module> -->
     </modules>
 
     <properties>
