@@ -28,7 +28,7 @@ LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 USER root
 WORKDIR /opt
 
-RUN curl -s -L "https://s3-us-west-2.amazonaws.com/confluent-packaging-tools/jmxterm-1.0-alpha-4-uber.jar" -o /opt/jmxterm-1.0-alpha-4-uber.jar
+RUN curl -s -L "https://s3-us-west-2.amazonaws.com/confluent-packaging-tools/jmxterm-1.0.1-uber.jar" -o /opt/jmxterm-1.0.1-uber.jar
 
 USER appuser
 WORKDIR /home/appuser
