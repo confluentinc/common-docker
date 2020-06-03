@@ -4,7 +4,7 @@ dockerfile {
     nodeLabel = 'docker-oraclejdk8-compose-swarm'
     dockerPush = true
     usePackages = true
-    dockerRepos = ['confluentinc/cp-base-new']
+    dockerRepos = ['confluentinc/cp-base-new', 'confluentinc/cp-jmxterm']
     slackChannel = '#tools-notifications'
     mvnSkipDeploy = true
     cron = ''
