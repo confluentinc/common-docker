@@ -26,7 +26,7 @@
     </modules>
 
     <properties>
-        <docker.os_type>deb8</docker.os_type>
+        <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${project.version}-${docker.os_type}</docker.tag>
     </properties>
