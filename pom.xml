@@ -53,7 +53,7 @@
         <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
         <findbugs-annotations.version>3.0.1</findbugs-annotations.version>
         <jackson.version>2.9.10</jackson.version>
-        <jackson.bom.version>2.9.10.20200223</jackson.bom.version>
+        <jackson.bom.version>2.9.10.20200621</jackson.bom.version>
 
         <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
         <junit.version>4.13</junit.version>
