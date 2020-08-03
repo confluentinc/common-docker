@@ -43,19 +43,20 @@ ENV LANG="C.UTF-8"
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 # Zulu openJDK
-ENV ZULU_OPENJDK="zulu-11-11.35+15-1"
+ENV ZULU_OPENJDK="zulu-11-11.99+0-1"
 
 ENV PYTHON_VERSION="36-3.6.8"
 
 COPY requirements.txt .
 
 RUN microdnf install yum \
-    && yum update -q -y \
+    && yum update -y \
     && yum install -y git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
     && alternatives --set python /usr/bin/python3 \
     && pip3 install --only-binary --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
-    && rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems \
-    && curl -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo \
+    # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachYumRepositoryRHEL-SLES-OracleLinuxSys.htm
+    && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
+    && yum -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum -y install ${ZULU_OPENJDK} \
     && yum remove -y git \
     && yum clean all \
