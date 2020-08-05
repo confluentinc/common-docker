@@ -53,7 +53,7 @@ RUN microdnf install yum \
     && yum update -y \
     && yum install -y git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
     && alternatives --set python /usr/bin/python3 \
-    && pip3 install --only-binary --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
+    && pip3 install --force-reinstall --only-binary --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachYumRepositoryRHEL-SLES-OracleLinuxSys.htm
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
