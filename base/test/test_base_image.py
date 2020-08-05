@@ -19,8 +19,8 @@ class BaseImageTest(unittest.TestCase):
     def test_cub_dub_runable(self):
         dub_cmd = "bash -c '/usr/local/bin/dub --help'"
         cub_cmd = "bash -c '/usr/local/bin/cub --help'"
-        self.assertTrue(b"Docker Utility Belt" in utils.run_docker_command(image=self.image, dub_cmd))
-        self.assertTrue(b"Confluent Platform Utility Belt." in utils.run_docker_command(image=self.image, cub_cmd))
+        self.assertTrue(b"Docker Utility Belt" in utils.run_docker_command(image=self.image, command=dub_cmd))
+        self.assertTrue(b"Confluent Platform Utility Belt." in utils.run_docker_command(image=self.image, command=cub_cmd))
 
 
 if __name__ == '__main__':
