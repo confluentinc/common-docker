@@ -74,9 +74,5 @@ COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 RUN mkdir /licenses
 COPY license.txt /licenses
 
-# This ensures these tools function
-RUN /usr/local/bin/dub --help
-RUN /usr/local/bin/cub --help
-
 USER appuser
 WORKDIR /home/appuser

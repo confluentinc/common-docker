@@ -41,7 +41,7 @@ COPY requirements.txt .
 
 RUN apt update \
     && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
-    && pip install --force-reinstall --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
+    && pip install --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*     \
@@ -52,7 +52,3 @@ ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY include/etc/confluent/docker /etc/confluent/docker
-
-# This ensures these tools function
-RUN /usr/local/bin/dub --help
-RUN /usr/local/bin/cub --help
