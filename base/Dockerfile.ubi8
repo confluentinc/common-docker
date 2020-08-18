@@ -51,7 +51,7 @@ COPY requirements.txt .
 
 RUN microdnf install yum \
     && yum update -y \
-    && yum install -y git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
+    && yum install -y openssl git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
     && alternatives --set python /usr/bin/python3 \
     && pip3 install --only-binary --install-option="--prefix=/usr/local" --upgrade -rrequirements.txt \
     # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachYumRepositoryRHEL-SLES-OracleLinuxSys.htm
