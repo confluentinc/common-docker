@@ -73,7 +73,7 @@ RUN echo "===> Updating debian ....." \
     && apt remove --purge -y git \
     && echo "Installing Zulu OpenJDK ${ZULU_OPENJDK_VERSION}" \
     # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachAPTRepositoryUbuntuOrDebianSys.htm
-    && apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 0x27BC0C8CB3D81623F59BDADCB1998361219BD9C9
+    && apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 0x27BC0C8CB3D81623F59BDADCB1998361219BD9C9 \
     && echo "deb http://repos.azulsystems.com/debian stable  main" >> /etc/apt/sources.list.d/zulu.list \
     && apt-get -qq update \
     && apt-get -y install zulu-${ZULU_OPENJDK_VERSION} \
