@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>6.1.0-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>utility-belt</artifactId>
-            <version>${project.version}</version>
+            <version>${io.confluent.common-docker.version}</version>
         </dependency>
 
         <dependency>
