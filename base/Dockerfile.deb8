@@ -68,7 +68,7 @@ RUN echo "===> Updating debian ....." \
                 netcat \
                 python=${PYTHON_VERSION} \
     && echo "===> Installing python packages ..."  \
-    && curl -fSL "https://bootstrap.pypa.io/get-pip.py" | python \
+    && curl -fSL "https://bootstrap.pypa.io/2.7/get-pip.py" | python \
     && pip install --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
     && apt remove --purge -y git \
     && echo "Installing Zulu OpenJDK ${ZULU_OPENJDK_VERSION}" \
