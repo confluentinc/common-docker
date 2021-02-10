@@ -54,7 +54,7 @@ RUN microdnf install yum \
     && yum install -y openssl git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade pip setuptools \
-    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@v0.0.42' \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@v0.0.43' \
     # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachYumRepositoryRHEL-SLES-OracleLinuxSys.htm
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
