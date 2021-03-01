@@ -74,7 +74,7 @@
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
         <maven-site-plugin.version>3.9.0</maven-site-plugin.version>
-        <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
+        <maven-project-info-reports-plugin.version>3.1.1</maven-project-info-reports-plugin.version>
         <mbknor-jackson-jsonschema.version>1.0.39</mbknor-jackson-jsonschema.version>
         <buildnumber-plugin.version>1.4</buildnumber-plugin.version>
         <mockito.version>2.23.0</mockito.version>
