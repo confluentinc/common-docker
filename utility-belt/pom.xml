@@ -103,7 +103,7 @@
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>${zookeeper.version}</version>
-            <type>test-jar</test>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
