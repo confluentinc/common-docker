@@ -42,7 +42,8 @@ COPY requirements.txt .
 RUN apt update \
     && apt install -y bash curl git wget netcat-openbsd python python-setuptools python-enum34 \
     && curl -fSL "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | python \
-    && pip install --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
+    && openssl s_client -connect files.pythonhosted.org:443 -showcerts | openssl x509 --text \
+    && pip install --trusted-host files.pythonhosted.org:443 --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*     \
