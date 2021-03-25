@@ -91,7 +91,7 @@ public class TopicEnsureCommand {
         System.err.printf("Topic [ %s ] exists ? %s\n", spec.name(), success);
         if (success) {
           success = topicEnsure.validateTopic(spec, res.getInt("timeout"));
-          if(!success) {
+          if (!success) {
             validationSuccess = false;
           }
           System.err.printf("Topic spec [ %s ] valid ? %s\n", spec, success);
