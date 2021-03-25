@@ -91,7 +91,9 @@ public class TopicEnsureCommand {
         System.err.printf("Topic [ %s ] exists ? %s\n", spec.name(), success);
         if (success) {
           success = topicEnsure.validateTopic(spec, res.getInt("timeout"));
-          if(!success) validationSuccess = false;
+          if(!success) {
+            validationSuccess = false;
+          }
           System.err.printf("Topic spec [ %s ] valid ? %s\n", spec, success);
         } else if (res.getBoolean("create_if_not_exists")) {
           success = topicEnsure.createTopic(spec, res.getInt("timeout"));
