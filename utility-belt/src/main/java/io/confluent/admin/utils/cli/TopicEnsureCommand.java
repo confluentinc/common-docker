@@ -75,6 +75,7 @@ public class TopicEnsureCommand {
 
     ArgumentParser parser = createArgsParser();
     boolean success = false;
+    boolean validationSuccess = false;
     try {
       Namespace res = parser.parseArgs(args);
       log.debug("Arguments {}. ", res);
@@ -90,6 +91,7 @@ public class TopicEnsureCommand {
         System.err.printf("Topic [ %s ] exists ? %s\n", spec.name(), success);
         if (success) {
           success = topicEnsure.validateTopic(spec, res.getInt("timeout"));
+          if(!success) validationSuccess = false;
           System.err.printf("Topic spec [ %s ] valid ? %s\n", spec, success);
         } else if (res.getBoolean("create_if_not_exists")) {
           success = topicEnsure.createTopic(spec, res.getInt("timeout"));
@@ -99,17 +101,17 @@ public class TopicEnsureCommand {
     } catch (ArgumentParserException e) {
       if (args.length == 0) {
         parser.printHelp();
-        success = true;
+        validationSuccess = true;
       } else {
         parser.handleError(e);
-        success = false;
+        validationSuccess = false;
       }
     } catch (Exception e) {
       log.error("Error while running topic-ensure {}.", e);
-      success = false;
+      validationSuccess = false;
     }
 
-    if (success) {
+    if (validationSuccess) {
       System.exit(0);
     } else {
       System.exit(1);
