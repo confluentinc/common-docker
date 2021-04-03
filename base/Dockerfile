@@ -41,6 +41,7 @@ COPY requirements.txt .
 
 RUN apt update \
     && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
+    && pip install --upgrade setuptools-git 'setuptools<51' 'pip<21' \
     && pip install --prefix /usr/local --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
