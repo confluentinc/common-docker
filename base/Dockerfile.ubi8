@@ -58,7 +58,7 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 
 RUN microdnf install yum \
     && rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems \
-    && curl -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo \
+    && curl -fSL -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo \
     && yum install -y \
         git \
         "openssl${OPENSSL_VERSION}" \
@@ -73,7 +73,7 @@ RUN microdnf install yum \
         "zulu-8${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
-    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}' \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}" \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
