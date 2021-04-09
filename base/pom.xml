@@ -98,7 +98,7 @@
                         <!-- Redhat Package Versions -->
                         <OPENSSL_VERSION>-1.1.1g-15.el8_3</OPENSSL_VERSION>
                         <WGET_VERSION>-1.19.5-10.el8</WGET_VERSION>
-                        <NETCAT_VERSION>-3.20-6.el8</NETCAT_VERSION>
+                        <NETCAT_VERSION>-2:7.70-5.el8</NETCAT_VERSION>
                         <PYTHON36_VERSION>-3.6.8-2.module+el8.1.0+3334+5cb623d7</PYTHON36_VERSION>
                         <TAR_VERSION>-1.30-5.el8</TAR_VERSION>
                         <PROCPS_VERSION>-3.3.15-3.el8</PROCPS_VERSION>

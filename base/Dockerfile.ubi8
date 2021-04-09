@@ -59,11 +59,11 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 RUN microdnf install yum \
     && rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems \
     && curl -fSL -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo \
-    && yum install -y \
+    && yum install -y --setopt=install_weak_deps=False \
         git \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
-        "nc${NETCAT_VERSION}" \
+        "nmap-ncat${NETCAT_VERSION}" \
         "python36${PYTHON36_VERSION}" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
