@@ -88,6 +88,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <configuration>
+                    <buildArgs>
+                        <!-- Redhat UBI Minimal Version -->
+                        <UBI_MINIMAL_VERSION>8.3-298</UBI_MINIMAL_VERSION>
+                        <!-- Redhat Package Versions -->
+                        <OPENSSL_VERSION>-1.1.1g-15.el8_3</OPENSSL_VERSION>
+                        <WGET_VERSION>-1.19.5-10.el8</WGET_VERSION>
+                        <NETCAT_VERSION>-3.20-6.el8</NETCAT_VERSION>
+                        <PYTHON36_VERSION>-3.6.8-2.module+el8.1.0+3334+5cb623d7</PYTHON36_VERSION>
+                        <TAR_VERSION>-1.30-5.el8</TAR_VERSION>
+                        <PROCPS_VERSION>-3.3.15-3.el8</PROCPS_VERSION>
+                        <KRB5_WORKSTATION_VERSION>-1.18.2-5.el8</KRB5_WORKSTATION_VERSION>
+                        <IPUTILS_VERSION>-20180629-2.el8</IPUTILS_VERSION>
+                        <HOSTNAME_VERSION>-3.20-6.el8</HOSTNAME_VERSION>
+                        <!-- ZULU OpenJDK Package Version -->
+                        <ZULU_OPENJDK_VERSION>-8.40.0.25</ZULU_OPENJDK_VERSION>
+                        <!-- Python Module Versions -->
+                        <PYTHON_PIP_VERSION>==21.*</PYTHON_PIP_VERSION>
+                        <PYTHON_SETUPTOOLS_VERSION>==54.*</PYTHON_SETUPTOOLS_VERSION>
+                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>v0.0.43</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                        <!-- Escape hatch option to bypass a security check. See the parent pom.xml for more details -->
+                        <DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE>${docker.dont.fail.if.security.update.availible}</DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

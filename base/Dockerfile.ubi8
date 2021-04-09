@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+ARG UBI_MINIMAL_VERSION
+FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -42,29 +42,51 @@ ENV LANG="C.UTF-8"
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
-# Zulu openJDK
-ENV ZULU_OPENJDK="zulu-8-8.40.0.25"
-
-ENV PYTHON_VERSION="36-3.6.8"
-
-COPY requirements.txt .
+ARG OPENSSL_VERSION=""
+ARG WGET_VERSION=""
+ARG NETCAT_VERSION=""
+ARH PYTHON36_VERSION=""
+ARG TAR_VERSION=""
+ARG PROCPS_VERSION=""
+ARG KRB5_WORKSTATION_VERSION=""
+ARG IPUTILS_VERSION=""
+ARG HOSTNAME_VERSION=""
+ARG ZULU_OPENJDK_VERSION=""
+ARG PYTHON_PIP_VERSION=""
+ARG PYTHON_SETUPTOOLS_VERSION=""
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 
 RUN microdnf install yum \
-    && yum update -y \
-    && yum install -y openssl git wget nc python${PYTHON_VERSION} tar procps krb5-workstation iputils hostname \
-    && alternatives --set python /usr/bin/python3 \
-    && python3 -m pip install --upgrade pip setuptools \
-    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@v0.0.43' \
     && rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems \
     && curl -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo \
-    && yum -y install ${ZULU_OPENJDK} \
+    && yum install -y \
+        git \
+        "openssl${OPENSSL_VERSION}" \
+        "wget${WGET_VERSION}" \
+        "nc${NETCAT_VERSION}" \
+        "python36${PYTHON36_VERSION}" \
+        "tar${TAR_VERSION}" \
+        "procps-ng${PROCPS_VERSION}" \
+        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
+        "iputils${IPUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "zulu-8${ZULU_OPENJDK_VERSION}"
+    && alternatives --set python /usr/bin/python3 \
+    && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}' \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
-    && rm -f requirements.txt \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
+
+# This is a step that will cause the build to fail of the package manager detects a security update is availible and isn't installed.
+# The ARG DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE is an "escape" hatch if you want to by-pass this check and build the container anyways, which
+# is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the ||) this check
+# will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a security update is availible.
+ARG DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE="false"
+RUN yum check-update --security || "${DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE}"
 
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/

@@ -29,5 +29,12 @@
         <docker.os_type>deb8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${project.version}-${docker.os_type}</docker.tag>
+        <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
+        detects that there is security update avaibilbe to be installed. This is an inverted name since we're being clever
+        with bash's || {true,false} check to fail the build. If this is false: This will fail a build if a security update
+        is detected. If true, then the check will not impact the build. The default beahvior is to fail (false) the build
+        if an update is detected. Users may pass -Ddocker.dont.fail.if.security.update.availible=true on the maven CLI
+        to bypass this check and make the build complete, despit that being a bad idea. Use at your own risk!-->
+        <docker.dont.fail.if.security.update.availible>false</docker.dont.fail.if.security.update.availible>
     </properties>
 </project>
