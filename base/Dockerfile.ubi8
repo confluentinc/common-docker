@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-ARG UBI_MINIMAL_VERSION
+ARG UBI_MINIMAL_VERSION="latest"
 FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
@@ -45,7 +45,7 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 ARG OPENSSL_VERSION=""
 ARG WGET_VERSION=""
 ARG NETCAT_VERSION=""
-ARH PYTHON36_VERSION=""
+ARG PYTHON36_VERSION=""
 ARG TAR_VERSION=""
 ARG PROCPS_VERSION=""
 ARG KRB5_WORKSTATION_VERSION=""
@@ -70,7 +70,7 @@ RUN microdnf install yum \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
         "iputils${IPUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
-        "zulu-8${ZULU_OPENJDK_VERSION}"
+        "zulu-8${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}' \
