@@ -107,7 +107,7 @@
                         <PYTHON_PIP_VERSION>==${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                        <DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE>${docker.dont.fail.if.security.update.availible}</DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE>
+                        <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                     </buildArgs>
                 </configuration>
             </plugin>

@@ -98,11 +98,12 @@ RUN microdnf install yum \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 # This is a step that will cause the build to fail of the package manager detects a security update is availible and isn't installed.
-# The ARG DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE is an "escape" hatch if you want to by-pass this check and build the container anyways, which
-# is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the ||) this check
-# will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a security update is availible.
-ARG DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE="false"
-RUN yum check-update --security || "${DONT_FAIL_IF_SECURITY_UPDATE_AVAILIBLE}"
+# The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
+# is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
+# hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
+# security update is availible.
+ARG SKIP_SECURITY_UPDATE_CHECK="false"
+RUN yum check-update --security || "${SKIP_SECURITY_UPDATE_CHECK}"
 
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
