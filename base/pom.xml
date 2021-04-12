@@ -58,6 +58,20 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Operator dependencies for metrics integration -->
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-jvm</artifactId>
+            <version>${jolokia-jvm.version}</version>
+            <classifier>agent</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus.jmx</groupId>
+            <artifactId>jmx_prometheus_javaagent</artifactId>
+            <version>${jmx_prometheus_javaagent.version}</version>
+        </dependency>
     </dependencies>
 
       <!-- This jar is only used by the deb8 base image and does not get added to the other images. -->

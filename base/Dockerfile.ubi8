@@ -67,6 +67,11 @@ RUN microdnf install yum \
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
+# Operator dependencies for metrics integration
+RUN mkdir -p /opt/javaagents
+ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/jolokia-jvm-*-agent.jar /opt/javaagents/.
+ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-*.jar /opt/javaagents/.
+
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 
 RUN mkdir /licenses
