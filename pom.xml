@@ -29,5 +29,29 @@
         <docker.os_type>deb8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${project.version}-${docker.os_type}</docker.tag>
+        <!-- Versions-->
+        <ubi.image.version>8.3-298</ubi.image.version>
+        <!-- Redhat Package Versions -->
+        <ubi.openssl.version>1.1.1g-15.el8_3</ubi.openssl.version>
+        <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
+        <ubi.netcat.version>7.70-5.el8</ubi.netcat.version>
+        <ubi.python36.version>3.6.8-2.module+el8.1.0+3334+5cb623d7</ubi.python36.version>
+        <ubi.tar.version>1.30-5.el8</ubi.tar.version>
+        <ubi.procps.version>3.3.15-3.el8</ubi.procps.version>
+        <ubi.krb5.workstation.version>1.18.2-5.el8</ubi.krb5.workstation.version>
+        <ubi.iputils.version>20180629-2.el8</ubi.iputils.version>
+        <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
+        <!-- ZULU OpenJDK Package Version -->
+        <ubi.zulu.openjdk.version>8.40.0.25</ubi.zulu.openjdk.version>
+        <!-- Python Module Versions -->
+        <ubi.python.pip.version>21.*</ubi.python.pip.version>
+        <ubi.python.setuptools.version>54.*</ubi.python.setuptools.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.43</ubi.python.confluent.docker.utils.version>
+        <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
+        detects that there is security update availible to be installed. Set to true if you want to skip the check
+        (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
+        false to enforce the check. Users may override this behavior on the maven CLI by adding this option:
+        `-Ddocker.skip-security-update-check=true` -->
+        <docker.skip-security-update-check>false</docker.skip-security-update-check>
     </properties>
 </project>
