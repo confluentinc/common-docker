@@ -40,6 +40,7 @@
         <argparse4j.version>0.7.0</argparse4j.version>
         <bcpkix.version>1.54</bcpkix.version>
         <gson.version>2.7</gson.version>
+        <netty.version>4.1.63.Final</netty.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,18 @@
             <artifactId>zookeeper</artifactId>
             <version>${zookeeper.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>${netty.version}</version>
             <scope>test</scope>
         </dependency>
 
