@@ -72,6 +72,12 @@
             <artifactId>jmx_prometheus_javaagent</artifactId>
             <version>${jmx_prometheus_javaagent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>disk-usage-agent</artifactId>
+            <version>${io.confluent.common.version}</version>
+        </dependency>
     </dependencies>
 
       <!-- This jar is only used by the deb8 base image and does not get added to the other images. -->
