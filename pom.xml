@@ -24,7 +24,6 @@
         <module>base</module>
         <module>jmxterm</module>
         <!-- <module>kerberos</module> -->
-        <module>disk-usage-agent</module>
     </modules>
 
     <properties>
