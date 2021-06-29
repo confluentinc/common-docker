@@ -101,7 +101,8 @@ RUN microdnf install yum \
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
 # is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
 # hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
-# security update is availible.
+# security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
+# such as identified bugs in ZuluJDK's software.
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum --disablerepo=zulu check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
