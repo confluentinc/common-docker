@@ -44,7 +44,6 @@ RUN apt update \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*     \
-    && rm requirements.txt \
     && mkdir -p /etc/confluent/docker
 
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
