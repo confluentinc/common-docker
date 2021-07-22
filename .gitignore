@@ -5,3 +5,10 @@ target/
 *.iml
 .idea/
 .ipr
+base/.project
+.settings/org.eclipse.m2e.core.prefs
+.project
+base/.settings/*
+docker-utils/*
+jmxterm/*
+utility-belt/*
