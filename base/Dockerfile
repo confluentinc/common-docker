@@ -37,10 +37,12 @@ ENV LANG="C.UTF-8"
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
+COPY requirements.txt .
+
 RUN apt update \
     && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
     && pip install --upgrade setuptools-git 'setuptools<51' 'pip<21' \
-    && pip install --prefix /usr/local --upgrade --no-cache-dir 'git+https://github.com/confluentinc/confluent-docker-utils@v0.0.40-python2' \
+    && pip install --prefix /usr/local --upgrade -rrequirements.txt \
     && apt remove --purge -y git python-pip \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*     \
