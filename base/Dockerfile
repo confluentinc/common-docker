@@ -39,8 +39,15 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
 COPY requirements.txt .
 
+ARG ZULU_OPENJDK_VERSION="8.0.302-1"
+
 RUN apt update \
-    && apt install -y bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
+    && apt install -y apt-transport-https bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
+    && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
+    && dpkg --install zulu-repo_1.0.0-2_all.deb \
+    && rm -f zulu-repo_1.0.0-2_all.deb \
+    && apt-get update \
+    && apt-get -y install "zulu8-ca-jdk-headless=${ZULU_OPENJDK_VERSION}" "zulu8-ca-jre-headless=${ZULU_OPENJDK_VERSION}" \
     && pip install --upgrade setuptools-git 'setuptools<51' 'pip<21' \
     && pip install --prefix /usr/local --upgrade 'git+https://github.com/confluentinc/confluent-docker-utils@v0.0.42-python2' \
     && apt remove --purge -y git python-pip \
