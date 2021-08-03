@@ -54,6 +54,7 @@ public class EmbeddedZookeeperEnsemble {
   private int tickTime = 2000;
   private int initLimit = 3;
   private int syncLimit = 3;
+  private int connectToLearnerMasterLimit = 3;
   private boolean isRunning = false;
 
   private int numNodes;
@@ -93,7 +94,7 @@ public class EmbeddedZookeeperEnsemble {
       int portClient = basePort++;
       log.info("creating QuorumPeer " + i + " port " + portClient);
       QuorumPeer s = new QuorumPeer(peers, dir, dir, portClient, 3, i, tickTime, initLimit,
-                                    syncLimit
+                                    syncLimit, connectToLearnerMasterLimit
       );
       Assert.assertEquals(portClient, s.getClientPort());
 
