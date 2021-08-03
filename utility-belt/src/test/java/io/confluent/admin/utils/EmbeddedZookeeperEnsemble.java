@@ -54,7 +54,7 @@ public class EmbeddedZookeeperEnsemble {
   private int tickTime = 2000;
   private int initLimit = 3;
   private int syncLimit = 3;
-  private int connectToLearnerMasterLimit = 3;
+  private int connectToLearnerMasterLimit = initLimit;
   private boolean isRunning = false;
 
   private int numNodes;
