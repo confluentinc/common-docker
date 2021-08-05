@@ -28,6 +28,7 @@ ENV ALLOW_UNSIGNED=$ALLOW_UNSIGNED
 
 MAINTAINER partner-support@confluent.io
 LABEL io.confluent.docker=true
+LABEL description="Common base image for Confluent's Docker images."
 
 # Python
 ENV PYTHON_VERSION="2.7.9-1"
