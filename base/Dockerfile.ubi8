@@ -96,7 +96,22 @@ RUN microdnf install yum \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
-    && chown appuser:appuser -R /etc/confluent/ /usr/logs
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs \
+    && echo "===> Adding confluent entries" \
+    && rpm --import ${CONFLUENT_PACKAGES_REPO}/archive.key \
+    && printf "[Confluent] \n\
+name=Confluent repository \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/ \n\
+gpgcheck=1 \n\
+gpgkey=${CONFLUENT_PACKAGES_REPO}/archive.key \n\
+enabled=1 \n\
+\n\
+[Confluent-Clients] \n\
+name=Confluent Clients repository \n\
+baseurl=https://packages.confluent.io/clients/rpm/centos/\$releasever/\$basearch \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.confluent.io/clients/rpm/archive.key \n\
+enabled=1 " > /etc/yum.repos.d/confluent.repo
 
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
