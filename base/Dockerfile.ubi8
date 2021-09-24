@@ -59,6 +59,7 @@ ARG PROCPS_VERSION=""
 ARG KRB5_WORKSTATION_VERSION=""
 ARG IPUTILS_VERSION=""
 ARG HOSTNAME_VERSION=""
+ARG CONFLUENT_PACKAGES_REPO
 
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
@@ -74,6 +75,19 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
 RUN microdnf install yum \
+    && printf "[Confluent] \n\
+name=Confluent repository \n\
+baseurl=${CONFLUENT_PACKAGES_REPO}/ \n\
+gpgcheck=1 \n\
+gpgkey=${CONFLUENT_PACKAGES_REPO}/archive.key \n\
+enabled=1 \n\
+\n\
+[Confluent-Clients] \n\
+name=Confluent Clients repository \n\
+baseurl=https://packages.confluent.io/clients/rpm/centos/\$releasever/\$basearch \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.confluent.io/clients/rpm/archive.key \n\
+enabled=1 " > /etc/yum.repos.d/confluent.repo \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum install -y --setopt=install_weak_deps=False \
