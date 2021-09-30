@@ -16,7 +16,7 @@ class BaseImageTest(unittest.TestCase):
         cmd = "java -version"
         expected = 'OpenJDK Runtime Environment (Zulu 8.'
         output = utils.run_docker_command(image=self.image, command=cmd)
-        self.assertTrue(expected in output)
+        self.assertTrue(expected in str(output))
 
     def test_dub_exists(self):
         self.assertTrue(utils.path_exists_in_image(self.image, "/usr/local/bin/dub"))
