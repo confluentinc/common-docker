@@ -74,6 +74,9 @@ RUN echo "===> Updating debian ....." \
     && pip install --no-cache-dir --upgrade pip==${PYTHON_PIP_VERSION} \
     && pip install --only-binary --no-cache-dir git+https://github.com/confluentinc/confluent-docker-utils@v0.0.20 \
     && apt remove --purge -y git \
+    # Expired cert blocking importing of GPG Keys
+    && rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt \
+    && update-ca-certificates \
     && echo "Installing Zulu OpenJDK ${ZULU_OPENJDK_VERSION}" \
     && apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 0x27BC0C8CB3D81623F59BDADCB1998361219BD9C9 \
     && echo "deb http://repos.azulsystems.com/debian stable  main" >> /etc/apt/sources.list.d/zulu.list \
