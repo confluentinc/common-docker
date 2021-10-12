@@ -92,7 +92,7 @@ RUN microdnf install yum \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && yum remove -y git \
     # Work around until Redhat releases updated base image
-    && yum update tzdata \
+    && yum update -y tzdata \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
