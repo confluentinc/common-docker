@@ -107,7 +107,7 @@ RUN microdnf install yum \
 # security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
 # such as identified bugs in ZuluJDK's software.
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
-RUN yum --disablerepo=zulu check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
+RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
