@@ -5,4 +5,5 @@ dockerfile {
     dockerRepos = ['confluentinc/cp-base-new']
     slackChannel = '#tools-notifications'
     upstreamProjects = ['confluentinc/confluent-docker-utils', 'confluentinc/common']
+    disableConcurrentBuilds = true
 }
