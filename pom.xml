@@ -34,13 +34,13 @@
         <!-- Versions-->
         <ubi.image.version>8.4-212</ubi.image.version>
         <!-- Redhat Package Versions -->
-        <ubi.openssl.version>1.1.1g-15.el8_3</ubi.openssl.version>
+        <ubi.openssl.version>1.1.1k-4.el8</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
-        <ubi.netcat.version>7.70-5.el8</ubi.netcat.version>
-        <ubi.python36.version>3.6.8-2.module+el8.1.0+3334+5cb623d7</ubi.python36.version>
+        <ubi.netcat.version>7.70-6.el8</ubi.netcat.version>
+        <ubi.python36.version>3.6.8-38.module+el8.5.0+12207+5c5719bc</ubi.python36.version>
         <ubi.tar.version>1.30-5.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-6.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-8.3.el8_4</ubi.krb5.workstation.version>
+        <ubi.krb5.workstation.version>1.18.2-14.el8</ubi.krb5.workstation.version>
         <ubi.iputils.version>20180629-7.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <!-- ZULU OpenJDK Package Version -->
@@ -54,6 +54,6 @@
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
         false to enforce the check. Users may override this behavior on the maven CLI by adding this option:
         `-Ddocker.skip-security-update-check=true` -->
-        <docker.skip-security-update-check>false</docker.skip-security-update-check>
+        <docker.skip-security-update-check>true</docker.skip-security-update-check>
     </properties>
 </project>
