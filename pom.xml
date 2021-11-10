@@ -32,7 +32,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>6.1.4-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.4-212</ubi.image.version>
+        <ubi.image.version>8.5-204</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1.1.1k-4.el8</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
@@ -54,6 +54,6 @@
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
         false to enforce the check. Users may override this behavior on the maven CLI by adding this option:
         `-Ddocker.skip-security-update-check=true` -->
-        <docker.skip-security-update-check>true</docker.skip-security-update-check>
+        <docker.skip-security-update-check>false</docker.skip-security-update-check>
     </properties>
 </project>
