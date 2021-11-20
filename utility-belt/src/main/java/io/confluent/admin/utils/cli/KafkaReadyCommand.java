@@ -112,6 +112,9 @@ public class KafkaReadyCommand {
 
       Map<String, String> workerProps = new HashMap<>();
 
+      // Initialize log4j to fix: https://confluentinc.atlassian.net/browse/ST-6627
+      org.apache.log4j.BasicConfigurator.configure();
+
       if (res.getString("config") == null
           && !(res.getString("security_protocol").equals("PLAINTEXT"))) {
         log.error("config is required for all protocols except PLAINTEXT");
