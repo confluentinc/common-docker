@@ -1,0 +1,6 @@
+[Adoptium]
+name=Adoptium
+baseurl=https://adoptium.jfrog.io/artifactory/rpm/centos/$releasever/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://adoptium.jfrog.io/artifactory/api/security/keypair/default-gpg-key/public

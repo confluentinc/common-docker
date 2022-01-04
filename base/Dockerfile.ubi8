@@ -43,6 +43,10 @@ ENV LANG="C.UTF-8"
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
+# These are build tools (and dependencies) needed to build & install confluent-docker-utils.
+# These will be removed after confluent-docker-utils is installed.
+ENV BUILD_TOOLS="git make gcc findutils python3-devel"
+
 # These ARGs are left blank indicating to the Dnf package manager to install the latest package
 # version that happens to be availible at this time. For reproducible builds, versions should be specified
 # as '-1.2.3-4.el8' on the command line. Or more preferibly the 'dockerfile-maven-plugin' is used
@@ -61,8 +65,8 @@ ARG IPUTILS_VERSION=""
 ARG HOSTNAME_VERSION=""
 ARG CONFLUENT_PACKAGES_REPO
 
-# Zulu OpenJDK version
-ARG ZULU_OPENJDK_VERSION=""
+# Adoptium JDK version
+ARG TEMURIN_JDK_VERSION=""
 
 # Python Module Versions
 ARG PYTHON_PIP_VERSION=""
@@ -74,11 +78,11 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
+ADD adoptium.repo /etc/yum.repos.d/adoptium.repo
+
 RUN microdnf --nodocs install yum \
-    && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
-    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
-        git \
+        ${BUILD_TOOLS} \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
@@ -88,13 +92,11 @@ RUN microdnf --nodocs install yum \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
         "iputils${IPUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
-        "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "temurin-11-jdk${TEMURIN_JDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-    && yum remove -y git \
-    # Work around until Redhat releases updated base image
-    && yum --nodocs update -y tzdata libgcc libstdc++ \
+    && yum remove -y ${BUILD_TOOLS} \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
@@ -105,8 +107,7 @@ RUN microdnf --nodocs install yum \
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
 # is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
 # hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
-# security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
-# such as identified bugs in ZuluJDK's software.
+# security update is availible.
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
