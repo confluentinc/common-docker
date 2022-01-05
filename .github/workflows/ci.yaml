@@ -1,0 +1,85 @@
+# Copyright 2021 Jack Viers
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  REGISTRY_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+  IMAGE_REGISTRY: docker.io
+  REGISTRY_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout project (pull-request)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v2.3.2
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Checkout project (main)
+        if: github.event_name == 'push'
+        uses: actions/checkout@v2
+      - name: Install qemu
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+      - name: Show Available platforms
+        run: echo ${{ steps.qemu.outputs.platforms }}
+      - name: Install podman
+        run: |
+          . /etc/os-release
+          echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+          curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+          sudo apt update
+          sudo apt -y upgrade
+          sudo apt install -y podman
+      - name: Setup build-essentials
+        run: |
+          sudo apt update
+          sudo apt install build-essential
+      - name: Setup build and test for ubuntu
+        run: |
+          echo "BATS_INSTALL_SCRIPT_LOCATION=./devel/src/main/bash/com/github/${env.REGISTRY_USER}/confluent/cp/images/installation/scripts/install_bats_ubuntu.sh" >> .local.make
+          echo "BATS_LIBS_INSTALL_LOCATION=/usr/local/lib" >> .local.make
+          echo "IMAGES_BUILD_TOOL=podman" >> .local.make
+          echo "REGISTRY_USER=${REGISTRY_USER}"
+      - name: Setup Bats
+        run: |
+          make install-bats
+      - name: Run Build & Tests
+        if: github.event_name == 'pull_request'
+        run: |
+          make make-devel
+      - name: Log in to Docker.io
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+      - name: Run Build & Tests & Publish to DOCKER.IO
+        if: github.event_name == 'push'
+        run: |
+          make make-ci
