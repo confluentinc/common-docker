@@ -193,6 +193,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -200,6 +201,11 @@
             <scope>test</scope>
         </dependency>
 
+         <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>confluent-log4j</artifactId>
+            <scope>compile</scope>
+         </dependency>
     </dependencies>
 
     <build>
