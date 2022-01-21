@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.1.0-0</version>
+        <version>7.2.0-0</version>
     </parent>
 
     <artifactId>utility-belt</artifactId>
@@ -211,6 +211,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -218,6 +219,11 @@
             <scope>test</scope>
         </dependency>
 
+         <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>confluent-log4j</artifactId>
+            <scope>compile</scope>
+         </dependency>
     </dependencies>
 
     <build>
