@@ -94,7 +94,7 @@ RUN microdnf --nodocs install yum \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && yum remove -y git \
     # Work around until Redhat releases updated base image
-    && yum --nodocs update -y tzdata libgcc libstdc++ \
+    && yum --nodocs update -y tzdata libgcc libstdc++ cyrus-sasl-lib \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
