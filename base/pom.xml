@@ -109,26 +109,76 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <executions>
+                    <execution>
+                        <id>docker-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>docker</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>build</argument>
+                                <argument>-f</argument>
+                                <argument>Dockerfile.ubi8</argument>
+                                <argument>--build-arg</argument>
+                                <argument>UBI_MINIMAL_VERSION=${ubi.image.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>OPENSSL_VERSION=${ubi.openssl.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>WGET_VERSION=${ubi.wget.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>NETCAT_VERSION=${ubi.netcat.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PYTHON36_VERSION=${ubi.python36.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>TAR_VERSION=${ubi.tar.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PROCPS_VERSION=${ubi.procps.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>KRB5_WORKSTATION_VERSION=${ubi.krb5.workstation.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>IPUTILS_VERSION=${ubi.iputils.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>HOSTNAME_VERSION=${ubi.hostname.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>ZULU_OPENJDK_VERSION=${ubi.zulu.openjdk.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PYTHON_PIP_VERSION=${ubi.python.pip.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PYTHON_SETUPTOOLS_VERSION=${ubi.python.setuptools.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PYTHON_CONFLUENT_DOCKER_UTILS_VERSION=${ubi.python.confluent.docker.utils.version}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>SKIP_SECURITY_UPDATE_CHECK=${docker.skip-security-update-check}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>ARTIFACT_ID=${project.artifactId}</argument>
+                                <argument>--build-arg</argument>
+                                <argument>PROJECT_VERSION=${project.version}</argument>
+                                <argument>-t</argument>
+                                <argument>${docker.registry}confluentinc/${project.artifactId}:${docker.tag}</argument>
+                                <argument>.</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
                 <configuration>
-                    <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                        <OPENSSL_VERSION>-${ubi.openssl.version}</OPENSSL_VERSION>
-                        <WGET_VERSION>-${ubi.wget.version}</WGET_VERSION>
-                        <NETCAT_VERSION>-${ubi.netcat.version}</NETCAT_VERSION>
-                        <PYTHON36_VERSION>-${ubi.python36.version}</PYTHON36_VERSION>
-                        <TAR_VERSION>-${ubi.tar.version}</TAR_VERSION>
-                        <PROCPS_VERSION>-${ubi.procps.version}</PROCPS_VERSION>
-                        <KRB5_WORKSTATION_VERSION>-${ubi.krb5.workstation.version}</KRB5_WORKSTATION_VERSION>
-                        <IPUTILS_VERSION>-${ubi.iputils.version}</IPUTILS_VERSION>
-                        <HOSTNAME_VERSION>-${ubi.hostname.version}</HOSTNAME_VERSION>
-                        <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
-                        <PYTHON_PIP_VERSION>==${ubi.python.pip.version}</PYTHON_PIP_VERSION>
-                        <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
-                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                        <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
-                    </buildArgs>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
