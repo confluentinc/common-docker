@@ -5,7 +5,7 @@ dockerfile {
     dockerPush = true
     usePackages = true
     dockerRepos = ['confluentinc/cp-base-new', 'confluentinc/cp-jmxterm']
-    slackChannel = '#tools-notifications'
+    slackChannel = '#devprod-notifications'
     mvnSkipDeploy = true
     cron = ''
     cpImages = true
