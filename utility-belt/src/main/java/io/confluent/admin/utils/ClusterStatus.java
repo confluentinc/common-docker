@@ -132,8 +132,6 @@ public class ClusterStatus {
       int timeoutMs
   ) {
 
-    log.debug("Check if Kafka is ready: {}", config);
-
     // Need to copy because `config` is Map<String, String> and `create` expects Map<String, Object>
     AdminClient adminClient = AdminClient.create(new HashMap<String, Object>(config));
 
