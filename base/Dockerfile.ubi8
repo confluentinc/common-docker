@@ -109,6 +109,16 @@ RUN microdnf --nodocs install yum \
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
+# Install Python 3.6.15 to address CVE-2021-3737
+# This is done separately to avoid issues with replacing the system python and will be available via python3.6 cli (e.g. 'python3.6 --version')
+RUN yum --nodocs install -y gcc make zlib-devel
+    && wget https://www.python.org/ftp/python/3.6.15/Python-3.6.15.tgz
+    && tar -xvf Python-3.6.15.tgz
+    && cd Python-3.6.15
+    && ./configure --prefix=/usr/local --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
+    && strip /usr/local/lib/libpython3.6m.so.1.0
+    && yes | rm Python-3.6.15.tgz
+
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
