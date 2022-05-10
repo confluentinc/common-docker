@@ -110,6 +110,10 @@
                     <groupId>io.netty</groupId>
                     <artifactId>netty-codec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -219,11 +223,14 @@
             <scope>test</scope>
         </dependency>
 
-         <dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.confluent</groupId>
-            <artifactId>confluent-log4j</artifactId>
-            <scope>compile</scope>
-         </dependency>
+            <artifactId>logredactor</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
