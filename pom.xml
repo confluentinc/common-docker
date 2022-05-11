@@ -55,5 +55,7 @@
         false to enforce the check. Users may override this behavior on the maven CLI by adding this option:
         `-Ddocker.skip-security-update-check=true` -->
         <docker.skip-security-update-check>false</docker.skip-security-update-check>
+        <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
+        <logredactor.version>1.0.10</logredactor.version>
     </properties>
 </project>
