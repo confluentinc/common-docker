@@ -59,6 +59,7 @@ ARG PROCPS_VERSION=""
 ARG KRB5_WORKSTATION_VERSION=""
 ARG IPUTILS_VERSION=""
 ARG HOSTNAME_VERSION=""
+ARG XZ_LIBS_VERSION=""
 
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
@@ -88,6 +89,7 @@ RUN microdnf --nodocs install yum \
         "iputils${IPUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
         "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "xz-libs${XZ_LIBS_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
