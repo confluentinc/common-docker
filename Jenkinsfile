@@ -9,6 +9,6 @@ dockerfile {
     mvnSkipDeploy = true
     cron = ''
     cpImages = true
-    osTypes = ['deb8', 'deb9', 'ubi8']
+    osTypes = ['ubi8']
     disableConcurrentBuilds = true
 }

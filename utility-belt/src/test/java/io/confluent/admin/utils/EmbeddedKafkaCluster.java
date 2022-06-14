@@ -42,7 +42,7 @@ import kafka.utils.MockTime;
 import kafka.utils.TestUtils;
 import scala.Option;
 import scala.Option$;
-import scala.collection.JavaConversions;
+import scala.collection.JavaConverters;
 
 /**
  * This class is based on code from
@@ -221,7 +221,7 @@ public class EmbeddedKafkaCluster {
     principals.add(principal);
     kdc.createPrincipal(
         keytabFile,
-        JavaConversions.asScalaBuffer(principals).toList()
+        JavaConverters.asScalaBuffer(principals).toList()
     );
 
     log.debug("Keytab file for " + principal + " : " + keytabFile.getAbsolutePath());
@@ -373,7 +373,7 @@ public class EmbeddedKafkaCluster {
   }
 
   public String getBootstrapBroker(SecurityProtocol securityProtocol) {
-    return TestUtils.getBrokerListStrFromServers(JavaConversions.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
+    return TestUtils.getBrokerListStrFromServers(JavaConverters.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
   }
 
   public boolean isRunning() {
