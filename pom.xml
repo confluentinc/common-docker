@@ -32,7 +32,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>6.2.3</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.6-751</ubi.image.version>
+        <ubi.image.version>8.6-751.1655117800</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1.1.1k-6.el8_5</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
@@ -44,6 +44,7 @@
         <ubi.iputils.version>20180629-9.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
+        <ubi.glibc.version>2.28-189.5.el8_6</ubi.glibc.version>
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.15-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
