@@ -99,6 +99,12 @@
             <version>${zookeeper.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
         </dependency>
 
         <dependency>
@@ -201,11 +207,11 @@
             <scope>test</scope>
         </dependency>
 
-         <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>confluent-log4j</artifactId>
-            <scope>compile</scope>
-         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
+            <version>1.7.36</version>
+        </dependency>
     </dependencies>
 
     <build>
