@@ -106,7 +106,7 @@
                         <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
-                        <PYTHON_PIP_VERSION>==${ubi.python39.pip.version}</PYTHON_PIP_VERSION>
+                        <PYTHON_PIP_VERSION>==${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
