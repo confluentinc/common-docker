@@ -35,7 +35,7 @@
         <ubi.openssl.version>1.1.1k-6.el8_5</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
         <ubi.netcat.version>7.70-6.el8</ubi.netcat.version>
-        <ubi.python36.version>3.6.8-38.module+el8.5.0+12207+5c5719bc</ubi.python36.version>
+        <ubi.python39.version>3.9.7-1.module+el8.6.0+12577+62b8d0a1</ubi.python39.version>
         <ubi.tar.version>1.30-5.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-6.el8</ubi.procps.version>
         <ubi.krb5.workstation.version>1.18.2-14.el8</ubi.krb5.workstation.version>
@@ -46,8 +46,8 @@
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.16-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
-        <ubi.python.pip.version>21.*</ubi.python.pip.version>
-        <ubi.python.setuptools.version>54.*</ubi.python.setuptools.version>
+        <ubi.python.pip.version>20.*</ubi.python.pip.version>
+        <ubi.python.setuptools.version>50.*</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.52</ubi.python.confluent.docker.utils.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
