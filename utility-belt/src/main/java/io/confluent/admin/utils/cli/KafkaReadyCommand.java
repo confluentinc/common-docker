@@ -104,6 +104,7 @@ public class KafkaReadyCommand {
 
   public static void main(String[] args) {
     org.apache.log4j.BasicConfigurator.configure();
+    log.setLevel(org.apache.log4j.Level.INFO);
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {
