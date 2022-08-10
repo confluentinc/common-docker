@@ -26,6 +26,7 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +51,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class KafkaReadyCommand {
 
-  private static final Logger log = LoggerFactory.getLogger(KafkaReadyCommand.class);
+  private static Logger log;
   public static final String KAFKA_READY = "kafka-ready";
 
   private static ArgumentParser createArgsParser() {
@@ -103,8 +104,9 @@ public class KafkaReadyCommand {
   }
 
   public static void main(String[] args) {
+    System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+    log = LoggerFactory.getLogger(KafkaReadyCommand.class);
     org.apache.log4j.BasicConfigurator.configure();
-    log.setLevel(org.apache.log4j.Level.INFO);
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {
