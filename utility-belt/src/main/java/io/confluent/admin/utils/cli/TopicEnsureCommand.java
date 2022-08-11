@@ -72,7 +72,8 @@ public class TopicEnsureCommand {
   }
 
   public static void main(String[] args) {
-    org.apache.log4j.PropertyConfigurator.configure("/docker-utils/main/resources/log4j.properties");
+    String log4jConfigFile = "/docker-utils/main/resources/log4j.properties";
+    org.apache.log4j.PropertyConfigurator.configure(log4jConfigFile);
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {
