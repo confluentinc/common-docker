@@ -72,7 +72,7 @@ public class TopicEnsureCommand {
   }
 
   public static void main(String[] args) {
-    org.apache.log4j.BasicConfigurator.configure();
+    org.apache.log4j.PropertyConfigurator.configure("/docker-utils/main/resources/log4j.properties");
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {
