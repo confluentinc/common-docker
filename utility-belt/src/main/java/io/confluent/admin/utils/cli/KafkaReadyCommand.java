@@ -103,8 +103,7 @@ public class KafkaReadyCommand {
   }
 
   public static void main(String[] args) {
-    String log4jConfigFile = "/docker-utils/main/resources/log4j.properties";
-    org.apache.log4j.PropertyConfigurator.configure(log4jConfigFile);
+    org.apache.log4j.BasicConfigurator.configure();
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {
