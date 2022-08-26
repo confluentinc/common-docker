@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.0.6-0</version>
+        <version>7.1.4-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -88,10 +88,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-reload4j</artifactId>
-        </dependency>        
+        </dependency>
+
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>logredactor</artifactId>
+        </dependency>
+
     </dependencies>
 
       <!-- This jar is only used by the deb8 base image and does not get added to the other images. -->
