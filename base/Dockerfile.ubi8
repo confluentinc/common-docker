@@ -61,6 +61,7 @@ ARG IPUTILS_VERSION=""
 ARG HOSTNAME_VERSION=""
 ARG XZ_LIBS_VERSION=""
 ARG GLIBC_VERSION=""
+ARG CURL_VERSION=""
 
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
@@ -92,6 +93,8 @@ RUN microdnf --nodocs install yum \
         "glibc${GLIBC_VERSION}" \
         "glibc-common${GLIBC_VERSION}" \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "curl${CURL_VERSION}" \
+        "libcurl${CURL_VERSION}" \
         "zulu8-ca-jre-headless${ZULU_OPENJDK_VERSION}" "zulu8-ca-jdk-headless${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
