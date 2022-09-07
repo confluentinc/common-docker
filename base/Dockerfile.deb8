@@ -1,5 +1,5 @@
 #
-# Copyright 2016 Confluent Inc.
+# Copyright 2017 Confluent Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,79 +12,109 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+ARG UBI_MINIMAL_VERSION="latest"
+FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
 
-FROM debian:jessie
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
+
+# Remember where we came from
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
 
 ARG GIT_COMMIT
 LABEL io.confluent.docker.git.id=$GIT_COMMIT
+
 ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
 
-ARG CONFLUENT_PACKAGES_REPO=$CONFLUENT_PACKAGES_REPO
-
-ARG ALLOW_UNSIGNED=false
-#Set an env var so that it's available in derived images
-ENV ALLOW_UNSIGNED=$ALLOW_UNSIGNED
-
-MAINTAINER partner-support@confluent.io
-LABEL io.confluent.docker=true
+LABEL maintainer="tools@confluent.io"
+LABEL vendor="Confluent"
+LABEL version=$GIT_COMMIT
+LABEL release=$PROJECT_VERSION
+LABEL name=$ARTIFACT_ID
+LABEL summary="Common base image for Confluent's Docker images."
 LABEL description="Common base image for Confluent's Docker images."
-
-# Python
-ENV PYTHON_VERSION="2.7.9-1"
-
-# Confluent
-ENV SCALA_VERSION="2.12"
-
-ARG KAFKA_VERSION=$KAFKA_VERSION
-ENV KAFKA_VERSION=$KAFKA_VERSION
-
-ARG CONFLUENT_PLATFORM_LABEL=$CONFLUENT_PLATFORM_LABEL
-ENV CONFLUENT_PLATFORM_LABEL=$CONFLUENT_PLATFORM_LABEL
-
-ARG CONFLUENT_VERSION=$CONFLUENT_VERSION
-ENV CONFLUENT_VERSION=$CONFLUENT_VERSION
-
-ENV CONFLUENT_DEB_VERSION="1"
-
-# Zulu
-ENV ZULU_OPENJDK_VERSION="8=8.40.0.25"
+LABEL io.confluent.docker=true
 
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
 
-COPY requirements.txt .
+# Set the classpath for JARs required by `cub`
+ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 
-RUN echo "===> Updating debian ....." \
-    && apt-get -qq update \
-    \
-    && echo "===> Installing curl wget netcat python...." \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-                apt-transport-https \
-                curl \
-                gnupg-curl \
-                git \
-                wget \
-                netcat \
-                python=${PYTHON_VERSION} \
-    && echo "===> Installing python packages ..."  \
-    && curl -fSL "https://bootstrap.pypa.io/pip/2.7/get-pip.py" | python \
-    && pip install --no-cache-dir --prefix /usr/local --upgrade -rrequirements.txt \
-    && apt remove --purge -y git \
-    # Expired cert blocking importing of GPG Keys
-    && rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt \
-    && update-ca-certificates \
-    && echo "Installing Zulu OpenJDK ${ZULU_OPENJDK_VERSION}" \
-    # https://docs.azul.com/zulu/zuludocs/ZuluUserGuide/PrepareZuluPlatform/AttachAPTRepositoryUbuntuOrDebianSys.htm
-    && apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 0x27BC0C8CB3D81623F59BDADCB1998361219BD9C9 \
-    && echo "deb http://repos.azulsystems.com/debian stable  main" >> /etc/apt/sources.list.d/zulu.list \
-    && apt-get -qq update \
-    && apt-get -y install zulu-${ZULU_OPENJDK_VERSION} \
-    && echo "===> Installing Kerberos Patch ..." \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y install krb5-user \
-    && rm -rf /var/lib/apt/lists/*
+# These ARGs are left blank indicating to the Dnf package manager to install the latest package
+# version that happens to be availible at this time. For reproducible builds, versions should be specified
+# as '-1.2.3-4.el8' on the command line. Or more preferibly the 'dockerfile-maven-plugin' is used
+# where these arguments are set in base/pom.xml under the <buildArgs> elements based on the commit you're
+# building from.
 
-ENV CUB_CLASSPATH=/etc/confluent/docker/docker-utils.jar
-COPY include/etc/confluent/docker /etc/confluent/docker
-COPY target/docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar /etc/confluent/docker/docker-utils.jar
+# Redhat Package Versions
+ARG OPENSSL_VERSION=""
+ARG WGET_VERSION=""
+ARG NETCAT_VERSION=""
+ARG PYTHON36_VERSION=""
+ARG TAR_VERSION=""
+ARG PROCPS_VERSION=""
+ARG KRB5_WORKSTATION_VERSION=""
+ARG IPUTILS_VERSION=""
+ARG HOSTNAME_VERSION=""
+
+# Zulu OpenJDK version
+ARG ZULU_OPENJDK_VERSION=""
+
+# Python Module Versions
+ARG PYTHON_PIP_VERSION=""
+ARG PYTHON_SETUPTOOLS_VERSION=""
+
+# Confluent Docker Utils Version (Namely the tag or branch to grab from git to install)
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
+
+# This can be overriden for an offline/air-gapped builds
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
+
+RUN microdnf --nodocs install yum \
+    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
+    && yum --nodocs install -y --setopt=install_weak_deps=False \
+        git \
+        "openssl${OPENSSL_VERSION}" \
+        "wget${WGET_VERSION}" \
+        "nmap-ncat${NETCAT_VERSION}" \
+        "python36${PYTHON36_VERSION}" \
+        "tar${TAR_VERSION}" \
+        "procps-ng${PROCPS_VERSION}" \
+        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
+        "iputils${IPUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "zulu8-ca-jre-headless${ZULU_OPENJDK_VERSION}" "zulu8-ca-jdk-headless${ZULU_OPENJDK_VERSION}" \
+    && alternatives --set python /usr/bin/python3 \
+    && python3 -m pip install --upgrade "pip${PYTHON_PIP_VERSION}" "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
+    && yum remove -y git \
+    # Work around until Redhat releases updated base image
+    && yum --nodocs update -y tzdata libgcc libstdc++ cyrus-sasl-lib \
+    && yum clean all \
+    && rm -rf /tmp/* \
+    && mkdir -p /etc/confluent/docker /usr/logs \
+    && useradd --no-log-init --create-home --shell /bin/bash appuser \
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs
+
+# This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
+# The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
+# is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
+# hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
+# security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
+# such as identified bugs in ZuluJDK's software.
+ARG SKIP_SECURITY_UPDATE_CHECK="true"
+#RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
+
+ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+ADD --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+
+COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
+
+RUN mkdir /licenses
+COPY license.txt /licenses
+
+USER appuser
+WORKDIR /home/appuser
