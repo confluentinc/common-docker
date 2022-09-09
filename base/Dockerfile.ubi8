@@ -121,6 +121,7 @@ COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/sh
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
 
 RUN mkdir /licenses
 COPY license.txt /licenses

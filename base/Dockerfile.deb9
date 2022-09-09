@@ -61,3 +61,4 @@ ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/
 ADD target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY include/etc/confluent/docker /etc/confluent/docker
+COPY include/etc/cp-base-new /etc/cp-base-new
