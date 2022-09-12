@@ -64,7 +64,6 @@
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-jvm</artifactId>
             <version>${jolokia-jvm.version}</version>
-            <classifier>agent</classifier>
         </dependency>
 
         <dependency>
