@@ -40,6 +40,8 @@
         <property name="header" value="/\*\nCopyright .* Confluent Inc."/>
     </module>
 
+    <module name="SuppressWarningsFilter" />
+
     <module name="LineLength">
         <property name="max" value="100"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
@@ -58,6 +60,8 @@
             <property name="onCommentFormat" value="CHECKSTYLE_RULES.ON:\s+([\w\|]+)"/>
             <property name="checkFormat" value="$1"/>
         </module>
+
+        <module name="SuppressWarningsHolder" />
 
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -249,7 +253,11 @@
         <module name="ParameterNumber">
             <property name="max" value="10"/>
         </module>
-        <module name="ClassDataAbstractionCoupling"/>
+        <module name="ClassDataAbstractionCoupling">
+            <property name="excludeClassesRegexps"
+                      value="${checkstyle.classdataabstractioncoupling.excludeclassesregexps}"
+                      default="^.*Exception$"/>
+        </module>
         <module name="BooleanExpressionComplexity"/>
         <module name="CyclomaticComplexity"/>
         <module name="JavaNCSS" />
@@ -270,6 +278,15 @@
         <module name="FinalClass">
             <property name="severity"
                       value="${checkstyle.finalclass.severity}"
+                      default="ignore"/>
+        </module>
+
+        <module name="TodoComment">
+            <property name="format"
+                      value="${checkstyle.todocomment.format}"
+                      default="(TODO)|(FIXME)"/>
+            <property name="severity"
+                      value="${checkstyle.todocomment.severity}"
                       default="ignore"/>
         </module>
 

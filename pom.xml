@@ -23,7 +23,7 @@
     <groupId>io.confluent</groupId>
     <artifactId>common-parent</artifactId>
     <packaging>pom</packaging>
-    <version>5.4.11-SNAPSHOT</version>
+    <version>5.5.13-SNAPSHOT</version>
     <name>common</name>
     <organization>
         <name>Confluent, Inc.</name>
@@ -47,9 +47,9 @@
         <argLine></argLine>
         <avro.version>1.9.2</avro.version>
         <required.maven.version>3.2</required.maven.version>
-        <confluent.version>5.4.11-SNAPSHOT</confluent.version>
-        <kafka.version>5.4.11-ccs-SNAPSHOT</kafka.version>
-        <ce.kafka.version>5.4.11-ce-SNAPSHOT</ce.kafka.version>
+        <confluent.version>5.5.13-SNAPSHOT</confluent.version>
+        <kafka.version>5.5.13-ccs-SNAPSHOT</kafka.version>
+        <ce.kafka.version>5.5.13-ce-SNAPSHOT</ce.kafka.version>
         <easymock.version>4.0.1</easymock.version>
         <exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
         <spotbugs.version>3.1.12</spotbugs.version>
@@ -59,11 +59,9 @@
         <jackson.databind.version>2.13.4.2</jackson.databind.version>
         <jackson.bom.version>2.13.4.20221013</jackson.bom.version>
         <jackson.cbor.version>2.13.4</jackson.cbor.version>
-
         <gson.version>2.9.0</gson.version>
         <guava.version>30.1.1-jre</guava.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-
         <junit.version>4.13.1</junit.version>
         <kafka.scala.version>2.12</kafka.scala.version>
         <licenses.version>${confluent.version}</licenses.version>
@@ -73,11 +71,12 @@
         <maven-deploy.version>2.8.2</maven-deploy.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-        <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
+        <maven-project-info-reports-plugin.version>3.1.1</maven-project-info-reports-plugin.version>
+        <mbknor-jackson-jsonschema.version>1.0.39</mbknor-jackson-jsonschema.version>
         <buildnumber-plugin.version>1.4</buildnumber-plugin.version>
         <mockito.version>2.23.0</mockito.version>
-        <maven-project-info-reports-plugin.version>3.1.1</maven-project-info-reports-plugin.version>
         <mockito-all.version>1.10.19</mockito-all.version>
         <os-maven-plugin.version>1.5.0.Final</os-maven-plugin.version>
         <slf4j-api.version>${slf4j.version}</slf4j-api.version>
