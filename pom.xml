@@ -15,6 +15,7 @@
   ~ limitations under the License.
   ~-->
 
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -23,7 +24,7 @@
     <groupId>io.confluent</groupId>
     <artifactId>common-parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.0.11-SNAPSHOT</version>
+    <version>6.1.9-0</version>
     <name>common</name>
     <organization>
         <name>Confluent, Inc.</name>
@@ -47,9 +48,8 @@
         <argLine></argLine>
         <avro.version>1.9.2</avro.version>
         <required.maven.version>3.2</required.maven.version>
-        <confluent.version>6.0.11-SNAPSHOT</confluent.version>
-        <kafka.version>6.0.11-ccs-SNAPSHOT</kafka.version>
-        <ce.kafka.version>6.0.11-ce-SNAPSHOT</ce.kafka.version>
+        <kafka.version>[6.1.9-0-ccs, 6.1.10-0-ccs)</kafka.version>
+        <ce.kafka.version>[6.1.9-0-ce, 6.1.10-0-ce)</ce.kafka.version>
         <easymock.version>4.0.1</easymock.version>
         <!-- keep exec-maven-plugin on 1.5.0 until https://github.com/mojohaus/exec-maven-plugin/issues/76 is fixed
              running our LicenseFinder plugin in create-licenses-for-docker breaks when upgrading to 1.6.0 -->
@@ -65,10 +65,11 @@
         <guava.version>30.1.1-jre</guava.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <junit.version>4.13.1</junit.version>
+        <junit.jupiter.version>5.7.0</junit.jupiter.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <scala.version>2.13.10</scala.version>
         <licenses.version>${confluent.version}</licenses.version>
-        <maven-assembly.version>3.0.0</maven-assembly.version>
+        <maven-assembly.version>3.3.0</maven-assembly.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
         <maven-deploy.version>2.8.2</maven-deploy.version>
@@ -94,7 +95,7 @@
         <reload4j.version>1.2.19</reload4j.version>
         <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
         <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.8</zookeeper.version>
+        <zookeeper.version>3.5.9</zookeeper.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <checkstyle.version>8.44</checkstyle.version>
         <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
@@ -126,6 +127,36 @@
         <!-- Pull the latest base image or use a local image. -->
         <docker.pull-image>false</docker.pull-image>
         <dependency.check.skip>true</dependency.check.skip>
+        <io.confluent.common.version>6.1.9-0</io.confluent.common.version>
+        <!-- This is a version of the pom file that we install and deploy because
+            the kafka and ce-kafka version ranges are resolved.
+        -->
+        <installed.pom.file>installed_pom.xml</installed.pom.file>
+        <coderplus.plugin.version>1.0</coderplus.plugin.version>
+        <!-- This version range is only used in the custom resolver plugin for 
+            resolving the version of ccs and ce kafka. This property should 
+            never be used any where else.
+        -->
+        <confluent.version.range>[6.1.9-0, 6.1.10-0)</confluent.version.range>
+        <!-- Controls whether we run the maven resolver plugin which is used to resolve
+            the version ranges for kafka and ce-kafka. We want to run this for local builds,
+            but disable this in the jenkins profile so it doesn't run during CI builds.
+        -->
+        <skip.maven.resolver.plugin>false</skip.maven.resolver.plugin>
+        <!-- The custom install step handles installing a modified pom file with the
+            kafka version ranges resolved. We only do this for local builds so for 
+            CI builds we set the phase to none.
+        -->
+        <custom.install.phase>install</custom.install.phase>
+        <!-- The custom deploy step handles copying the modified pom over the 
+            standard pom so that we deploy a pom with the kafka versions resolved.
+            We only do this for local builds so for 
+            CI builds we set the phase to none.
+        -->
+        <custom.deploy.phase>deploy</custom.deploy.phase>
+        <maven.resolver.plugin.version>0.6.0</maven.resolver.plugin.version>
+        <fail.if.ce-kafka.version.not.found>false</fail.if.ce-kafka.version.not.found>
+        <io.confluent.license-file-generator.version>${confluent.version.range}</io.confluent.license-file-generator.version>
     </properties>
 
     <scm>
@@ -342,17 +373,17 @@
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>common-config</artifactId>
-                <version>${confluent.version}</version>
+                <version>${io.confluent.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>common-metrics</artifactId>
-                <version>${confluent.version}</version>
+                <version>${io.confluent.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>common-utils</artifactId>
-                <version>${confluent.version}</version>
+                <version>${io.confluent.common.version}</version>
             </dependency>
 
             <!--test deps-->
@@ -360,6 +391,24 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -444,7 +493,7 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>assembly-plugin-boilerplate</artifactId>
-            <version>${confluent.version}</version>
+            <version>${io.confluent.common.version}</version>
             <classifier>resources</classifier>
             <type>zip</type>
             <scope>provided</scope>
@@ -483,7 +532,7 @@
                         <dependency>
                             <groupId>io.confluent</groupId>
                             <artifactId>build-tools</artifactId>
-                            <version>${confluent.version}</version>
+                            <version>${io.confluent.common.version}</version>
                         </dependency>
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
@@ -738,6 +787,83 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- This custom resolver plugin is used to resolve the version ranges
+                for kafka and ce-kafka since they don't use the standard version scheme.
+                This will set the properties kafka.version and ce.kafka.version
+            -->
+            <plugin>
+                <groupId>io.confluent</groupId>
+                <artifactId>resolver-maven-plugin</artifactId>
+                <version>${maven.resolver.plugin.version}</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                    <phase>validate</phase>
+                        <goals>
+                            <goal>resolve-kafka-range</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
+                    <versionRange>${confluent.version.range}</versionRange>
+                    <newPomFile>${installed.pom.file}</newPomFile>
+                    <skip>${skip.maven.resolver.plugin}</skip>
+                    <failIfCCSNotfound>true</failIfCCSNotfound>
+                    <failIfCENotfound>${fail.if.ce-kafka.version.not.found}</failIfCENotfound>
+                </configuration>
+            </plugin>
+            <!-- This custom install plugin is run so that we install the common
+                artifact using a the pom with the kafka and ce-kafka version
+                range properties resolved to a specific version.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven-install-plugin.version}</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>custom-install</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>${custom.install.phase}</phase>
+                        <configuration>
+                            <file>${installed.pom.file}</file>
+                            <groupId>io.confluent</groupId>
+                            <artifactId>common-parent</artifactId>
+                            <packaging>pom</packaging>
+                            <version>${project.version}</version>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- This custom deploy plugin is run so that when we deploy the common
+                artifact we use a version of the pom file with the kafka and
+                ce-kafka version range properties resolved to a specific version.
+            -->
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>${coderplus.plugin.version}</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>copy-file</id>
+                        <phase>${custom.deploy.phase}</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <overWrite>true</overWrite>
+                            <sourceFile>${basedir}/${installed.pom.file}</sourceFile>
+                            <destinationFile>${basedir}/pom.xml</destinationFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -823,6 +949,17 @@
             </activation>
             <properties>
                 <dependency.check.skip>false</dependency.check.skip>
+                <!-- During CI builds we do not want to execute the resolver plugin
+                    or the additional install and deploy steps as they are only
+                    needed when building locally.
+                -->
+                <skip.maven.resolver.plugin>true</skip.maven.resolver.plugin>
+                <custom.install.phase>none</custom.install.phase>
+                <custom.deploy.phase>none</custom.deploy.phase>
+                <!-- During CI builds we need to fail if we are unable to resolve
+                    the latest version of ce-kafka artifacts.
+                -->
+                <fail.if.ce-kafka.version.not.found>true</fail.if.ce-kafka.version.not.found>
             </properties>
             <build>
                 <pluginManagement>
@@ -928,7 +1065,7 @@
                         <dependency>
                             <groupId>io.confluent</groupId>
                             <artifactId>build-tools</artifactId>
-                            <version>${confluent.version}</version>
+                            <version>${io.confluent.common.version}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -1018,7 +1155,7 @@
                                 <configuration>
                                     <skipAssembly>${docker.skip-build}</skipAssembly>
                                     <descriptors>
-                                        <descriptor>target/dependency/assembly-plugin-boilerplate-${confluent.version}/common-docker-package.xml</descriptor>
+                                        <descriptor>target/dependency/assembly-plugin-boilerplate-${io.confluent.common.version}/common-docker-package.xml</descriptor>
                                     </descriptors>
                                     <archive>
                                         <manifest>
@@ -1052,7 +1189,7 @@
                                         <argument>-h ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses.html</argument>
                                         <argument>-l ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/licenses</argument>
                                         <argument>-n ${project.build.directory}/${project.build.finalName}-package/share/doc/${project.artifactId}/notices</argument>
-                                        <argument>-x licenses-${licenses.version}.jar</argument>
+                                        <argument>-x licenses-${io.confluent.license-file-generator.version}.jar</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -1088,7 +1225,7 @@
                             <dependency>
                                 <groupId>io.confluent</groupId>
                                 <artifactId>licenses</artifactId>
-                                <version>${licenses.version}</version>
+                                <version>${io.confluent.license-file-generator.version}</version>
                             </dependency>
                         </dependencies>
                     </plugin>
