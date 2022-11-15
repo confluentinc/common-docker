@@ -68,7 +68,6 @@
         <junit.jupiter.version>5.7.0</junit.jupiter.version>
         <kafka.scala.version>2.13</kafka.scala.version>
         <scala.version>2.13.10</scala.version>
-        <licenses.version>${confluent.version}</licenses.version>
         <maven-assembly.version>3.3.0</maven-assembly.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
