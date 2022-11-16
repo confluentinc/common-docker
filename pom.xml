@@ -24,7 +24,7 @@
     <groupId>io.confluent</groupId>
     <artifactId>common-parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.2.8-0</version>
+    <version>7.0.7-0</version>
     <name>common</name>
     <organization>
         <name>Confluent, Inc.</name>
@@ -46,10 +46,10 @@
     <properties>
         <!--jacoco prepare-agent needs argLine defined to set this variable. if we don't have a default set then maven gets angry.-->
         <argLine></argLine>
-        <avro.version>1.10.1</avro.version>
+        <avro.version>1.11.0</avro.version>
         <required.maven.version>3.2</required.maven.version>
-        <kafka.version>[6.2.8-0-ccs, 6.2.9-0-ccs)</kafka.version>
-        <ce.kafka.version>[6.2.8-0-ce, 6.2.9-0-ce)</ce.kafka.version>
+        <kafka.version>[7.0.7-0-ccs, 7.0.8-0-ccs)</kafka.version>
+        <ce.kafka.version>[7.0.7-0-ce, 7.0.8-0-ce)</ce.kafka.version>
         <easymock.version>4.0.1</easymock.version>
         <!-- keep exec-maven-plugin on 1.5.0 until https://github.com/mojohaus/exec-maven-plugin/issues/76 is fixed
              running our LicenseFinder plugin in create-licenses-for-docker breaks when upgrading to 1.6.0 -->
@@ -94,10 +94,10 @@
         <reload4j.version>1.2.19</reload4j.version>
         <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
         <zkclient.version>0.11</zkclient.version>
-        <zookeeper.version>3.5.9</zookeeper.version>
+        <zookeeper.version>3.6.3</zookeeper.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <jmx_prometheus_javaagent.version>0.17.2</jmx_prometheus_javaagent.version>
-        <jolokia-jvm.version>1.6.2</jolokia-jvm.version>
+        <jolokia-jvm.version>1.7.1</jolokia-jvm.version>
         <checkstyle.version>8.44</checkstyle.version>
         <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
@@ -128,7 +128,7 @@
         <!-- Pull the latest base image or use a local image. -->
         <docker.pull-image>false</docker.pull-image>
         <dependency.check.skip>true</dependency.check.skip>
-        <io.confluent.common.version>6.2.8-0</io.confluent.common.version>
+        <io.confluent.common.version>7.0.7-0</io.confluent.common.version>
         <!-- This is a version of the pom file that we install and deploy because
             the kafka and ce-kafka version ranges are resolved.
         -->
@@ -138,7 +138,7 @@
             resolving the version of ccs and ce kafka. This property should 
             never be used any where else.
         -->
-        <confluent.version.range>[6.2.8-0, 6.2.9-0)</confluent.version.range>
+        <confluent.version.range>[7.0.7-0, 7.0.8-0)</confluent.version.range>
         <!-- Controls whether we run the maven resolver plugin which is used to resolve
             the version ranges for kafka and ce-kafka. We want to run this for local builds,
             but disable this in the jenkins profile so it doesn't run during CI builds.
