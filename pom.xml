@@ -32,20 +32,20 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.3.1-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.6-994</ubi.image.version>
+        <ubi.image.version>8.7-923</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1.1.1k-7.el8_6</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
-        <ubi.netcat.version>7.70-6.el8</ubi.netcat.version>
+        <ubi.netcat.version>7.70-8.el8</ubi.netcat.version>
         <ubi.python39.version>3.9.7-1.module+el8.6.0+12577+62b8d0a1</ubi.python39.version>
-        <ubi.tar.version>1.30-5.el8</ubi.tar.version>
-        <ubi.procps.version>3.3.15-6.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-14.el8</ubi.krb5.workstation.version>
-        <ubi.iputils.version>20180629-9.el8</ubi.iputils.version>
+        <ubi.tar.version>1.30-6.el8</ubi.tar.version>
+        <ubi.procps.version>3.3.15-9.el8</ubi.procps.version>
+        <ubi.krb5.workstation.version>1.18.2-21.el8</ubi.krb5.workstation.version>
+        <ubi.iputils.version>20180629.10.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
-        <ubi.glibc.version>2.28-189.5.el8_6</ubi.glibc.version>
-        <ubi.curl.version>7.61.1-22.el8_6.4</ubi.curl.version>
+        <ubi.glibc.version>2.28-211.el8</ubi.glibc.version>
+        <ubi.curl.version>7.61.1-25.el8</ubi.curl.version>
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.17-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
