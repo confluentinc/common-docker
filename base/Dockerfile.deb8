@@ -60,7 +60,7 @@ RUN echo "===> Updating debian ....." \
     && apt-get -qq update \
     \
     && echo "===> Installing curl wget netcat python...." \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --force-yes -y \
                 apt-transport-https \
                 curl \
                 gnupg-curl \
