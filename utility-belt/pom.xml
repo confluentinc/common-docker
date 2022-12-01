@@ -40,6 +40,7 @@
         <argparse4j.version>0.7.0</argparse4j.version>
         <bcpkix.version>1.54</bcpkix.version>
         <gson.version>2.7</gson.version>
+        <snakeyaml.version>1.32</snakeyaml.version>
     </properties>
 
     <dependencies>
@@ -79,6 +80,12 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
         <!--Test dependencies-->
         <dependency>
             <groupId>io.confluent</groupId>
@@ -86,6 +93,7 @@
             <version>${io.confluent.common.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
