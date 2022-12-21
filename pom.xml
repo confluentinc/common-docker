@@ -47,7 +47,7 @@
         <ubi.glibc.version>2.28-211.el8</ubi.glibc.version>
         <ubi.curl.version>7.61.1-25.el8</ubi.curl.version>
         <ubi.libcurl.version>7.61.1-25.el8</ubi.libcurl.version>
-        <ubi.nmap.version>7.70-8.el8</ubi.nmap.version>
+        <ubi.nmap-ncat.version>7.70-6.el8</ubi.nmap-ncat.version>
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.16.1-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
