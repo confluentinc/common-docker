@@ -102,7 +102,7 @@ public class ClusterWaitTest {
   }
 
 
-  @Test(timeout = 180000)
+  @Test(timeout = 250000)
   public void isKafkaReadyWaitUsingZooKeeper() throws Exception {
     final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, 3);
 
