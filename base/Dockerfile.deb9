@@ -42,8 +42,7 @@ COPY requirements.txt .
 
 ARG ZULU_JDK_VERSION="8.0.302-1"
 
-RUN apt update \
-    && apt install -y apt-transport-https bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
+RUN apt update; apt install -y apt-transport-https bash curl git wget netcat-openbsd python python-pip python-setuptools python-enum34 \
     && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
     && dpkg --install zulu-repo_1.0.0-2_all.deb \
     && rm -f zulu-repo_1.0.0-2_all.deb \
