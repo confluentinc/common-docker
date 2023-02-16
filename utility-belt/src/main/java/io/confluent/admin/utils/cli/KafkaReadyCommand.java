@@ -103,6 +103,7 @@ public class KafkaReadyCommand {
   }
 
   public static void main(String[] args) {
+
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {

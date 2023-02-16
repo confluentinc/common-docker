@@ -14,16 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   ~-->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>6.0.11</version>
+        <version>6.1.0</version>
     </parent>
 
     <artifactId>utility-belt</artifactId>
@@ -40,7 +38,6 @@
         <argparse4j.version>0.7.0</argparse4j.version>
         <bcpkix.version>1.54</bcpkix.version>
         <gson.version>2.7</gson.version>
-        <snakeyaml.version>1.32</snakeyaml.version>
     </properties>
 
     <dependencies>
@@ -80,20 +77,13 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
-        </dependency>
-
         <!--Test dependencies-->
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>common-utils</artifactId>
-            <version>${project.version}</version>
+            <version>${io.confluent.common.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
@@ -107,12 +97,6 @@
             <version>${zookeeper.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
         </dependency>
 
         <dependency>
@@ -208,9 +192,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-reload4j</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

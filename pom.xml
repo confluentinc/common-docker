@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>6.0.11</version>
+        <version>6.1.0</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
+    <version>6.1.0</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, and new cp-base image</description>
@@ -28,18 +27,19 @@
     <properties>
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
-        <docker.tag>${project.version}-${docker.os_type}</docker.tag>
+        <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
+        <io.confluent.common-docker.version>6.1.0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi.image.version>8.7-1049.1675784874</ubi.image.version>
         <!-- Redhat Package Versions -->
-        <ubi.openssl.version>1.1.1k-7.el8_6</ubi.openssl.version>
+        <ubi.openssl.version>1.1.1k-6.el8_5</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
-        <ubi.netcat.version>7.70-8.el8</ubi.netcat.version>
-        <ubi.python39.version>3.9.13-2.module+el8.7.0+17195+44752b34</ubi.python39.version>
-        <ubi.tar.version>1.30-6.el8</ubi.tar.version>
-        <ubi.procps.version>3.3.15-9.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-22.el8_7</ubi.krb5.workstation.version>
-        <ubi.iputils.version>20180629-10.el8</ubi.iputils.version>
+        <ubi.netcat.version>7.70-6.el8</ubi.netcat.version>
+        <ubi.python36.version>3.6.8-38.module+el8.5.0+12207+5c5719bc</ubi.python36.version>
+        <ubi.tar.version>1.30-5.el8</ubi.tar.version>
+        <ubi.procps.version>3.3.15-6.el8</ubi.procps.version>
+        <ubi.krb5.workstation.version>1.18.2-14.el8</ubi.krb5.workstation.version>
+        <ubi.iputils.version>20180629-9.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
         <ubi.glibc.version>2.28-211.el8</ubi.glibc.version>
@@ -47,9 +47,9 @@
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.18-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
-        <ubi.python.pip.version>20.*</ubi.python.pip.version>
-        <ubi.python.setuptools.version>50.*</ubi.python.setuptools.version>
-        <ubi.python.confluent.docker.utils.version>v0.0.56</ubi.python.confluent.docker.utils.version>
+        <ubi.python.pip.version>21.*</ubi.python.pip.version>
+        <ubi.python.setuptools.version>54.*</ubi.python.setuptools.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.49</ubi.python.confluent.docker.utils.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
