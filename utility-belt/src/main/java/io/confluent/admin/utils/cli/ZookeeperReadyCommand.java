@@ -63,7 +63,6 @@ public class ZookeeperReadyCommand {
   }
 
   public static void main(String[] args) {
-    org.apache.log4j.BasicConfigurator.configure();
     ArgumentParser parser = createArgsParser();
     boolean success;
     try {
