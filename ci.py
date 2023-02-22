@@ -99,7 +99,7 @@ class CI:
         cmd += "-Dprint{} -q".format(print_method)
         log.info("Resolving the version range for: {}".format(version_range))
         result, stdout = self.run_cmd(cmd, return_stdout=True)
-  
+
         if result:
             # When run from Jenkins there will be additional output included so we just get the last line of output.
             version = stdout.strip().splitlines()[-1]
@@ -115,8 +115,8 @@ class CI:
 
     def is_version_range(self, version):
         """Checks if the specified Maven version is a range"""
-        return (version.startsWith('[') or version.startsWith('(')) and
-            (version.endsWith(']') or version.endsWith(')'))
+        return (version.startswith('[') or version.startswith('(')) and \
+            (version.endswith(']') or version.endswith(')'))
 
     def run_cmd(self, cmd, return_stdout=False):
         """Execute a shell command. Return true if successful, false otherwise."""
