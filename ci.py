@@ -115,7 +115,7 @@ class CI:
 
     def is_version_range(self, version):
         """Checks if the specified Maven version is a range"""
-        return (version.startsWith('[') or version.startsWith(')')) and
+        return (version.startsWith('[') or version.startsWith('(')) and
             (version.endsWith(']') or version.endsWith(')'))
 
     def run_cmd(self, cmd, return_stdout=False):
