@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>5.5.13</version>
+        <version>6.0.0</version>
     </parent>
 
     <groupId>io.confluent</groupId>
@@ -26,15 +24,15 @@
     </modules>
 
     <properties>
-        <docker.os_type>deb8</docker.os_type>
+        <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${project.version}-${docker.os_type}</docker.tag>
         <!-- Versions-->
         <ubi.image.version>8.7-1085</ubi.image.version>
         <!-- Redhat Package Versions -->
-        <ubi.openssl.version>1.1.1k-7.el8_6</ubi.openssl.version>
+        <ubi.openssl.version>1.1.1k-6.el8_5</ubi.openssl.version>
         <ubi.wget.version>1.19.5-10.el8</ubi.wget.version>
-        <ubi.netcat.version>7.70-8.el8</ubi.netcat.version>
+        <ubi.netcat.version>7.70-6.el8</ubi.netcat.version>
         <ubi.python36.version>3.6.8-38.module+el8.5.0+12207+5c5719bc</ubi.python36.version>
         <ubi.tar.version>1.30-6.el8_7.1</ubi.tar.version>
         <ubi.procps.version>3.3.15-9.el8</ubi.procps.version>
@@ -45,11 +43,11 @@
         <ubi.glibc.version>2.28-211.el8</ubi.glibc.version>
         <ubi.curl.version>7.61.1-25.el8_7.2</ubi.curl.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.zulu.openjdk.version>8.0.362-1</ubi.zulu.openjdk.version>
+        <ubi.zulu.openjdk.version>11.0.18-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>21.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>54.*</ubi.python.setuptools.version>
-        <ubi.python.confluent.docker.utils.version>v0.0.56</ubi.python.confluent.docker.utils.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.49</ubi.python.confluent.docker.utils.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as

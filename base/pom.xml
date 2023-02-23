@@ -14,16 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   ~-->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>5.5.13</version>
+        <version>6.0.0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -105,7 +103,6 @@
                         <HOSTNAME_VERSION>-${ubi.hostname.version}</HOSTNAME_VERSION>
                         <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
-                        <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
                         <PYTHON_PIP_VERSION>==${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>

@@ -72,6 +72,7 @@ public class TopicEnsureCommand {
   }
 
   public static void main(String[] args) {
+
     ArgumentParser parser = createArgsParser();
     boolean success = false;
     try {

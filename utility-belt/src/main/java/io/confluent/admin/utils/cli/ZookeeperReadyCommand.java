@@ -63,6 +63,7 @@ public class ZookeeperReadyCommand {
   }
 
   public static void main(String[] args) {
+
     ArgumentParser parser = createArgsParser();
     boolean success;
     try {
