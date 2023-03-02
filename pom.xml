@@ -16,12 +16,13 @@
     <version>7.4.0-0</version>
 
     <name>${project.artifactId}</name>
-    <description>Common Docker utilities, and new cp-base image</description>
+    <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
 
     <modules>
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
+        <module>base-lite</module>
         <module>jmxterm</module>
         <!-- <module>kerberos</module> -->
     </modules>
