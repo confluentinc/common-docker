@@ -47,6 +47,7 @@ RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
+        "curl${CURL_VERSION}" \
         "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     # Work around until Redhat releases updated base image
     && yum --nodocs update -y tzdata libgcc libstdc++ cyrus-sasl-lib libksba libsolv libxml2 \
