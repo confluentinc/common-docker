@@ -43,6 +43,8 @@ ENV LANG="C.UTF-8"
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
 
+ENV HEALTH_CLASSPATH=/usr/share/java/cp-base-lite/*
+
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
@@ -68,6 +70,7 @@ RUN yum --disablerepo="zulu-openjdk" check-update || "${SKIP_SECURITY_UPDATE_CHE
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser readiness-checks/target/readiness-checks*.jar /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite
