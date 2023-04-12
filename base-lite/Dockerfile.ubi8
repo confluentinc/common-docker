@@ -51,6 +51,7 @@ RUN microdnf --nodocs install yum \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         "curl${CURL_VERSION}" \
         "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+    && microdnf clean all \
     # Work around until Redhat releases updated base image
     && yum --nodocs update -y tzdata libgcc libstdc++ cyrus-sasl-lib libksba libsolv libxml2 \
     && yum clean all \
@@ -70,7 +71,6 @@ RUN yum --disablerepo="zulu-openjdk" check-update || "${SKIP_SECURITY_UPDATE_CHE
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
-COPY --chown=appuser:appuser readiness-checks/target/readiness-checks*.jar /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite

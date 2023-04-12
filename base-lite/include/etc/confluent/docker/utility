@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2016 Confluent Inc.
+# Copyright 2023 Confluent Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ build_log4j_properties_kafka() {
 }
 
 
-# builds tool log4j props file for broker
+# builds tool log4j props file for kafka-rest
 # $1 - source base file prepopulated with required log4j configs
 # $2 - final location of tools log4j props file
 build_log4j_properties_kafka_rest() {
@@ -189,9 +189,10 @@ parse_props() {
 # checks if kafka brokers are up
 # $1 - minimum number of brokers
 # $2 - timeout in ms
-# $3 - path to properties file
+# $3 - bootstrap-servers
+# $4 - path to the config file
 function kafka_ready {
-  if java $KAFKA_OPTS -cp "$HEALTH_CLASSPATH" "io.confluent.health.KafkaCheck"  $1 $2 $3
+  if java $KAFKA_OPTS -cp "$HEALTH_CLASSPATH" "io.confluent.admin.utils.cli.KafkaReadyCommand" $1 $2 -b $3 -c $4
   then
     echo "Kafka ready: found at least $1 broker(s)."
   else
