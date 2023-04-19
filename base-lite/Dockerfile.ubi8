@@ -52,7 +52,7 @@ ENV LANG="C.UTF-8"
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
 
-ENV HEALTH_CLASSPATH=/usr/share/java/cp-base-lite/*
+ENV UB_CLASSPATH=/usr/share/java/cp-base-lite/*
 
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
