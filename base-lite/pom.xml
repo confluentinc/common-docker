@@ -35,7 +35,7 @@
 
     <properties>
         <docker.skip-build>false</docker.skip-build>
-        <docker.skip-test>true</docker.skip-test>
+        <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
     </properties>
 
@@ -88,24 +88,9 @@
                         <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
+                        <GOLANG_VERSION>1.18</GOLANG_VERSION>
                     </buildArgs>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>exec-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <executions>
-                    <execution>
-                        <id>Build Go binary</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/buildUb</executable>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
