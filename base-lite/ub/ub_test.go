@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
@@ -137,7 +139,8 @@ func TestPath(t *testing.T) {
 
 func TestRenderTemplateParsesSuccessfully(t *testing.T) {
 	templateFile := "testResources/sampleLog4j.template"
-	renderTemplate(templateFile)
+	passed := renderTemplate(templateFile)
+	assert.True(t, passed)
 }
 
 func TestSplitToMapDefaults(t *testing.T) {
