@@ -4,7 +4,7 @@ import unittest
 import confluent.docker_utils as utils
 
 
-class BaseImageTest(unittest.TestCase):
+class BaseLiteImageTest(unittest.TestCase):
 
     def setUp(self):
         self.image = "{0}confluentinc/cp-base-lite:{1}".format(os.environ["DOCKER_REGISTRY"], os.environ["DOCKER_TAG"])
