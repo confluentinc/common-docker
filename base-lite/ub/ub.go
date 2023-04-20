@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"regexp"
 	"sort"
 	"strings"
@@ -27,46 +29,47 @@ type ConfigSpec struct {
 	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
 }
 
-var re = regexp.MustCompile("[^_]_[^_]")
-
-var ensureCmd = &cobra.Command{
-	Use:   "ensure <environment-variable>",
-	Short: "checks if environment variable is set or not",
-	Args:  cobra.ExactArgs(1),
-	Run:   runEnsureCmd,
-}
-
-var pathCmd = &cobra.Command{
-	Use:   "path <path-to-file> <operation>",
-	Short: "checks if an operation is permitted on a file",
-	Args:  cobra.ExactArgs(2),
-	Run:   runPathCmd,
-}
-
-var renderTemplateCmd = &cobra.Command{
-	Use:   "render-template <path-to-template>",
-	Short: "renders template to stdout",
-	Args:  cobra.ExactArgs(1),
-	Run:   runRenderTemplateCmd,
-}
-
-var renderPropertiesCmd = &cobra.Command{
-	Use:   "render-properties <path-to-config-spec>",
-	Short: "creates and renders properties to stdout using the json config spec.",
-	Args:  cobra.ExactArgs(1),
-	Run:   runRenderPropertiesCmd,
-}
-
 var (
 	bootstrapServers string
-	configFile      string
+	configFile       string
 	zookeeperConnect string
-	security string
-	kafkaReadyCmd   = &cobra.Command{
+	security         string
+
+	re = regexp.MustCompile("[^_]_[^_]")
+
+	ensureCmd = &cobra.Command{
+		Use:   "ensure <environment-variable>",
+		Short: "checks if environment variable is set or not",
+		Args:  cobra.ExactArgs(1),
+		RunE:  runEnsureCmd,
+	}
+
+	pathCmd = &cobra.Command{
+		Use:   "path <path-to-file> <operation>",
+		Short: "checks if an operation is permitted on a file",
+		Args:  cobra.ExactArgs(2),
+		RunE:  runPathCmd,
+	}
+
+	renderTemplateCmd = &cobra.Command{
+		Use:   "render-template <path-to-template>",
+		Short: "renders template to stdout",
+		Args:  cobra.ExactArgs(1),
+		RunE:  runRenderTemplateCmd,
+	}
+
+	renderPropertiesCmd = &cobra.Command{
+		Use:   "render-properties <path-to-config-spec>",
+		Short: "creates and renders properties to stdout using the json config spec.",
+		Args:  cobra.ExactArgs(1),
+		RunE:  runRenderPropertiesCmd,
+	}
+
+	kafkaReadyCmd = &cobra.Command{
 		Use:   "kafka-ready <min-num-brokers> <timeout-secs>",
 		Short: "checks if kafka brokers are up and running",
 		Args:  cobra.ExactArgs(2),
-		Run:   runKafkaReadyCmd,
+		RunE:  runKafkaReadyCmd,
 	}
 )
 
@@ -87,13 +90,16 @@ func path(filePath string, operation string) (bool, error) {
 	case "executable":
 		info, err := os.Stat(filePath)
 		if err != nil {
-			err = fmt.Errorf("error checking executable status of file %q: %q", filePath, err)
+			err = fmt.Errorf("error checking executable status of file %q: %w", filePath, err)
 			return false, err
 		}
 		return info.Mode()&0111 != 0, nil //check whether file is executable by anyone, use 0100 to check for execution rights for owner
 	case "existence":
-		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			return false, nil
+		if _, err := os.Stat(filePath); err != nil {
+			if os.IsNotExist(err) {
+				return false, nil
+			}
+			return false, err
 		}
 		return true, nil
 	case "writable":
@@ -115,7 +121,7 @@ func renderTemplate(templateFilePath string) error {
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
-		err = fmt.Errorf("error  %q: %q", templateFilePath, err)
+		err = fmt.Errorf("error  %q: %w", templateFilePath, err)
 		return err
 	}
 	return buildTemplate(os.Stdout, *t)
@@ -124,7 +130,7 @@ func renderTemplate(templateFilePath string) error {
 func buildTemplate(writer io.Writer, template template.Template) error {
 	err := template.Execute(writer, GetEnvironment())
 	if err != nil {
-		err = fmt.Errorf("error building template file : %q", err)
+		err = fmt.Errorf("error building template file : %w", err)
 		return err
 	}
 	return nil
@@ -220,7 +226,7 @@ func writeConfig(writer io.Writer, config map[string]string) error {
 	for _, n := range sortedNames {
 		_, err := fmt.Fprintf(writer, "%s=%s\n", n, config[n])
 		if err != nil {
-			err = fmt.Errorf("error printing configs: %q", err)
+			err = fmt.Errorf("error printing configs: %w", err)
 			return err
 		}
 	}
@@ -231,13 +237,13 @@ func loadConfigSpec(path string) (ConfigSpec, error) {
 	var spec ConfigSpec
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		err = fmt.Errorf("error reading from json file %q : %q", path, err)
+		err = fmt.Errorf("error reading from json file %q : %w", path, err)
 		return spec, err
 	}
 
 	errParse := json.Unmarshal(bytes, &spec)
 	if errParse != nil {
-		err = fmt.Errorf("error parsing json file %q : %q", path, errParse)
+		err = fmt.Errorf("error parsing json file %q : %w", path, errParse)
 		return spec, err
 	}
 	return spec, nil
@@ -291,53 +297,58 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
-func runEnsureCmd(_ *cobra.Command, args []string) {
+func runEnsureCmd(_ *cobra.Command, args []string) error {
 	success := ensure(args[0])
 	if !success {
-		fmt.Fprintf(os.Stderr, "environment variable %q is not set", args[0])
-		os.Exit(1)
+		err := fmt.Errorf("environment variable %q is not set", args[0])
+		return err
 	}
+	return nil
 }
 
-func runPathCmd(_ *cobra.Command, args []string) {
+func runPathCmd(_ *cobra.Command, args []string) error {
 	success, err := path(args[0], args[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in checking operation %q on file %q: %q", args[1], args[0], err)
-		os.Exit(1)
+		err = fmt.Errorf("error in checking operation %q on file %q: %w", args[1], args[0], err)
+		return err
 	}
 	if !success {
-		fmt.Fprintf(os.Stderr, "operation %q on file %q is unsuccessful", args[1], args[0])
-		os.Exit(1)
+		err = fmt.Errorf("operation %q on file %q is unsuccessful", args[1], args[0])
+		return err
 	}
+	return nil
 }
 
-func runRenderTemplateCmd(_ *cobra.Command, args []string) {
+func runRenderTemplateCmd(_ *cobra.Command, args []string) error {
 	err := renderTemplate(args[0])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in rendering template %q: %q", args[0], err)
-		os.Exit(1)
+		err = fmt.Errorf("error in rendering template %q: %w", args[0], err)
+		return err
 	}
+	return nil
 }
 
-func runRenderPropertiesCmd(_ *cobra.Command, args []string) {
+func runRenderPropertiesCmd(_ *cobra.Command, args []string) error {
 	configSpec, err := loadConfigSpec(args[0])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in loading config from file %q: %q", args[0], err)
-		os.Exit(1)
+		err = fmt.Errorf("error in loading config from file %q: %w", args[0], err)
+		return err
 	}
 	err = renderConfig(os.Stdout, configSpec)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in building properties from file %q: %q", args[0], err)
-		os.Exit(1)
+		err = fmt.Errorf("error in building properties from file %q: %w", args[0], err)
+		return err
 	}
+	return nil
 }
 
-func runKafkaReadyCmd(_ *cobra.Command, args []string) {
+func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	success := checkKafkaReady(args[0], args[1], bootstrapServers, zookeeperConnect, configFile, security)
 	if !success {
-		fmt.Fprintf(os.Stderr, "kafka-ready check failed")
-		os.Exit(1)
+		err := fmt.Errorf("kafka-ready check failed")
+		return err
 	}
+	return nil
 }
 
 func main() {
@@ -358,8 +369,10 @@ func main() {
 	rootCmd.AddCommand(renderPropertiesCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error in executing the command: %q", err)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "error in executing the command: %s", err)
 		os.Exit(1)
 	}
 }
