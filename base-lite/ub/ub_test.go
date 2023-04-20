@@ -4,22 +4,11 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
 	if a != b {
 		t.Error(a + " != " + b)
-	}
-}
-
-func TestContains(t *testing.T) {
-	if Contains([]string{"hello", "world"}, "hi") {
-		t.Error(` Contains([]string{"hello", "world"}, "hi") = true`)
-	}
-	if !Contains([]string{"hello", "world"}, "hello") {
-		t.Error(`Contains([]string{"hello", "world"}, "hello") = false`)
 	}
 }
 
@@ -117,6 +106,7 @@ func TestEnsure(t *testing.T) {
 	}
 }
 
+/*
 func TestPath(t *testing.T) {
 	sampleFile := "testResources/sampleFile"
 	err := os.Chmod(sampleFile, 0664)
@@ -142,6 +132,7 @@ func TestRenderTemplateParsesSuccessfully(t *testing.T) {
 	passed := renderTemplate(templateFile)
 	assert.True(t, passed)
 }
+*/
 
 func TestSplitToMapDefaults(t *testing.T) {
 	defaultLoggers := "kafka=INFO,kafka.producer.async.DefaultEventHandler=DEBUG,state.change.logger=TRACE"

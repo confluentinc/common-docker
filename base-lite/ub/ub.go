@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -12,72 +13,75 @@ import (
 	"strings"
 	"text/template"
 
+	pt "path"
+
+	"golang.org/x/exp/slices"
 	"golang.org/x/sys/unix"
 )
+
+type ConfigSpec struct {
+	Prefixes          map[string]bool   `json:"prefixes"`
+	Excludes          []string          `json:"excludes"`
+	Renamed           map[string]string `json:"renamed"`
+	Defaults          map[string]string `json:"defaults"`
+	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
+}
+
+var re *regexp.Regexp = regexp.MustCompile("[^_]_[^_]")
 
 func ensure(envVar string) bool {
 	_, found := os.LookupEnv(envVar)
 	return found
 }
 
-func path(filePath string, operation string) bool {
+func path(filePath string, operation string) (bool, error) {
 	switch operation {
 
 	case "readable":
-		return unix.Access(filePath, unix.R_OK) == nil
+		return unix.Access(filePath, unix.R_OK) == nil, nil
 	case "executable":
 		info, err := os.Stat(filePath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error checking executable status of file %s: %s", filePath, err)
-			return false
+			err = fmt.Errorf("Error checking executable status of file %s: %q", filePath, err)
+			return false, err
 		}
-		return info.Mode()&0111 != 0 //check whether file is executable by anyone, use 0100 to check for execution rights for owner
+		return info.Mode()&0111 != 0, nil //check whether file is executable by anyone, use 0100 to check for execution rights for owner
 	case "existence":
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			return false
+			return false, nil
 		}
-		return true
+		return true, nil
 	case "writable":
-		return unix.Access(filePath, unix.W_OK) == nil
+		return unix.Access(filePath, unix.W_OK) == nil, nil
 	default:
-		fmt.Fprintf(os.Stderr, "Unknown operation %s", operation)
+		err := fmt.Errorf("Unknown operation %s", operation)
+		return false, err
 	}
-	return false
 }
 
-func renderTemplate(templateFilePath string) bool {
-	templateFile, err := os.Open(templateFilePath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening file at path %s: %s", templateFilePath, err)
-		return false
-	}
-	bytes, err := io.ReadAll(templateFile)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading from file at path %s: %s", templateFilePath, err)
-		return false
-	}
+func renderTemplate(templateFilePath string) error {
 	funcs := template.FuncMap{
 		"getEnv":             getEnvOrDefault,
 		"splitToMapDefaults": splitToMapDefaults,
 	}
-	t, err := template.New("tmpl").Funcs(funcs).Parse(string(bytes))
+	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error  %s: %s", templateFilePath, err)
-		return false
+		err = fmt.Errorf("Error  %s: %q", templateFilePath, err)
+		return err
 	}
 	return buildTemplate(os.Stdout, *t)
 }
 
-func buildTemplate(writer io.Writer, template template.Template) bool {
+func buildTemplate(writer io.Writer, template template.Template) error {
 	err := template.Execute(writer, GetEnvironment())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error building template file : %s", err)
-		return false
+		err = fmt.Errorf("Error building template file : %q", err)
+		return err
 	}
-	return true
+	return nil
 }
 
-func renderConfig(writer io.Writer, configSpec ConfigSpec) bool {
+func renderConfig(writer io.Writer, configSpec ConfigSpec) error {
 	return writeConfig(writer, buildProperties(configSpec, GetEnvironment()))
 }
 
@@ -88,7 +92,6 @@ func renderConfig(writer io.Writer, configSpec ConfigSpec) bool {
 // Moreover, the whole string is converted to lower-case.
 // The behavior of sequences of four or more underscores is undefined.
 func ConvertKey(key string) string {
-	re := regexp.MustCompile("[^_]_[^_]")
 	singleReplaced := re.ReplaceAllStringFunc(key, replaceUnderscores)
 	singleTripleReplaced := strings.ReplaceAll(singleReplaced, "___", "-")
 	return strings.ToLower(strings.ReplaceAll(singleTripleReplaced, "__", "_"))
@@ -99,27 +102,10 @@ func replaceUnderscores(s string) string {
 	return strings.ReplaceAll(s, "_", ".")
 }
 
-type ConfigSpec struct {
-	Prefixes          map[string]bool   `json:"prefixes"`
-	Excludes          []string          `json:"excludes"`
-	Renamed           map[string]string `json:"renamed"`
-	Defaults          map[string]string `json:"defaults"`
-	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
-}
-
-// Contains returns true if slice contains element, and false otherwise.
-func Contains(slice []string, element string) bool {
-	for _, v := range slice {
-		if v == element {
-			return true
-		}
-	}
-	return false
-}
-
 // ListToMap splits each and entry of the kvList argument at '=' into a key/value pair and returns a map of all the k/v pair thus obtained.
+// this will only work for pairs formatted as key=value
 func ListToMap(kvList []string) map[string]string {
-	m := make(map[string]string)
+	m := make(map[string]string, len(kvList)/2)
 	for _, l := range kvList {
 		parts := strings.Split(l, "=")
 		if len(parts) == 2 {
@@ -157,7 +143,7 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 		if newKey, found := spec.Renamed[envKey]; found {
 			config[newKey] = envValue
 		} else {
-			if !Contains(spec.Excludes, envKey) && !(len(spec.ExcludeWithPrefix) > 0 && strings.HasPrefix(envKey, spec.ExcludeWithPrefix)) {
+			if !slices.Contains(spec.Excludes, envKey) && !(len(spec.ExcludeWithPrefix) > 0 && strings.HasPrefix(envKey, spec.ExcludeWithPrefix)) {
 				for prefix, keep := range spec.Prefixes {
 					if strings.HasPrefix(envKey, prefix) {
 						var effectiveKey string
@@ -175,7 +161,7 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
-func writeConfig(writer io.Writer, config map[string]string) bool {
+func writeConfig(writer io.Writer, config map[string]string) error {
 	// Go randomizes iterations over map by design. We sort properties by name to ease debugging:
 	sortedNames := make([]string, 0, len(config))
 	for name := range config {
@@ -185,31 +171,27 @@ func writeConfig(writer io.Writer, config map[string]string) bool {
 	for _, n := range sortedNames {
 		_, err := fmt.Fprintf(writer, "%s=%s\n", n, config[n])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error printing configs: %s", err)
-			return false
+			err = fmt.Errorf("Error printing configs: %q", err)
+			return err
 		}
 	}
-	return true
+	return nil
 }
 
-func loadConfigSpec(path string) (ConfigSpec, bool) {
+func loadConfigSpec(path string) (ConfigSpec, error) {
 	var spec ConfigSpec
-	jsonFile, err := os.Open(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening json file %s : %s", path, err)
-		return spec, false
-	}
-	bytes, err := io.ReadAll(jsonFile)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading from json file %s : %s", path, err)
-		return spec, false
+		err = fmt.Errorf("Error reading from json file %s : %q", path, err)
+		return spec, err
 	}
 
 	errParse := json.Unmarshal(bytes, &spec)
 	if errParse != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing json file %s : %s", path, errParse)
+		err = fmt.Errorf("Error parsing json file %s : %q", path, errParse)
+		return spec, err
 	}
-	return spec, true
+	return spec, nil
 }
 
 func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
@@ -221,9 +203,11 @@ func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
 	}
 	opts = append(opts, "-cp", classPath, className)
 	cmd := exec.Command("java", append(opts[:], args...)...)
-
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			return exitError.ExitCode() == 0
 		}
 		return false
@@ -232,11 +216,11 @@ func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
 }
 
 func getEnvOrDefault(envVar string, defaultValue string) string {
-	v, found := os.LookupEnv(envVar)
-	if !found {
+	val := os.Getenv(envVar)
+	if len(val) == 0 {
 		return defaultValue
 	}
-	return v
+	return val
 }
 
 func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers string, zookeeperConnect string, configFile string, security string) bool {
@@ -252,7 +236,7 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 		opts = append(opts, "-c", configFile)
 	}
 	if security != "" {
-		opts = append(opts, "s", security)
+		opts = append(opts, "-s", security)
 	}
 	jvmOpts := os.Getenv("KAFKA_OPTS")
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
@@ -277,16 +261,16 @@ func main() {
 		success = ensure(os.Args[2])
 	case "path":
 		checkAndPrintUsage(4, "<path-to-file> <operation>")
-		success = path(os.Args[2], os.Args[3])
+		success, _ = path(os.Args[2], os.Args[3])
 	case "render-template":
 		// render a template (used for log4j properties)
 		checkAndPrintUsage(3, "<path-to-template>")
-		success = renderTemplate(os.Args[2])
+		_ = renderTemplate(os.Args[2])
 	case "render-properties":
 		checkAndPrintUsage(3, "<path-to-config-spec>")
 		configSpec, isSuccess := loadConfigSpec(os.Args[2])
-		if isSuccess {
-			success = renderConfig(os.Stdout, configSpec)
+		if isSuccess != nil {
+			renderConfig(os.Stdout, configSpec)
 		}
 	case "kafka-ready":
 		//first positional argument: number brokers
