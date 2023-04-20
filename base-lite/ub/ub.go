@@ -63,8 +63,8 @@ var (
 	zookeeperConnect string
 	security string
 	kafkaReadyCmd   = &cobra.Command{
-		Use:   "kafka-ready <min-no-of-brokers> <timeout-in-secs>",
-		Short: "checks is kafka broker are up using bootstrap servers and config file",
+		Use:   "kafka-ready <min-num-brokers> <timeout-secs>",
+		Short: "checks if kafka brokers are up and running",
 		Args:  cobra.ExactArgs(2),
 		Run:   runKafkaReadyCmd,
 	}
