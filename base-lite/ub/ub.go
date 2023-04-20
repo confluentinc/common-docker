@@ -87,7 +87,7 @@ func path(filePath string, operation string) (bool, error) {
 	case "executable":
 		info, err := os.Stat(filePath)
 		if err != nil {
-			err = fmt.Errorf("error checking executable status of file %s: %q", filePath, err)
+			err = fmt.Errorf("error checking executable status of file %q: %q", filePath, err)
 			return false, err
 		}
 		return info.Mode()&0111 != 0, nil //check whether file is executable by anyone, use 0100 to check for execution rights for owner
@@ -103,7 +103,7 @@ func path(filePath string, operation string) (bool, error) {
 		}
 		return true, nil
 	default:
-		err := fmt.Errorf("unknown operation %s", operation)
+		err := fmt.Errorf("unknown operation %q", operation)
 		return false, err
 	}
 }
@@ -115,7 +115,7 @@ func renderTemplate(templateFilePath string) error {
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
-		err = fmt.Errorf("error  %s: %q", templateFilePath, err)
+		err = fmt.Errorf("error  %q: %q", templateFilePath, err)
 		return err
 	}
 	return buildTemplate(os.Stdout, *t)
@@ -231,13 +231,13 @@ func loadConfigSpec(path string) (ConfigSpec, error) {
 	var spec ConfigSpec
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		err = fmt.Errorf("error reading from json file %s : %q", path, err)
+		err = fmt.Errorf("error reading from json file %q : %q", path, err)
 		return spec, err
 	}
 
 	errParse := json.Unmarshal(bytes, &spec)
 	if errParse != nil {
-		err = fmt.Errorf("error parsing json file %s : %q", path, errParse)
+		err = fmt.Errorf("error parsing json file %q : %q", path, errParse)
 		return spec, err
 	}
 	return spec, nil
@@ -294,7 +294,7 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 func runEnsureCmd(_ *cobra.Command, args []string) {
 	success := ensure(args[0])
 	if !success {
-		fmt.Fprintf(os.Stderr, "environment variable %s is not set", args[0])
+		fmt.Fprintf(os.Stderr, "environment variable %q is not set", args[0])
 		os.Exit(1)
 	}
 }
@@ -314,7 +314,7 @@ func runPathCmd(_ *cobra.Command, args []string) {
 func runRenderTemplateCmd(_ *cobra.Command, args []string) {
 	err := renderTemplate(args[0])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in rendering template %s: %q", args[0], err)
+		fmt.Fprintf(os.Stderr, "error in rendering template %q: %q", args[0], err)
 		os.Exit(1)
 	}
 }
@@ -322,12 +322,12 @@ func runRenderTemplateCmd(_ *cobra.Command, args []string) {
 func runRenderPropertiesCmd(_ *cobra.Command, args []string) {
 	configSpec, err := loadConfigSpec(args[0])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in loading config from file %s: %q", args[0], err)
+		fmt.Fprintf(os.Stderr, "error in loading config from file %q: %q", args[0], err)
 		os.Exit(1)
 	}
 	err = renderConfig(os.Stdout, configSpec)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error in building properties from file %s: %q", args[0], err)
+		fmt.Fprintf(os.Stderr, "error in building properties from file %q: %q", args[0], err)
 		os.Exit(1)
 	}
 }
@@ -349,8 +349,8 @@ func main() {
 
 	kafkaReadyCmd.PersistentFlags().StringVarP(&bootstrapServers, "bootstrap-servers", "b", "", "comma-separated list of kafka brokers")
 	kafkaReadyCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path to the config file")
-	kafkaReadyCmd.PersistentFlags().StringVarP(&zookeeperConnect, "zookeeper-connect", "z", "", "path to the config file")
-	kafkaReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "path to the config file")
+	kafkaReadyCmd.PersistentFlags().StringVarP(&zookeeperConnect, "zookeeper-connect", "z", "", "zookeeper connect string")
+	kafkaReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "security protocol to use when multiple listeners are enabled.")
 
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
