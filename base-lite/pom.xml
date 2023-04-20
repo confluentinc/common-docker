@@ -88,7 +88,7 @@
                         <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
-                        <GOLANG_VERSION>1.19</GOLANG_VERSION>
+                        <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
                     </buildArgs>
                 </configuration>
             </plugin>
