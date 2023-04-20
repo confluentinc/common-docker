@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -15,6 +14,7 @@ import (
 
 	pt "path"
 
+	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/unix"
 )
@@ -28,6 +28,47 @@ type ConfigSpec struct {
 }
 
 var re = regexp.MustCompile("[^_]_[^_]")
+
+var ensureCmd = &cobra.Command{
+	Use:   "ensure <environment-variable>",
+	Short: "checks if environment variable is set or not",
+	Args:  cobra.ExactArgs(1),
+	Run:   runEnsureCmd,
+}
+
+var pathCmd = &cobra.Command{
+	Use:   "path <path-to-file> <operation>",
+	Short: "checks if an operation is permitted on a file",
+	Args:  cobra.ExactArgs(2),
+	Run:   runPathCmd,
+}
+
+var renderTemplateCmd = &cobra.Command{
+	Use:   "render-template <path-to-template>",
+	Short: "renders template to stdout",
+	Args:  cobra.ExactArgs(1),
+	Run:   runRenderTemplateCmd,
+}
+
+var renderPropertiesCmd = &cobra.Command{
+	Use:   "render-properties <path-to-config-spec>",
+	Short: "creates and renders properties to stdout using the json config spec.",
+	Args:  cobra.ExactArgs(1),
+	Run:   runRenderPropertiesCmd,
+}
+
+var (
+	bootstrapServers string
+	configFile      string
+	zookeeperConnect string
+	security string
+	kafkaReadyCmd   = &cobra.Command{
+		Use:   "kafka-ready <min-no-of-brokers> <timeout-in-secs>",
+		Short: "checks is kafka broker are up using bootstrap servers and config file",
+		Args:  cobra.ExactArgs(2),
+		Run:   runKafkaReadyCmd,
+	}
+)
 
 func ensure(envVar string) bool {
 	_, found := os.LookupEnv(envVar)
@@ -250,56 +291,75 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
-func checkAndPrintUsage(numArguments int, message string) {
-	if len(os.Args) != numArguments {
-		fmt.Fprintf(os.Stderr, "Usage '%s %s %s' \n", os.Args[0], os.Args[1], message)
+func runEnsureCmd(_ *cobra.Command, args []string) {
+	success := ensure(args[0])
+	if !success {
+		fmt.Fprintf(os.Stderr, "environment variable %s is not set", args[0])
+		os.Exit(1)
+	}
+}
+
+func runPathCmd(_ *cobra.Command, args []string) {
+	success, err := path(args[0], args[1])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error in checking operation %q on file %q: %q", args[1], args[0], err)
+		os.Exit(1)
+	}
+	if !success {
+		fmt.Fprintf(os.Stderr, "operation %q on file %q is unsuccessful", args[1], args[0])
+		os.Exit(1)
+	}
+}
+
+func runRenderTemplateCmd(_ *cobra.Command, args []string) {
+	err := renderTemplate(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error in rendering template %s: %q", args[0], err)
+		os.Exit(1)
+	}
+}
+
+func runRenderPropertiesCmd(_ *cobra.Command, args []string) {
+	configSpec, err := loadConfigSpec(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error in loading config from file %s: %q", args[0], err)
+		os.Exit(1)
+	}
+	err = renderConfig(os.Stdout, configSpec)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error in building properties from file %s: %q", args[0], err)
+		os.Exit(1)
+	}
+}
+
+func runKafkaReadyCmd(_ *cobra.Command, args []string) {
+	success := checkKafkaReady(args[0], args[1], bootstrapServers, zookeeperConnect, configFile, security)
+	if !success {
+		fmt.Fprintf(os.Stderr, "kafka-ready check failed")
 		os.Exit(1)
 	}
 }
 
 func main() {
-	success := false
-	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage '%s <subcommand> ...'", os.Args[0])
-		os.Exit(1)
-	}
-	switch os.Args[1] {
-	case "ensure":
-		checkAndPrintUsage(3, "<env-variable>")
-		success = ensure(os.Args[2])
-	case "path":
-		checkAndPrintUsage(4, "<path-to-file> <operation>")
-		success, _ = path(os.Args[2], os.Args[3])
-	case "render-template":
-		// render a template (used for log4j properties)
-		checkAndPrintUsage(3, "<path-to-template>")
-		_ = renderTemplate(os.Args[2])
-	case "render-properties":
-		checkAndPrintUsage(3, "<path-to-config-spec>")
-		configSpec, isSuccess := loadConfigSpec(os.Args[2])
-		if isSuccess != nil {
-			renderConfig(os.Stdout, configSpec)
-		}
-	case "kafka-ready":
-		//first positional argument: number brokers
-		//second positional argument: timeout in seconds
-		kafkaReadyCmd := flag.NewFlagSet("kafka-ready", flag.ExitOnError)
-		kafkaReadyBootstrap := kafkaReadyCmd.String("b", "", "Bootstrap broker list")
-		kafkaReadyZooKeeper := kafkaReadyCmd.String("z", "", "ZooKeeper connect string")
-		kafkaReadyConfig := kafkaReadyCmd.String("c", "", "Path to config properties")
-		kafkaReadySecurity := kafkaReadyCmd.String("s", "", "Security protocol")
-
-		kafkaReadyCmd.Parse(os.Args[2:])
-		if kafkaReadyCmd.NArg() != 2 {
-			fmt.Fprintln(os.Stderr, "Missing positional argument", kafkaReadyCmd.Args())
-		} else {
-			success = checkKafkaReady(kafkaReadyCmd.Arg(0), kafkaReadyCmd.Arg(1), *kafkaReadyBootstrap, *kafkaReadyZooKeeper, *kafkaReadyConfig, *kafkaReadySecurity)
-		}
-	default:
-		fmt.Fprintln(os.Stderr, "Unknown subcommand "+os.Args[1])
+	rootCmd := &cobra.Command{
+		Use:   "ub",
+		Short: "utility commands for cp docker images",
+		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 
-	if !success {
+	kafkaReadyCmd.PersistentFlags().StringVarP(&bootstrapServers, "bootstrap-servers", "b", "", "comma-separated list of kafka brokers")
+	kafkaReadyCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path to the config file")
+	kafkaReadyCmd.PersistentFlags().StringVarP(&zookeeperConnect, "zookeeper-connect", "z", "", "path to the config file")
+	kafkaReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "path to the config file")
+
+	rootCmd.AddCommand(pathCmd)
+	rootCmd.AddCommand(ensureCmd)
+	rootCmd.AddCommand(renderTemplateCmd)
+	rootCmd.AddCommand(renderPropertiesCmd)
+	rootCmd.AddCommand(kafkaReadyCmd)
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "error in executing the command: %q", err)
 		os.Exit(1)
 	}
 }

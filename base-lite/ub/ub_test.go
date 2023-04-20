@@ -106,33 +106,35 @@ func TestEnsure(t *testing.T) {
 	}
 }
 
-/*
+
 func TestPath(t *testing.T) {
 	sampleFile := "testResources/sampleFile"
 	err := os.Chmod(sampleFile, 0664)
 	if err != nil {
 		t.Error("Unable to set permissions for the file")
 	}
-	if !path(sampleFile, "readable") {
+	if result, _ := path(sampleFile, "readable"); !result {
 		t.Error("File is readable but returned false")
 	}
-	if !path(sampleFile, "writable") {
+	if result, _ := path(sampleFile, "writable"); !result {
 		t.Error("File is writable but returned false")
 	}
-	if !path(sampleFile, "existence") {
+	if result, _ := path(sampleFile, "existence"); !result {
 		t.Error("File exists but returned false")
 	}
-	if path(sampleFile, "executable") {
+	if result, _ := path(sampleFile, "executable"); result {
 		t.Error("File is not executable but returned true")
 	}
 }
 
 func TestRenderTemplateParsesSuccessfully(t *testing.T) {
 	templateFile := "testResources/sampleLog4j.template"
-	passed := renderTemplate(templateFile)
-	assert.True(t, passed)
+	err := renderTemplate(templateFile)
+	if err != nil {
+		t.Fail()
+	}
 }
-*/
+
 
 func TestSplitToMapDefaults(t *testing.T) {
 	defaultLoggers := "kafka=INFO,kafka.producer.async.DefaultEventHandler=DEBUG,state.change.logger=TRACE"
