@@ -27,7 +27,7 @@ type ConfigSpec struct {
 	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
 }
 
-var re *regexp.Regexp = regexp.MustCompile("[^_]_[^_]")
+var re = regexp.MustCompile("[^_]_[^_]")
 
 func ensure(envVar string) bool {
 	_, found := os.LookupEnv(envVar)
@@ -38,11 +38,15 @@ func path(filePath string, operation string) (bool, error) {
 	switch operation {
 
 	case "readable":
-		return unix.Access(filePath, unix.R_OK) == nil, nil
+		err := unix.Access(filePath, unix.R_OK)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
 	case "executable":
 		info, err := os.Stat(filePath)
 		if err != nil {
-			err = fmt.Errorf("Error checking executable status of file %s: %q", filePath, err)
+			err = fmt.Errorf("error checking executable status of file %s: %q", filePath, err)
 			return false, err
 		}
 		return info.Mode()&0111 != 0, nil //check whether file is executable by anyone, use 0100 to check for execution rights for owner
@@ -52,9 +56,13 @@ func path(filePath string, operation string) (bool, error) {
 		}
 		return true, nil
 	case "writable":
-		return unix.Access(filePath, unix.W_OK) == nil, nil
+		err := unix.Access(filePath, unix.W_OK)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
 	default:
-		err := fmt.Errorf("Unknown operation %s", operation)
+		err := fmt.Errorf("unknown operation %s", operation)
 		return false, err
 	}
 }
@@ -66,7 +74,7 @@ func renderTemplate(templateFilePath string) error {
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
-		err = fmt.Errorf("Error  %s: %q", templateFilePath, err)
+		err = fmt.Errorf("error  %s: %q", templateFilePath, err)
 		return err
 	}
 	return buildTemplate(os.Stdout, *t)
@@ -75,7 +83,7 @@ func renderTemplate(templateFilePath string) error {
 func buildTemplate(writer io.Writer, template template.Template) error {
 	err := template.Execute(writer, GetEnvironment())
 	if err != nil {
-		err = fmt.Errorf("Error building template file : %q", err)
+		err = fmt.Errorf("error building template file : %q", err)
 		return err
 	}
 	return nil
@@ -103,9 +111,9 @@ func replaceUnderscores(s string) string {
 }
 
 // ListToMap splits each and entry of the kvList argument at '=' into a key/value pair and returns a map of all the k/v pair thus obtained.
-// this will only work for pairs formatted as key=value
+// this method will only consider values in the list formatted as key=value
 func ListToMap(kvList []string) map[string]string {
-	m := make(map[string]string, len(kvList)/2)
+	m := make(map[string]string, len(kvList))
 	for _, l := range kvList {
 		parts := strings.Split(l, "=")
 		if len(parts) == 2 {
@@ -171,7 +179,7 @@ func writeConfig(writer io.Writer, config map[string]string) error {
 	for _, n := range sortedNames {
 		_, err := fmt.Fprintf(writer, "%s=%s\n", n, config[n])
 		if err != nil {
-			err = fmt.Errorf("Error printing configs: %q", err)
+			err = fmt.Errorf("error printing configs: %q", err)
 			return err
 		}
 	}
@@ -182,13 +190,13 @@ func loadConfigSpec(path string) (ConfigSpec, error) {
 	var spec ConfigSpec
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		err = fmt.Errorf("Error reading from json file %s : %q", path, err)
+		err = fmt.Errorf("error reading from json file %s : %q", path, err)
 		return spec, err
 	}
 
 	errParse := json.Unmarshal(bytes, &spec)
 	if errParse != nil {
-		err = fmt.Errorf("Error parsing json file %s : %q", path, errParse)
+		err = fmt.Errorf("error parsing json file %s : %q", path, errParse)
 		return spec, err
 	}
 	return spec, nil
