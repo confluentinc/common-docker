@@ -18,7 +18,7 @@ func Test_ensure(t *testing.T) {
 	}
 	err := os.Setenv("ENV_VAR", "value")
 	if err != nil {
-		t.Error("Unable to set ENV_VAR for the test")
+		t.Fatal("Unable to set ENV_VAR for the test")
 	}
 	tests := []struct {
 		name string
@@ -73,46 +73,62 @@ func Test_path(t *testing.T) {
 		want    bool
 		wantErr bool
 	}{
-		{name: "file readable",
+		{
+			name: "file readable",
 			args: args{filePath: sampleFile,
 				operation: "readable"},
 			want:    true,
-			wantErr: false},
-		{name: "file writable",
+			wantErr: false,
+		},
+		{
+			name: "file writable",
 			args: args{filePath: sampleFile,
 				operation: "writable"},
 			want:    true,
-			wantErr: false},
-		{name: "file executable",
+			wantErr: false,
+		},
+		{
+			name: "file executable",
 			args: args{filePath: sampleFile,
 				operation: "executable"},
 			want:    true,
-			wantErr: false},
-		{name: "file existence",
+			wantErr: false,
+		},
+		{
+			name: "file existence",
 			args: args{filePath: sampleFile,
 				operation: "existence"},
 			want:    true,
-			wantErr: false},
-		{name: "file not readable",
+			wantErr: false,
+		},
+		{
+			name: "file not readable",
 			args: args{filePath: sampleFile2,
 				operation: "readable"},
 			want:    false,
-			wantErr: true},
-		{name: "file not writable",
+			wantErr: true,
+		},
+		{
+			name: "file not writable",
 			args: args{filePath: sampleFile2,
 				operation: "writable"},
 			want:    false,
-			wantErr: true},
-		{name: "file not executable",
+			wantErr: true,
+		},
+		{
+			name: "file not executable",
 			args: args{filePath: sampleFile2,
 				operation: "executable"},
 			want:    false,
-			wantErr: false},
-		{name: "file does not exist",
+			wantErr: false,
+		},
+		{
+			name: "file does not exist",
 			args: args{filePath: fileDoesNotExist,
 				operation: "existence"},
 			want:    false,
-			wantErr: false},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -222,9 +238,6 @@ func Test_buildProperties(t *testing.T) {
 			name: "only defaults",
 			args: args{
 				spec: ConfigSpec{
-					Prefixes: map[string]bool{},
-					Excludes: []string{},
-					Renamed:  map[string]string{},
 					Defaults: map[string]string{
 						"default.property.key": "default.property.value",
 						"bootstrap.servers":    "unknown",

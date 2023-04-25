@@ -18,7 +18,9 @@ ARG GOLANG_VERSION
 
 FROM golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
-COPY ub/ ./
+RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+COPY --chown=appuser:appuser ub/ ./
+USER appuser
 RUN go build -ldflags="-w -s" ./ub.go
 RUN go test ./...
 
