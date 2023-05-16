@@ -46,18 +46,6 @@
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
         <ubi.glibc.version>2.28-225.el8</ubi.glibc.version>
         <ubi.curl.version>7.61.1-30.el8_8.2</ubi.curl.version>
-        <ubi.coreutils.version>8.30-15.el8</ubi.coreutils.version>
-        <ubi.cryptopolicies.version>20221215-1.gitece0092.el8 </ubi.cryptopolicies.version>
-        <ubi.filelibs.version>5.33-24.el8</ubi.filelibs.version>
-        <ubi.glib2.version>2.56.4-161.el8</ubi.glib2.version>
-        <ubi.libarchive.version>3.3.3-5.el8</ubi.libarchive.version>
-        <ubi.libffi.version>3.1-24.el8</ubi.libffi.version>
-        <ubi.librepo.version>1.14.2-4.el8</ubi.librepo.version>
-        <ubi.librhsm.version>0.0.3-5.el8</ubi.librhsm.version>
-        <ubi.libselinux.version>2.9-8.el8</ubi.libselinux.version>
-        <ubi.libssh.version>0.9.6-6.el8</ubi.libssh.version>
-        <ubi.redhatrelease.version>8.8-0.8.el8</ubi.redhatrelease.version>
-        <ubi.setup.version>2.12.2-9.el8</ubi.setup.version>
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.18-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
