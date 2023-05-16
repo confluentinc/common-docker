@@ -62,6 +62,18 @@ ARG HOSTNAME_VERSION=""
 ARG XZ_LIBS_VERSION=""
 ARG GLIBC_VERSION=""
 ARG CURL_VERSION=""
+ARG COREUTILS_VERSION=""
+ARG CRYPTO_POLICIES_VERSION=""
+ARG FILELIBS_VERSION=""
+ARG GLIB2_VERSION=""
+ARG LIBARCHIVE_VERSION=""
+ARG LIBFFI_VERSION=""
+ARG LIBREPO_VERSION=""
+ARG LIBRHSM_VERSION=""
+ARG LIBSELINUX_VERSION=""
+ARG LIBSSH_VERSION=""
+ARG REDHAT_RELEASE_VERSION=""
+ARG SETUP_VERSION=""
 
 # Zulu OpenJDK version
 ARG ZULU_OPENJDK_VERSION=""
@@ -97,6 +109,19 @@ RUN microdnf --nodocs install yum \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
         "curl${CURL_VERSION}" \
         "libcurl${CURL_VERSION}" \
+        "coreutils-single${COREUTILS_VERSION}" \
+        "crypto-policies${CRYPTO_POLICIES_VERSION}" \
+        "file-libs${FILELIBS_VERSION}" \
+        "glib2${GLIB2_VERSION}" \
+        "libarchive${LIBARCHIVE_VERSION}" \
+        "libffi${LIBFFI_VERSION}" \
+        "librepo${LIBREPO_VERSION}" \
+        "librhsm${LIBRHSM_VERSION}" \
+        "libselinux{LIBSELINUX_VERSION}" \
+        "libssh${LIBSSH_VERSION}" \
+        "libssh-config${LIBSSH_VERSION}" \
+        "redhat-release${REDHAT_RELEASE_VERSION}" \
+        "setup${SETUP_VERSION}" \
         "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
