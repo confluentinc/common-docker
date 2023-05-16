@@ -146,18 +146,6 @@
                         <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
                         <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
-                        <COREUTILS_VERSION>-${ubi.coreutils.version}</COREUTILS_VERSION>
-                        <CRYPTO_POLICIES_VERSION>-${ubi.cryptopolicies.version}</CRYPTO_POLICIES_VERSION>
-                        <FILELIBS_VERSION>-${ubi.filelibs.version}</FILELIBS_VERSION>
-                        <GLIB2_VERSION>-${ubi.glib2.version}</GLIB2_VERSION>
-                        <LIBARCHIVE_VERSION>-${ubi.libarchive.version}</LIBARCHIVE_VERSION>
-                        <LIBFFI_VERSION>-${ubi.libffi.version}</LIBFFI_VERSION>
-                        <LIBREPO_VERSION>-${ubi.librepo.version}</LIBREPO_VERSION>
-                        <LIBRHSM_VERSION>-${ubi.librhsm.version}</LIBRHSM_VERSION>
-                        <LIBSELINUX_VERSION>-${ubi.libselinux.version}</LIBSELINUX_VERSION>
-                        <LIBSSH_VERSION>-${ubi.libssh.version}</LIBSSH_VERSION>
-                        <REDHAT_RELEASE_VERSION>-${ubi.redhatrelease.version}</REDHAT_RELEASE_VERSION>
-                        <SETUP_VERSION>-${ubi.setup.version}</SETUP_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
