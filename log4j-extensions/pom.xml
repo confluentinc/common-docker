@@ -40,10 +40,6 @@
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
-            <artifactId>logredactor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
             <artifactId>common-logging</artifactId>
             <version>${confluent.version}</version>
         </dependency>
