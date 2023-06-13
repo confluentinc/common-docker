@@ -19,7 +19,6 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.server.util.MockTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -356,7 +355,7 @@ public class EmbeddedKafkaCluster {
             false
         );
 
-    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), new MockTime());
+    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Option.empty());
     brokersById.put(brokerId, broker);
   }
 
