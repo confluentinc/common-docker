@@ -39,7 +39,6 @@ import kafka.security.minikdc.MiniKdc;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.CoreUtils;
-import kafka.utils.MockTime;
 import kafka.utils.TestUtils;
 import scala.Option;
 import scala.Option$;
@@ -356,7 +355,7 @@ public class EmbeddedKafkaCluster {
             false
         );
 
-    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), new MockTime());
+    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Option.empty());
     brokersById.put(brokerId, broker);
   }
 
