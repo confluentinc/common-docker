@@ -6,13 +6,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	pt "path"
 
@@ -63,6 +66,13 @@ var (
 		Short: "creates and renders properties to stdout using the json config spec.",
 		Args:  cobra.ExactArgs(1),
 		RunE:  runRenderPropertiesCmd,
+	}
+
+	waitCmd = &cobra.Command{
+		Use:   "wait <host> <port> <timeout>",
+		Short: "waits for a service to start listening on a port",
+		Args:  cobra.ExactArgs(3),
+		RunE:  runWaitCmd,
 	}
 
 	kafkaReadyCmd = &cobra.Command{
@@ -297,6 +307,24 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
+func waitForServer(host string, port int, timeout time.Duration) bool {
+	address := fmt.Sprintf("%s:%d", host, port)
+	startTime := time.Now()
+	connectTimeout := 5 * time.Second
+
+	for {
+		conn, err := net.DialTimeout("tcp", address, connectTimeout)
+		if err == nil {
+			_ = conn.Close()
+			return true
+		}
+		if time.Since(startTime) >= timeout {
+			return false
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
+
 func runEnsureCmd(_ *cobra.Command, args []string) error {
 	success := ensure(args[0])
 	if !success {
@@ -342,6 +370,26 @@ func runRenderPropertiesCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func runWaitCmd(_ *cobra.Command, args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		err = fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		err = fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(int64(secs) * int64(time.Second))
+
+	success := waitForServer(args[0], port, timeout)
+	if !success {
+		err := fmt.Errorf("service is unreachable")
+		return err
+	}
+	return nil
+}
+
 func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	success := checkKafkaReady(args[0], args[1], bootstrapServers, zookeeperConnect, configFile, security)
 	if !success {
@@ -367,6 +415,7 @@ func main() {
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
 	rootCmd.AddCommand(renderPropertiesCmd)
+	rootCmd.AddCommand(waitCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
