@@ -391,10 +391,6 @@ func Test_waitForServer(t *testing.T) {
 }
 
 func Test_waitForHttp(t *testing.T) {
-	//mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	//	w.WriteHeader(http.StatusOK)
-	//}))
-
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/names" {
 			w.WriteHeader(http.StatusOK)
