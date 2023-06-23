@@ -367,7 +367,7 @@ func Test_waitForServer(t *testing.T) {
 			args: args{
 				host:    "localhost",
 				port:    port + 1,
-				timeout: time.Duration(int64(5) * int64(time.Second)),
+				timeout: time.Duration(5) * time.Second,
 			},
 			want: false,
 		},
@@ -376,7 +376,7 @@ func Test_waitForServer(t *testing.T) {
 			args: args{
 				host:    "localhost",
 				port:    port,
-				timeout: time.Duration(int64(5) * int64(time.Second)),
+				timeout: time.Duration(5) * time.Second,
 			},
 			want: true,
 		},
@@ -400,10 +400,10 @@ func Test_waitForHttp(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	url := mockServer.URL
+	serverURL := mockServer.URL
 
 	type args struct {
-		url     string
+		URL     string
 		timeout time.Duration
 	}
 	tests := []struct {
@@ -414,31 +414,31 @@ func Test_waitForHttp(t *testing.T) {
 		{
 			name: "valid server address, valid url",
 			args: args{
-				url:     url + "/names",
-				timeout: time.Duration(int64(5) * int64(time.Second)),
+				URL:     serverURL + "/names",
+				timeout: time.Duration(5) * time.Second,
 			},
 			wantErr: false,
 		},
 		{
 			name: "valid server address, invalid url",
 			args: args{
-				url:     url,
-				timeout: time.Duration(int64(5) * int64(time.Second)),
+				URL:     serverURL,
+				timeout: time.Duration(5) * time.Second,
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid server address",
 			args: args{
-				url:     "http://invalidAddress:50111/names",
-				timeout: time.Duration(int64(5) * int64(time.Second)),
+				URL:     "http://invalidAddress:50111/names",
+				timeout: time.Duration(5) * time.Second,
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := waitForHttp(tt.args.url, tt.args.timeout); (err != nil) != tt.wantErr {
+			if err := waitForHttp(tt.args.URL, tt.args.timeout); (err != nil) != tt.wantErr {
 				t.Errorf("waitForHttp() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

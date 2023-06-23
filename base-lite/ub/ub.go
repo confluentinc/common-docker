@@ -71,14 +71,14 @@ var (
 	}
 
 	waitCmd = &cobra.Command{
-		Use:   "wait <host> <port> <timeout>",
+		Use:   "wait <host> <port> <timeout-in-secs>",
 		Short: "waits for a service to start listening on a port",
 		Args:  cobra.ExactArgs(3),
 		RunE:  runWaitCmd,
 	}
 
 	httpReadyCmd = &cobra.Command{
-		Use:   "http-ready <url> <timeout>",
+		Use:   "http-ready <url> <timeout-in-secs>",
 		Short: "waits for an HTTP/HTTPS URL to be retrievable",
 		Args:  cobra.ExactArgs(2),
 		RunE:  runHttpReadyCmd,
@@ -334,48 +334,48 @@ func waitForServer(host string, port int, timeout time.Duration) bool {
 	}
 }
 
-func waitForHttp(urlString string, timeout time.Duration) error {
-	parsedUrl, err := url.Parse(urlString)
+func waitForHttp(URL string, timeout time.Duration) error {
+	parsedURL, err := url.Parse(URL)
 	if err != nil {
-		err = fmt.Errorf("error in parsing url %q: %w", urlString, err)
-		return err
+		return fmt.Errorf("error in parsing url %q: %w", URL, err)
 	}
 
-	host := parsedUrl.Hostname()
-	portStr := parsedUrl.Port()
+	host := parsedURL.Hostname()
+	portStr := parsedURL.Port()
 
 	if len(host) == 0 {
 		host = "localhost"
 	}
 
 	if len(portStr) == 0 {
-		portMap := map[string]string{"http": "80", "https": "443"}
-		defaultPort, found := portMap[parsedUrl.Scheme]
-		if !found {
-			err = fmt.Errorf("no port specified and cannot infer port based on protocol (only http(s) supported)")
-			return err
+		switch parsedURL.Scheme {
+		case "http":
+			portStr = "80"
+		case "https":
+			portStr = "443"
+		default:
+			return fmt.Errorf("no port specified and cannot infer port based on protocol (only http(s) supported)")
 		}
-		portStr = defaultPort
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		err = fmt.Errorf("error in parsing port %q: %w", portStr, err)
-		return err
+		return fmt.Errorf("error in parsing port %q: %w", portStr, err)
 	}
 
 	if !waitForServer(host, port, timeout) {
-		err = fmt.Errorf("service is unreachable on host = %q, port = %q", host, portStr)
-		return err
+		return fmt.Errorf("service is unreachable on host = %q, port = %q", host, portStr)
 	}
 
-	resp, err := http.Get(urlString)
-	if err != nil {
-		err = fmt.Errorf("error retrieving url")
-		return err
+	httpClient := &http.Client{
+		Timeout: timeout * time.Second,
 	}
-	if resp.StatusCode/100 != 2 {
-		err = fmt.Errorf("unexpected response for %q with code %d", urlString, resp.StatusCode)
-		return err
+	resp, err := httpClient.Get(URL)
+	if err != nil {
+		return fmt.Errorf("error retrieving url")
+	}
+	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
+	if !statusOK {
+		return fmt.Errorf("unexpected response for %q with code %d", URL, resp.StatusCode)
 	}
 	return nil
 }
@@ -428,21 +428,18 @@ func runRenderPropertiesCmd(_ *cobra.Command, args []string) error {
 func runWaitCmd(_ *cobra.Command, args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
-		err = fmt.Errorf("error in parsing port %q: %w", args[1], err)
-		return err
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
 	}
 
 	secs, err := strconv.Atoi(args[2])
 	if err != nil {
-		err = fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
-		return err
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
 	}
-	timeout := time.Duration(int64(secs) * int64(time.Second))
+	timeout := time.Duration(secs) * time.Second
 
 	success := waitForServer(args[0], port, timeout)
 	if !success {
-		err = fmt.Errorf("service is unreachable for host %q and port %q", args[0], args[1])
-		return err
+		return fmt.Errorf("service is unreachable for host %q and port %q", args[0], args[1])
 	}
 	return nil
 }
@@ -450,15 +447,13 @@ func runWaitCmd(_ *cobra.Command, args []string) error {
 func runHttpReadyCmd(_ *cobra.Command, args []string) error {
 	secs, err := strconv.Atoi(args[1])
 	if err != nil {
-		err = fmt.Errorf("error in parsing timeout seconds %q: %w", args[1], err)
-		return err
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[1], err)
 	}
-	timeout := time.Duration(int64(secs) * int64(time.Second))
+	timeout := time.Duration(secs) * time.Second
 
 	success := waitForHttp(args[0], timeout)
 	if success != nil {
-		err = fmt.Errorf("error in http-ready check for url %q: %w", args[0], success)
-		return err
+		return fmt.Errorf("error in http-ready check for url %q: %w", args[0], success)
 	}
 	return nil
 }
