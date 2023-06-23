@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -73,6 +75,13 @@ var (
 		Short: "waits for a service to start listening on a port",
 		Args:  cobra.ExactArgs(3),
 		RunE:  runWaitCmd,
+	}
+
+	httpReadyCmd = &cobra.Command{
+		Use:   "http-ready <url> <timeout>",
+		Short: "waits for an HTTP/HTTPS URL to be retrievable",
+		Args:  cobra.ExactArgs(2),
+		RunE:  runHttpReadyCmd,
 	}
 
 	kafkaReadyCmd = &cobra.Command{
@@ -325,6 +334,52 @@ func waitForServer(host string, port int, timeout time.Duration) bool {
 	}
 }
 
+func waitForHttp(urlString string, timeout time.Duration) error {
+	parsedUrl, err := url.Parse(urlString)
+	if err != nil {
+		err = fmt.Errorf("error in parsing url %q: %w", urlString, err)
+		return err
+	}
+
+	host := parsedUrl.Hostname()
+	portStr := parsedUrl.Port()
+
+	if len(host) == 0 {
+		host = "localhost"
+	}
+
+	if len(portStr) == 0 {
+		portMap := map[string]string{"http": "80", "https": "443"}
+		defaultPort, found := portMap[parsedUrl.Scheme]
+		if !found {
+			err = fmt.Errorf("no port specified and cannot infer port based on protocol (only http(s) supported)")
+			return err
+		}
+		portStr = defaultPort
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		err = fmt.Errorf("error in parsing port %q: %w", portStr, err)
+		return err
+	}
+
+	if !waitForServer(host, port, timeout) {
+		err = fmt.Errorf("service is unreachable on host = %q, port = %q", host, portStr)
+		return err
+	}
+
+	resp, err := http.Get(urlString)
+	if err != nil {
+		err = fmt.Errorf("error retrieving url")
+		return err
+	}
+	if resp.StatusCode/100 != 2 {
+		err = fmt.Errorf("unexpected response for %q with code %d", urlString, resp.StatusCode)
+		return err
+	}
+	return nil
+}
+
 func runEnsureCmd(_ *cobra.Command, args []string) error {
 	success := ensure(args[0])
 	if !success {
@@ -374,17 +429,35 @@ func runWaitCmd(_ *cobra.Command, args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		err = fmt.Errorf("error in parsing port %q: %w", args[1], err)
+		return err
 	}
 
 	secs, err := strconv.Atoi(args[2])
 	if err != nil {
 		err = fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+		return err
 	}
 	timeout := time.Duration(int64(secs) * int64(time.Second))
 
 	success := waitForServer(args[0], port, timeout)
 	if !success {
-		err := fmt.Errorf("service is unreachable")
+		err = fmt.Errorf("service is unreachable for host %q and port %q", args[0], args[1])
+		return err
+	}
+	return nil
+}
+
+func runHttpReadyCmd(_ *cobra.Command, args []string) error {
+	secs, err := strconv.Atoi(args[1])
+	if err != nil {
+		err = fmt.Errorf("error in parsing timeout seconds %q: %w", args[1], err)
+		return err
+	}
+	timeout := time.Duration(int64(secs) * int64(time.Second))
+
+	success := waitForHttp(args[0], timeout)
+	if success != nil {
+		err = fmt.Errorf("error in http-ready check for url %q: %w", args[0], success)
 		return err
 	}
 	return nil
@@ -416,6 +489,7 @@ func main() {
 	rootCmd.AddCommand(renderTemplateCmd)
 	rootCmd.AddCommand(renderPropertiesCmd)
 	rootCmd.AddCommand(waitCmd)
+	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)

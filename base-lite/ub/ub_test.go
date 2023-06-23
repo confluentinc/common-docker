@@ -389,3 +389,62 @@ func Test_waitForServer(t *testing.T) {
 		})
 	}
 }
+
+func Test_waitForHttp(t *testing.T) {
+	//mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	//	w.WriteHeader(http.StatusOK)
+	//}))
+
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/names" {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	url := mockServer.URL
+
+	type args struct {
+		url     string
+		timeout time.Duration
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "valid server address, valid url",
+			args: args{
+				url:     url + "/names",
+				timeout: time.Duration(int64(5) * int64(time.Second)),
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid server address, invalid url",
+			args: args{
+				url:     url,
+				timeout: time.Duration(int64(5) * int64(time.Second)),
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid server address",
+			args: args{
+				url:     "http://invalidAddress:50111/names",
+				timeout: time.Duration(int64(5) * int64(time.Second)),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := waitForHttp(tt.args.url, tt.args.timeout); (err != nil) != tt.wantErr {
+				t.Errorf("waitForHttp() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
