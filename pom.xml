@@ -32,15 +32,15 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>6.2.11-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.8-860</ubi.image.version>
+        <ubi.image.version>8.8-1014</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1.1.1k-9.el8_7</ubi.openssl.version>
         <ubi.wget.version>1.19.5-11.el8</ubi.wget.version>
         <ubi.netcat.version>7.70-8.el8</ubi.netcat.version>
-        <ubi.python39.version>3.9.16-1.module+el8.8.0+17625+b531f198</ubi.python39.version>
+        <ubi.python39.version>3.9.16-1.module+el8.8.0+18968+3d7b19f0.1</ubi.python39.version>
         <ubi.tar.version>1.30-9.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-13.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-22.el8_7</ubi.krb5.workstation.version>
+        <ubi.krb5.workstation.version>1.18.2-25.el8_8</ubi.krb5.workstation.version>
         <ubi.iputils.version>20180629-10.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
