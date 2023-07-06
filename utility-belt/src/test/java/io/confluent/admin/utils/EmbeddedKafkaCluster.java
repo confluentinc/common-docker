@@ -352,7 +352,6 @@ public class EmbeddedKafkaCluster {
             false,
             NUM_PARTITIONS,
             DEFAULT_REPLICATION_FACTOR,
-            false,
             false
         );
 
