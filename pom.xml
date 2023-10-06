@@ -90,7 +90,7 @@
         <!-- Update to 2.0.0 for unit test patch usage -->
         <powermock.version>2.0.0</powermock.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <reload4j.version>1.2.19</reload4j.version>
+        <reload4j.version>1.2.25</reload4j.version>
         <logredactor.version>1.0.12</logredactor.version>
         <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
         <snakeyaml.version>2.0</snakeyaml.version>
@@ -238,7 +238,7 @@
                 <artifactId>snappy-java</artifactId>
                 <version>1.1.10.1</version>
             </dependency>
-            <!-- jose4j is used in ce-kafka and its version is sepcified
+            <!-- jose4j is used in ce-kafka and its version is specified
             in ce-kafka, this is for maven projects to use the correct version -->
             <dependency>
                 <groupId>org.bitbucket.b_c</groupId>
