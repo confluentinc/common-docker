@@ -167,6 +167,11 @@
     <dependencyManagement>
         <dependencies>
             <!-- our deps-->
+            <dependency>
+              <groupId>org.apache.avro</groupId>
+              <artifactId>avro</artifactId>
+              <version>${avro.version}</version>
+            </dependency>
             <!-- This is to unify the version of Protocol Buffers across CP -->
             <dependency>
                 <groupId>com.google.protobuf</groupId>
