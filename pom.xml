@@ -97,7 +97,9 @@
         <snappy.version>1.1.10.5</snappy.version>
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.9</zookeeper.version>
-        <bouncycastle.version>1.68</bouncycastle.version>
+        <!-- remove the bouncycastle.version after all downstream repos are updated -->
+        <bouncycastle.version>1.70</bouncycastle.version>
+        <bouncycastle.jdk18.version>1.77</bouncycastle.jdk18.version>
         <jmx_prometheus_javaagent.version>0.18.0</jmx_prometheus_javaagent.version>
         <jolokia-jvm.version>1.6.2</jolokia-jvm.version>
         <checkstyle.version>8.44</checkstyle.version>
@@ -136,8 +138,8 @@
         -->
         <installed.pom.file>installed_pom.xml</installed.pom.file>
         <coderplus.plugin.version>1.0</coderplus.plugin.version>
-        <!-- This version range is only used in the custom resolver plugin for 
-            resolving the version of ccs and ce kafka. This property should 
+        <!-- This version range is only used in the custom resolver plugin for
+            resolving the version of ccs and ce kafka. This property should
             never be used any where else.
         -->
         <confluent.version.range>[6.2.14-0, 6.2.15-0)</confluent.version.range>
@@ -152,13 +154,13 @@
         -->
         <skip.maven.resolver.plugin>false</skip.maven.resolver.plugin>
         <!-- The custom install step handles installing a modified pom file with the
-            kafka version ranges resolved. We only do this for local builds so for 
+            kafka version ranges resolved. We only do this for local builds so for
             CI builds we set the phase to none.
         -->
         <custom.install.phase>install</custom.install.phase>
-        <!-- The custom deploy step handles copying the modified pom over the 
+        <!-- The custom deploy step handles copying the modified pom over the
             standard pom so that we deploy a pom with the kafka versions resolved.
-            We only do this for local builds so for 
+            We only do this for local builds so for
             CI builds we set the phase to none.
         -->
         <custom.deploy.phase>deploy</custom.deploy.phase>
@@ -318,6 +320,21 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.jdk18.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.jdk18.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
