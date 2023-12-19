@@ -34,7 +34,7 @@
         <!-- Versions-->
         <ubi.image.version>8.9-1029</ubi.image.version>
         <!-- Redhat Package Versions -->
-        <ubi.openssl.version>1.1.1k-9.el8_7</ubi.openssl.version>
+        <ubi.openssl.version>1.1.1k-12.el8_9</ubi.openssl.version>
         <ubi.wget.version>1.19.5-11.el8</ubi.wget.version>
         <ubi.netcat.version>7.92-1.el8</ubi.netcat.version>
         <ubi.python39.version>3.9.18-1.module+el8.9.0+20024+793d7211</ubi.python39.version>
