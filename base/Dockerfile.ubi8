@@ -110,8 +110,8 @@ RUN microdnf --nodocs install yum \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else if a NO OP.
-#RUN yum install -y crypto-policies-scripts \
-#   && update-crypto-policies --set FIPS
+RUN yum install -y crypto-policies-scripts \
+   && update-crypto-policies --set FIPS
 
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
@@ -130,6 +130,15 @@ COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
 
 RUN mkdir /licenses
 COPY license.txt /licenses
+
+RUN chmod g-s /usr/bin/chage /usr/bin/gpasswd /usr/bin/ksu \
+    /usr/bin/mount /usr/bin/newgrp /usr/bin/su /usr/bin/umount \
+    /usr/bin/write /usr/libexec/dbus-1/dbus-daemon-launch-helper \
+    /usr/libexec/utempter/utempter /usr/sbin/pam_timestamp_check /usr/sbin/unix_chkpwd
+RUN chmod a-s /usr/bin/chage /usr/bin/gpasswd /usr/bin/ksu \
+    /usr/bin/mount /usr/bin/newgrp /usr/bin/su /usr/bin/umount \
+    /usr/bin/write /usr/libexec/dbus-1/dbus-daemon-launch-helper \
+    /usr/libexec/utempter/utempter /usr/sbin/pam_timestamp_check /usr/sbin/unix_chkpwd
 
 USER appuser
 WORKDIR /home/appuser
