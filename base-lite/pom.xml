@@ -92,6 +92,28 @@
                     </buildArgs>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.43.4</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <build>
+                                <args>
+                                    <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
+                                    <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}
+                                    </ZULU_OPENJDK_VERSION>
+                                    <SKIP_SECURITY_UPDATE_CHECK>
+                                        ${docker.skip-security-update-check}
+                                    </SKIP_SECURITY_UPDATE_CHECK>
+                                    <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
+                                </args>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
