@@ -162,12 +162,12 @@ func replaceUnderscores(s string) string {
 func ListToMap(kvList []string) map[string]string {
 	m := make(map[string]string, len(kvList))
 	for _, l := range kvList {
-		parts := strings.Split(l, "=")
-		if len(parts) == 2 {
-			m[parts[0]] = parts[1]
-		}
-	}
-	return m
+		parts := strings.SplitN(l, "=", 2)
+        	if len(parts) == 2 {
+            		m[parts[0]] = parts[1]
+        	}
+    	}
+    	return m
 }
 
 func splitToMapDefaults(separator string, defaultValues string, value string) map[string]string {
