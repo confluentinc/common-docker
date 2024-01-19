@@ -163,11 +163,11 @@ func ListToMap(kvList []string) map[string]string {
 	m := make(map[string]string, len(kvList))
 	for _, l := range kvList {
 		parts := strings.SplitN(l, "=", 2)
-        	if len(parts) == 2 {
-            		m[parts[0]] = parts[1]
-        	}
-    	}
-    	return m
+		if len(parts) == 2 {
+			m[parts[0]] = parts[1]
+		}
+	}
+	return m
 }
 
 func splitToMapDefaults(separator string, defaultValues string, value string) map[string]string {
