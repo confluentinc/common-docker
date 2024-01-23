@@ -294,8 +294,9 @@ func Test_buildProperties(t *testing.T) {
 					ExcludeWithPrefix: "KAFKA_EXCLUDE_PREFIX_",
 				},
 				environment: map[string]string{
-					"KAFKA_FOO":                       "foo",
-					"KAFKA_FOO_BAR":                   "bar",
+					"KAFKA_FOO":     "foo",
+					"KAFKA_FOO_BAR": "bar",
+					"KAFKA_LISTENER_NAME_BROKER_PLAIN_SASL_JAAS_CONFIG": `org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";`,
 					"KAFKA_IGNORED":                   "ignored",
 					"KAFKA_WITH__UNDERSCORE":          "with underscore",
 					"KAFKA_WITH__UNDERSCORE_AND_MORE": "with underscore and more",
@@ -303,12 +304,26 @@ func Test_buildProperties(t *testing.T) {
 					"KAFKA_WITH___DASH_AND_MORE":      "with dash and more",
 				},
 			},
-			want: map[string]string{"bootstrap.servers": "unknown", "default.property.key": "default.property.value", "foo": "foo", "foo.bar": "bar", "with-dash": "with dash", "with-dash.and.more": "with dash and more", "with_underscore": "with underscore", "with_underscore.and.more": "with underscore and more"},
+			want: map[string]string{
+				"bootstrap.servers":    "unknown",
+				"default.property.key": "default.property.value",
+				"foo":                  "foo",
+				"foo.bar":              "bar",
+				"listener.name.broker.plain.sasl.jaas.config": `org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";`,
+				"with-dash":                "with dash",
+				"with-dash.and.more":       "with dash and more",
+				"with_underscore":          "with underscore",
+				"with_underscore.and.more": "with underscore and more",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := buildProperties(tt.args.spec, tt.args.environment); !reflect.DeepEqual(got, tt.want) {
+			for k, v := range tt.args.environment {
+				t.Setenv(k, v)
+			}
+
+			if got := buildProperties(tt.args.spec, GetEnvironment()); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("buildProperties() = %v, want %v", got, tt.want)
 			}
 		})
