@@ -35,14 +35,14 @@
         <!-- Versions-->
         <ubi.image.version>8.8-1014</ubi.image.version>
         <!-- Redhat Package Versions -->
-        <ubi.openssl.version>1.1.1k-9.el8_7</ubi.openssl.version>
+        <ubi.openssl.version>1.1.1k-12.el8_9</ubi.openssl.version>
         <ubi.wget.version>1.19.5-11.el8</ubi.wget.version>
         <ubi.netcat.version>7.70-8.el8</ubi.netcat.version>
-        <ubi.python39.version>3.9.16-1.module+el8.8.0+18968+3d7b19f0.1</ubi.python39.version>
+        <ubi.python39.version>3.9.18-1.module+el8.9.0+20024+793d7211</ubi.python39.version>
         <ubi.tar.version>1.30-9.el8</ubi.tar.version>
-        <ubi.procps.version>3.3.15-13.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-25.el8_8</ubi.krb5.workstation.version>
-        <ubi.iputils.version>20180629-10.el8</ubi.iputils.version>
+        <ubi.procps.version>3.3.15-14.el8</ubi.procps.version>
+        <ubi.krb5.workstation.version>1.18.2-26.el8_9</ubi.krb5.workstation.version>
+        <ubi.iputils.version>20180629-11.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
         <ubi.glibc.version>2.28-225.el8</ubi.glibc.version>
