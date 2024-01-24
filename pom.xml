@@ -33,7 +33,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.4.1-cp1</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.9-1108</ubi.image.version>
+        <ubi.image.version>8.9-1029</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1.1.1k-12.el8_9</ubi.openssl.version>
         <ubi.wget.version>1.19.5-11.el8</ubi.wget.version>
@@ -51,10 +51,10 @@
         <ubi.zulu.openjdk.version>11.0.21-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
-        <ubi.python.setuptools.version>50.*</ubi.python.setuptools.version>
-        <ubi.python.confluent.docker.utils.version>v0.0.59</ubi.python.confluent.docker.utils.version>
+        <ubi.python.setuptools.version>67.8.0</ubi.python.setuptools.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.67</ubi.python.confluent.docker.utils.version>
         <!-- Golang Version -->
-        <golang.version>1.20</golang.version>
+        <golang.version>1.21-bullseye</golang.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
