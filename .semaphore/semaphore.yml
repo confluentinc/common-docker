@@ -37,6 +37,7 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - pip install tox==3.28.0
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
