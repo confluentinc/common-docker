@@ -5,5 +5,7 @@ git:
   enable: true
 semaphore:
   enable: true
-  pipeline_enable: false
-  pipeline_type: cp
+  execution_time_limit: {"hours": 1}
+  pipeline_type: cp-dockerfile
+  docker_repos: ['confluentinc/cp-base-new','confluentinc/cp-base-lite','confluentinc/cp-jmxterm']
+  build_arm: true
