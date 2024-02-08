@@ -38,7 +38,7 @@ global_job_config:
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
       - pip install tox==3.28.0
-      - pip install pytest==4.6.1
+      - pip install pytest
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
