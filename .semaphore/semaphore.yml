@@ -26,6 +26,7 @@ global_job_config:
       - checkout
       - sem-version java 8
       - . cache-maven restore
+      - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
       - export BUILD_NUMBER=$(echo $SEMAPHORE_WORKFLOW_ID | cut -f1 -d"-")
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
@@ -45,13 +46,13 @@ blocks:
       when: "change_in('/', {exclude: ['/.deployed-versions/', '.github/']})"
     task:
       jobs:
-        - name: Build, Test, & Scan
+        - name: Build, Test, & Scan ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
             - export AMD_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$AMD_ARCH }$AMD_ARCH
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
-              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH
+              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi8
             - . cache-maven store
             - cve-scan "$AMD_DOCKER_DEV_FULL_IMAGES"
             - for image in $AMD_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
@@ -67,9 +68,9 @@ blocks:
       when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
-        - name: Deploy AMD confluentinc/cp-base-new
+        - name: Deploy AMD confluentinc/cp-base-new ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-new
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$AMD_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$AMD_ARCH
@@ -85,9 +86,9 @@ blocks:
       when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
-        - name: Deploy AMD confluentinc/cp-base-lite
+        - name: Deploy AMD confluentinc/cp-base-lite ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-lite
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$AMD_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$AMD_ARCH
@@ -103,9 +104,9 @@ blocks:
       when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
-        - name: Deploy AMD confluentinc/cp-jmxterm
+        - name: Deploy AMD confluentinc/cp-jmxterm ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-jmxterm
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$AMD_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$AMD_ARCH
@@ -125,13 +126,13 @@ blocks:
         machine:
           type: s1-prod-ubuntu20-04-arm64-1
       jobs:
-        - name: Build & Test
+        - name: Build & Test ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
             - export ARM_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$ARM_ARCH }$ARM_ARCH
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
-              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH
+              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi8
             - . cache-maven store
             - for image in $ARM_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
@@ -149,9 +150,9 @@ blocks:
         machine:
           type: s1-prod-ubuntu20-04-arm64-1
       jobs:
-        - name: Deploy ARM confluentinc/cp-base-new
+        - name: Deploy ARM confluentinc/cp-base-new ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-new
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$ARM_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$ARM_ARCH
@@ -170,9 +171,9 @@ blocks:
         machine:
           type: s1-prod-ubuntu20-04-arm64-1
       jobs:
-        - name: Deploy ARM confluentinc/cp-base-lite
+        - name: Deploy ARM confluentinc/cp-base-lite ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-lite
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$ARM_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$ARM_ARCH
@@ -191,9 +192,9 @@ blocks:
         machine:
           type: s1-prod-ubuntu20-04-arm64-1
       jobs:
-        - name: Deploy ARM confluentinc/cp-jmxterm
+        - name: Deploy ARM confluentinc/cp-jmxterm ubi8
           commands:
-            - export OS_TAG=""
+            - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-jmxterm
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$ARM_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$ARM_ARCH
@@ -213,13 +214,12 @@ blocks:
         - name: Create Manifest and Maven Deploy
           commands:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker -DaltDeploymentRepository=confluent-codeartifact-internal::default::https://confluent-519856050701.d.codeartifact.us-west-2.amazonaws.com/maven/maven-snapshots/
-              -DrepositoryId=confluent-codeartifact-internal deploy -DskipTests -Ddocker.skip-build=true -Ddocker.skip-test=true
+            - echo "Skipping Maven Deploy"
             # Create manifest
             - >-
               for image in $DOCKER_PROD_IMAGE_NAME;
               do
-                export OS_TAG=""
+                export OS_TAG="-ubi8"
                 export GIT_TAG=$GIT_COMMIT$OS_TAG
                 docker manifest create $image:$GIT_TAG $image:$GIT_TAG$AMD_ARCH $image:$GIT_TAG$ARM_ARCH
                 docker manifest push $image:$GIT_TAG
