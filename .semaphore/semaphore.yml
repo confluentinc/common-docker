@@ -64,8 +64,6 @@ blocks:
             - artifact push workflow target --destination target-AMD
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
@@ -82,8 +80,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
   - name: Deploy AMD confluentinc/cp-base-lite
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-lite ubi8
@@ -100,8 +96,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-jmxterm ubi8
@@ -143,8 +137,6 @@ blocks:
             - artifact push workflow target --destination target-ARM
   - name: Deploy ARM confluentinc/cp-base-new
     dependencies: ["Build & Test ARM"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       agent:
         machine:
@@ -164,8 +156,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
   - name: Deploy ARM confluentinc/cp-base-lite
     dependencies: ["Build & Test ARM"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       agent:
         machine:
@@ -185,8 +175,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       agent:
         machine:
@@ -207,8 +195,6 @@ blocks:
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-base-lite", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-base-lite",
       "Deploy ARM confluentinc/cp-jmxterm"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
         - name: Create Manifest and Maven Deploy
