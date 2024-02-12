@@ -41,7 +41,7 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 
 # Set the classpath for JARs required by `cub`
-ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
+ENV CUB_CLASSPATH='"/usr/share/java/kafka/*:/usr/share/java/cp-base-new/*"'
 
 # These ARGs are left blank indicating to the Dnf package manager to install the latest package
 # version that happens to be availible at this time. For reproducible builds, versions should be specified
