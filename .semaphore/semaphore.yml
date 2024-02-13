@@ -24,7 +24,6 @@ global_job_config:
   prologue:
     commands:
       - checkout
-      - sem-version python 3.9
       - sem-version java 8
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -216,6 +215,7 @@ blocks:
           commands:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
             - echo "Skipping Maven Deploy"
+            - . ci-tools ci-update-version
             # Create manifest
             - >-
               for image in $DOCKER_PROD_IMAGE_NAME;
