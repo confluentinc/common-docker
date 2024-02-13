@@ -24,7 +24,6 @@ global_job_config:
   prologue:
     commands:
       - checkout
-      - sem-version python 3.9
       - sem-version java 8
       - . cache-maven restore
       - pip install tox==3.28.0
