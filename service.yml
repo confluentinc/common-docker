@@ -10,6 +10,6 @@ semaphore:
   docker_repos: ['confluentinc/cp-base-new','confluentinc/cp-base-lite','confluentinc/cp-jmxterm']
   build_arm: true
   os_types: ["ubi8"]
-  nano_versions: true
+  nano_version: true
   maven_skip_deploy: true
   pip_install_package: 'tox==3.28.0'
