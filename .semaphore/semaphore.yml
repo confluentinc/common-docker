@@ -24,7 +24,6 @@ global_job_config:
   prologue:
     commands:
       - checkout
-      - sem-version python 3.9
       - sem-version java 8
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -215,7 +214,9 @@ blocks:
         - name: Create Manifest and Maven Deploy
           commands:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
-            - echo "Skipping Maven Deploy"
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker -DaltDeploymentRepository=confluent-codeartifact-internal::default::https://confluent-519856050701.d.codeartifact.us-west-2.amazonaws.com/maven/maven-snapshots/
+              -DrepositoryId=confluent-codeartifact-internal deploy -DskipTests -Ddocker.skip-build=true -Ddocker.skip-test=true
+            - . ci-tools ci-update-version
             # Create manifest
             - >-
               for image in $DOCKER_PROD_IMAGE_NAME;
