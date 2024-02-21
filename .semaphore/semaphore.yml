@@ -55,7 +55,11 @@ blocks:
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
               -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi8
             - . cache-maven store
-            - for image in $AMD_DOCKER_DEV_FULL_IMAGES; do cve-scan $image; done
+            - >-
+              for dev_image in $AMD_DOCKER_DEV_FULL_IMAGES;
+              do
+                cve-scan $dev_image
+              done
             - for image in $AMD_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
         always:
@@ -215,7 +219,8 @@ blocks:
         - name: Create Manifest and Maven Deploy
           commands:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
-            - echo "Skipping Maven Deploy"
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker -DaltDeploymentRepository=confluent-codeartifact-internal::default::https://confluent-519856050701.d.codeartifact.us-west-2.amazonaws.com/maven/maven-snapshots/
+              -DrepositoryId=confluent-codeartifact-internal deploy -DskipTests -Ddocker.skip-build=true -Ddocker.skip-test=true
             - . ci-tools ci-update-version
             # Create manifest
             - >-
