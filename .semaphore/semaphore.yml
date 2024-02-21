@@ -24,8 +24,8 @@ global_job_config:
   prologue:
     commands:
       - checkout
-      - sem-version python 3.9
       - sem-version java 8
+      - sem-version python 3.9
       - . cache-maven restore
       - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
