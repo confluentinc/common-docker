@@ -33,8 +33,8 @@ global_job_config:
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
-      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_DEV_REGISTRY
-      - export DOCKER_UPSTREAM_TAG=""
+      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
+      - export DOCKER_UPSTREAM_TAG="$BRANCH_TAG-latest"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
@@ -55,11 +55,7 @@ blocks:
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
               -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi8
             - . cache-maven store
-            - >-
-              for dev_image in $AMD_DOCKER_DEV_FULL_IMAGES;
-              do
-                cve-scan $dev_image
-              done
+            - cve-scan "$AMD_DOCKER_DEV_FULL_IMAGES"
             - for image in $AMD_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
         always:
@@ -180,6 +176,7 @@ blocks:
           commands:
             - export OS_TAG="-ubi8"
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-lite
+            
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$ARM_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$ARM_ARCH
             - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH
@@ -219,8 +216,7 @@ blocks:
         - name: Create Manifest and Maven Deploy
           commands:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker -DaltDeploymentRepository=confluent-codeartifact-internal::default::https://confluent-519856050701.d.codeartifact.us-west-2.amazonaws.com/maven/maven-snapshots/
-              -DrepositoryId=confluent-codeartifact-internal deploy -DskipTests -Ddocker.skip-build=true -Ddocker.skip-test=true
+            - echo "Skipping Maven Deploy"
             - . ci-tools ci-update-version
             # Create manifest
             - >-
