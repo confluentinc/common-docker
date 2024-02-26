@@ -29,7 +29,7 @@ global_job_config:
       - . cache-maven restore
       - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
-      - export BUILD_NUMBER=$(echo $SEMAPHORE_WORKFLOW_ID | cut -f1 -d"-")
+      - export BUILD_NUMBER=$SEMAPHORE_WORKFLOW_NUMBER
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
@@ -39,6 +39,8 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export LATEST_TAG=$BRANCH_TAG-latest-ubi8
+      - export BRANCH_LATEST_TAG:$BRANCH_TAG-latest
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
@@ -84,8 +86,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Deploy AMD confluentinc/cp-base-lite
     dependencies: ["Build, Test, & Scan AMD"]
     run:
@@ -163,6 +169,7 @@ blocks:
             - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-new
             - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$ARM_ARCH
             - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$ARM_ARCH
+            - export BRANCH_LATEST_TAG=$BRANCH_TAG-latest$OS_TAG
             - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
