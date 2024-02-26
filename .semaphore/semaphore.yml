@@ -72,8 +72,6 @@ blocks:
             - artifact push workflow target --destination target-AMD
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
