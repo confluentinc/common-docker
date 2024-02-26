@@ -39,8 +39,8 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
-      - export LATEST_TAG=$BRANCH_TAG-latest-ubi8
-      - export BRANCH_LATEST_TAG:$BRANCH_TAG-latest
+      - export LATEST_TAG="$BRANCH_TAG-latest-ubi8"
+      - export BRANCH_LATEST_TAG="$BRANCH_TAG-latest"
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
