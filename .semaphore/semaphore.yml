@@ -39,6 +39,8 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export LATEST_TAG="$BRANCH_TAG-latest-ubi8"
+      - export BRANCH_LATEST_TAG="$BRANCH_TAG-latest"
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
@@ -84,8 +86,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Deploy AMD confluentinc/cp-base-lite
     dependencies: ["Build, Test, & Scan AMD"]
     run:
@@ -102,8 +108,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
     run:
@@ -120,8 +130,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Build & Test ARM
     dependencies: []
     run:
@@ -167,8 +181,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Deploy ARM confluentinc/cp-base-lite
     dependencies: ["Build & Test ARM"]
     run:
@@ -188,8 +206,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
     run:
@@ -209,8 +231,12 @@ blocks:
             - docker pull $DEV_IMAGE_FULL
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_LATEST_TAG
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-base-lite", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-base-lite",
       "Deploy ARM confluentinc/cp-jmxterm"]
