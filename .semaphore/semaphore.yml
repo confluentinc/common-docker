@@ -33,8 +33,9 @@ global_job_config:
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
-      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_DEV_REGISTRY
-      - export DOCKER_UPSTREAM_TAG=""
+      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
+      - export LATEST_TAG=$BRANCH_TAG-latest
+      - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
@@ -86,6 +87,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$AMD_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy AMD confluentinc/cp-base-lite
     dependencies: ["Build, Test, & Scan AMD"]
     run:
@@ -104,6 +108,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$AMD_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
     run:
@@ -122,6 +129,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$AMD_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Build & Test ARM
     dependencies: []
     run:
@@ -169,6 +179,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy ARM confluentinc/cp-base-lite
     dependencies: ["Build & Test ARM"]
     run:
@@ -190,6 +203,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
     run:
@@ -211,6 +227,9 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-base-lite", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-base-lite",
       "Deploy ARM confluentinc/cp-jmxterm"]
@@ -236,6 +255,9 @@ blocks:
                 export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG
                 docker manifest create $image:$BRANCH_BUILD_TAG $image:$BRANCH_BUILD_TAG$AMD_ARCH $image:$BRANCH_BUILD_TAG$ARM_ARCH
                 docker manifest push $image:$BRANCH_BUILD_TAG
+                export LATEST_MANIFEST_TAG=$LATEST_TAG$OS_TAG
+                docker manifest create $image:$LATEST_MANIFEST_TAG $image:$LATEST_MANIFEST_TAG$AMD_ARCH $image:$LATEST_MANIFEST_TAG$ARM_ARCH
+                docker manifest push $image:$LATEST_MANIFEST_TAG
               done
 after_pipeline:
   task:
