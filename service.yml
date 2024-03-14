@@ -13,6 +13,7 @@ semaphore:
   nano_version: true
   maven_skip_deploy: false
   pip_install_package: 'tox==3.28.0'
+  push_latest: true
 code_artifact:
   enable: true
   package_paths:
