@@ -5,6 +5,7 @@ codeowners:
   enable: true
 semaphore:
   enable: true
+  run_pint_merge: true
   pipeline_type: cp
   nano_version: true
   extra_deploy_args: "-Pjenkins"
