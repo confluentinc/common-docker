@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--~
-  ~ Copyright 2015 Confluent Inc.
+  ~ Copyright 2021 Confluent Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,7 +17,7 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,19 +27,20 @@
         <version>6.2.15-0</version>
     </parent>
 
-    <artifactId>common-metrics</artifactId>
+    <properties>
+    </properties>
+
+    <artifactId>disk-usage-agent</artifactId>
     <packaging>jar</packaging>
-    <name>metrics</name>
 
     <dependencies>
         <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>common-utils</artifactId>
-            <version>${io.confluent.common.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <artifactId>slf4j-reload4j</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -46,4 +48,25 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Premain-Class>io.confluent.agent.monitoring.DiskUsage</Premain-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
