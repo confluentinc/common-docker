@@ -14,6 +14,8 @@ semaphore:
   maven_skip_deploy: false
   pip_install_package: 'tox==3.28.0'
   push_latest: true
+  use_packages: true
+  cp_images: true
 code_artifact:
   enable: true
   package_paths:
