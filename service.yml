@@ -36,6 +36,9 @@ semaphore:
         - name: ALLOW_UNSIGNED
           required: true
           default_value: 'false'
+          options:
+            - 'True'
+            - 'False'
         - name: CONFLUENT_DEB_VERSION
           required: true
           default_value: '1'
@@ -58,6 +61,9 @@ semaphore:
         - name: PROMOTE_OS_TYPE
           required: true
           default_value: 'NONE'
+          options:
+            - 'deb'
+            - 'ubi'
 code_artifact:
   enable: true
   package_paths:
