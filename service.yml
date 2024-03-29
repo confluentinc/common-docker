@@ -16,6 +16,54 @@ semaphore:
   push_latest: true
   use_packages: true
   cp_images: true
+  tasks:
+    - name: cp-dockerfile-build
+      branch: master
+      pipeline_file: .semaphore/cp_dockerfile_build.yml
+      parameters:
+        - name: CONFLUENT_VERSION
+          required: true
+          default_value: 'NONE'
+        - name: PACKAGES_URL
+          required: true
+          default_value: 'NONE'
+        - name: PACKAGES_MAVEN_URL
+          required: true
+          default_value: 'NONE'
+        - name: PACKAGING_BUILD_NUMBER
+          required: true
+          default_value: 'NONE'
+        - name: ALLOW_UNSIGNED
+          required: true
+          default_value: 'false'
+          options:
+            - 'true'
+            - 'false'
+        - name: CONFLUENT_DEB_VERSION
+          required: true
+          default_value: '1'
+    - name: cp-dockerfile-promote
+      branch: master
+      pipeline_file: .semaphore/cp_dockerfile_promote.yml
+      parameters:
+        - name: CONFLUENT_VERSION
+          required: true
+          default_value: 'NONE'
+        - name: IMAGE_REVISION
+          required: true
+          default_value: '1'
+        - name: UPDATE_LATEST_TAG
+          required: true
+          default_value: 'NONE'
+        - name: PACKAGING_BUILD_NUMBER
+          required: true
+          default_value: 'NONE'
+        - name: PROMOTE_OS_TYPE
+          required: true
+          default_value: 'NONE'
+          options:
+            - 'deb'
+            - 'ubi'
 code_artifact:
   enable: true
   package_paths:
