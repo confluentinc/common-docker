@@ -37,8 +37,8 @@ semaphore:
           required: true
           default_value: 'false'
           options:
-            - 'True'
-            - 'False'
+            - 'true'
+            - 'false'
         - name: CONFLUENT_DEB_VERSION
           required: true
           default_value: '1'
