@@ -32,8 +32,8 @@ global_job_config:
       - export BUILD_NUMBER=$(echo $SEMAPHORE_WORKFLOW_ID | cut -f1 -d"-")
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       # Semaphore does not accept empty values for parameters.
-      - if [[ "$PACKAGES_MAVEN_URL" = "NONE" ]] then; unset PACKAGES_MAVEN_URL ;fi
-      - if [[ "$PACKAGING_BUILD_NUMBER" = "NONE" ]] then; unset PACKAGING_BUILD_NUMBER ;fi
+      - if [[ "$PACKAGES_MAVEN_URL" = "NONE" ]]; then unset PACKAGES_MAVEN_URL ;fi
+      - if [[ "$PACKAGING_BUILD_NUMBER" = "NONE" ]]; then unset PACKAGING_BUILD_NUMBER ;fi
       - >-
         echo """
         Parameters:
@@ -45,12 +45,12 @@ global_job_config:
         ALLOW_UNSIGNED: $ALLOW_UNSIGNED
         CONFLUENT_DEB_VERSION: $CONFLUENT_DEB_VERSION
         """
-      - if [[ $BRANCH_TAG =~ "-rc" ]] then export IS_RC="true"; fi
-      - if [[ $BRANCH_TAG =~ "-cp" ]] then export IS_HOTFIX="true"; fi
-      - if [[ $BRANCH_TAG =~ "-post" ]] then export IS_POST="true"; fi
-      - if [[ $BRANCH_TAG =~ "-beta" ]] then export IS_BETA="true"; fi
-      - if [[ $BRANCH_TAG =~ "-alpha" ]] then export IS_PREVIEW="true"; fi
-      - if [[ $IS_RC || $IS_HOTFIX || $IS_POST || $IS_BETA || $IS_PREVIEW ]] then export IS_RELEASE="true"; fi
+      - if [[ $BRANCH_TAG =~ "-rc" ]]; then export IS_RC="true"; fi
+      - if [[ $BRANCH_TAG =~ "-cp" ]]; then export IS_HOTFIX="true"; fi
+      - if [[ $BRANCH_TAG =~ "-post" ]]; then export IS_POST="true"; fi
+      - if [[ $BRANCH_TAG =~ "-beta" ]]; then export IS_BETA="true"; fi
+      - if [[ $BRANCH_TAG =~ "-alpha" ]]; then export IS_PREVIEW="true"; fi
+      - if [[ $IS_RC || $IS_HOTFIX || $IS_POST || $IS_BETA || $IS_PREVIEW ]]; then export IS_RELEASE="true"; fi
 
       - >-
         if [[ $IS_BETA || $IS_HOTFIX || $IS_POST ]]; then
