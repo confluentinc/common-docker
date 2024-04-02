@@ -35,10 +35,10 @@ semaphore:
           default_value: 'NONE'
         - name: ALLOW_UNSIGNED
           required: true
-          default_value: 'false'
+          default_value: 'False'
           options:
-            - 'true'
-            - 'false'
+            - 'True'
+            - 'False'
         - name: CONFLUENT_DEB_VERSION
           required: true
           default_value: '1'
