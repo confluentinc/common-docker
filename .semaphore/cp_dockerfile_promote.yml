@@ -26,11 +26,11 @@ global_job_config:
       - checkout
       - . vault-setup
       # Semaphore does not accept empty values for parameters.
-      - if [[ "$CONFLUENT_VERSION" = "NONE" ]] then; echo "Must specify CONFLUENT_VERSION" && exit 1 ;fi
-      - if [[ "$IMAGE_REVISION" = "NONE" ]] then; echo "Must specify IMAGE_REVISION" && exit 1 ;fi
-      - if [[ "$UPDATE_LATEST_TAG" = "NONE" ]] then; unset UPDATE_LATEST_TAG ;fi
-      - if [[ "$PACKAGING_BUILD_NUMBER" = "NONE" ]] then; unset PACKAGING_BUILD_NUMBER ;fi
-      - if [[ "$PROMOTE_OS_TYPE" = "NONE" ]] then; echo "Must specify PROMOTE_OS_TYPE" && exit 1 ;fi
+      - if [[ "$CONFLUENT_VERSION" = "NONE" ]]; then echo "Must specify CONFLUENT_VERSION" && exit 1; fi
+      - if [[ "$IMAGE_REVISION" = "NONE" ]]; then echo "Must specify IMAGE_REVISION" && exit 1; fi
+      - if [[ "$UPDATE_LATEST_TAG" = "NONE" ]]; then unset UPDATE_LATEST_TAG; fi
+      - if [[ "$PACKAGING_BUILD_NUMBER" = "NONE" ]]; then unset PACKAGING_BUILD_NUMBER; fi
+      - if [[ "$PROMOTE_OS_TYPE" = "NONE" ]]; then echo "Must specify PROMOTE_OS_TYPE" && exit 1; fi
       - >-
         echo """
         Parameters:
@@ -64,18 +64,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
+                  docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi8 AMD
           commands:
@@ -88,18 +92,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
+                  docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi8 AMD
           commands:
@@ -112,18 +120,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
+                  docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
   - name: Promote ARM
     dependencies: []
@@ -140,18 +152,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
+                  docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi8 ARM
           commands:
@@ -164,18 +180,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
+                  docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi8 ARM
           commands:
@@ -188,18 +208,22 @@ blocks:
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run -rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
+            - docker push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
+                  docker push $DOCKER_REPO:$APPLY_TAG
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
+                  docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
   - name: Create Manifest
     dependencies: ["Promote confluentinc/cp-base-new ubi8 AMD", "Promote confluentinc/cp-base-lite ubi8 AMD", "Promote confluentinc/cp-jmxterm ubi8 AMD", "Promote confluentinc/cp-base-new ubi8 ARM", "Promote\
@@ -212,17 +236,21 @@ blocks:
             - export DOCKER_REPO="confluentinc/cp-base-new"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
+            - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-base-lite ubi8
           commands:
@@ -230,17 +258,21 @@ blocks:
             - export DOCKER_REPO="confluentinc/cp-base-lite"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
+            - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-jmxterm ubi8
           commands:
@@ -248,15 +280,19 @@ blocks:
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
+            - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG ]]; then
                   if [[ $APPLIED ]]; then
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
