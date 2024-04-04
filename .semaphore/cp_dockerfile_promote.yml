@@ -57,7 +57,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -81,7 +81,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -105,7 +105,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -133,7 +133,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -157,7 +157,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -181,7 +181,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
-            - if [[ "$OS_TYPE" ~= "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
