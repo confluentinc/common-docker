@@ -45,6 +45,7 @@ global_job_config:
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
       - export PROMOTED_TAG_PREFIX="$CONFLUENT_VERSION-$IMAGE_REVISION"
       - if [[ ! "$PACKAGING_BUILD_NUMBER" ]]; then export $PACKAGING_BUILD_NUMBER="latest"; fi
+      - docker login --username $DOCKERHUB_USER --password $DOCKERHUB_APIKEY
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
 
@@ -201,7 +202,7 @@ blocks:
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
-  - name: Create Manifest confluentinc/cp-base-new ubi8
+  - name: Create Manifest
     dependencies: ["Promote AMD", "Promote ARM"]
     task:
       jobs:
@@ -223,10 +224,6 @@ blocks:
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
-  - name: Create Manifest confluentinc/cp-base-lite ubi8
-    dependencies: ["Promote AMD", "Promote ARM"]
-    task:
-      jobs:
         - name: Create Manifest confluentinc/cp-base-lite ubi8
           commands:
             - export OS_TYPE="ubi8"
@@ -245,10 +242,6 @@ blocks:
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
-  - name: Create Manifest confluentinc/cp-jmxterm ubi8
-    dependencies: ["Promote AMD", "Promote ARM"]
-    task:
-      jobs:
         - name: Create Manifest confluentinc/cp-jmxterm ubi8
           commands:
             - export OS_TYPE="ubi8"
