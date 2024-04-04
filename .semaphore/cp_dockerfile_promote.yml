@@ -201,7 +201,7 @@ blocks:
                   fi
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
-  - name: Create Manifest
+  - name: Create Manifest confluentinc/cp-base-new ubi8
     dependencies: ["Promote AMD", "Promote ARM"]
     task:
       jobs:
@@ -223,6 +223,10 @@ blocks:
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
+  - name: Create Manifest confluentinc/cp-base-lite ubi8
+    dependencies: ["Promote AMD", "Promote ARM"]
+    task:
+      jobs:
         - name: Create Manifest confluentinc/cp-base-lite ubi8
           commands:
             - export OS_TYPE="ubi8"
@@ -241,6 +245,10 @@ blocks:
                   fi
                   docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
+  - name: Create Manifest confluentinc/cp-jmxterm ubi8
+    dependencies: ["Promote AMD", "Promote ARM"]
+    task:
+      jobs:
         - name: Create Manifest confluentinc/cp-jmxterm ubi8
           commands:
             - export OS_TYPE="ubi8"
