@@ -202,8 +202,7 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
   - name: Create Manifest
-    dependencies: ["Promote confluentinc/cp-base-new ubi8 AMD", "Promote confluentinc/cp-base-lite ubi8 AMD", "Promote confluentinc/cp-jmxterm ubi8 AMD", "Promote confluentinc/cp-base-new ubi8 ARM", "Promote\
-          \ confluentinc/cp-base-lite ubi8 ARM", "Promote confluentinc/cp-jmxterm ubi8 ARM"]
+    dependencies: ["Promote AMD", "Promote ARM"]
     task:
       jobs:
         - name: Create Manifest confluentinc/cp-base-new ubi8
