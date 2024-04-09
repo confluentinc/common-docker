@@ -49,7 +49,6 @@
         <ubi.curl.version>7.61.1-33.el8_9.5</ubi.curl.version>
         <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
         <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
-
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.22-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
