@@ -17,7 +17,7 @@ semaphore:
   cp_images: true
   tasks:
     - name: cp-dockerfile-build
-      branch: 6.2.x
+      branch: master
       pipeline_file: .semaphore/cp_dockerfile_build.yml
       parameters:
         - name: CONFLUENT_VERSION
@@ -42,7 +42,7 @@ semaphore:
           required: true
           default_value: '1'
     - name: cp-dockerfile-promote
-      branch: 6.2.x
+      branch: master
       pipeline_file: .semaphore/cp_dockerfile_promote.yml
       parameters:
         - name: CONFLUENT_VERSION
