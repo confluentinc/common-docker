@@ -121,7 +121,7 @@ blocks:
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\.[0-9]+\.x$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
@@ -145,7 +145,7 @@ blocks:
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\.[0-9]+\.x$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-jmxterm ubi8
@@ -169,7 +169,7 @@ blocks:
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-jmxterm"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\.[0-9]+\.x$'"
     task:
       jobs:
         - name: Create Manifest and Maven Deploy
