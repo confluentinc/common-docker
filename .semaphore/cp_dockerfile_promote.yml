@@ -46,7 +46,7 @@ global_job_config:
       - docker login --username $DOCKERHUB_USER --password $DOCKERHUB_APIKEY
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
-      
+
 blocks:
   - name: Promote AMD
     dependencies: []
@@ -108,7 +108,6 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
                   docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
-
   - name: Promote ARM
     dependencies: []
     task:
@@ -178,7 +177,6 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
-
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
