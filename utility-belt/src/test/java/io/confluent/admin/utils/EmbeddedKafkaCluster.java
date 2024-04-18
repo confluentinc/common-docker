@@ -16,6 +16,7 @@
 package io.confluent.admin.utils;
 
 import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.slf4j.Logger;
@@ -135,7 +136,7 @@ public class EmbeddedKafkaCluster {
 
       saslProperties = new Properties();
       saslProperties.put(SaslConfigs.SASL_MECHANISM, "GSSAPI");
-      saslProperties.put(SaslConfigs.SASL_ENABLED_MECHANISMS, "GSSAPI");
+      saslProperties.put(BrokerSecurityConfigs.SASL_ENABLED_MECHANISMS_CONFIG, "GSSAPI");
 
       this.brokerTrustStoreFile = Option.apply(trustStoreFile);
       this.brokerSaslProperties = Option.apply(saslProperties);

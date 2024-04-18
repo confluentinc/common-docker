@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>6.2.16-0</version>
+        <version>7.0.15-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -64,7 +64,6 @@
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-jvm</artifactId>
             <version>${jolokia-jvm.version}</version>
-            <classifier>agent</classifier>
         </dependency>
 
         <dependency>
@@ -82,13 +81,16 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>io.confluent</groupId>
+                    <artifactId>confluent-log4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-reload4j</artifactId>
-        </dependency>
-
+        </dependency>        
     </dependencies>
 
       <!-- This jar is only used by the deb8 base image and does not get added to the other images. -->
