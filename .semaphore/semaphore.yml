@@ -108,6 +108,7 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-AMD
+
   - name: Build & Test ARM
     dependencies: []
     run:
@@ -136,6 +137,7 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-ARM
+
 after_pipeline:
   task:
     agent:

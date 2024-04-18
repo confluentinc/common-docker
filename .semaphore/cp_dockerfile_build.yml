@@ -87,6 +87,7 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      
 blocks:
   - name: Build, Test, & Scan AMD
     dependencies: []
@@ -269,6 +270,7 @@ blocks:
               do
                 export OS_TAG="-ubi8"
                 export GIT_TAG=$GIT_COMMIT$OS_TAG
+
                 docker manifest create $image:$GIT_TAG $image:$GIT_TAG$AMD_ARCH $image:$GIT_TAG$ARM_ARCH
                 docker manifest push $image:$GIT_TAG
                 export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG
@@ -298,5 +300,6 @@ after_pipeline:
           - checkout
           - sem-version java 11
           - artifact pull workflow target-AMD
+
           - artifact pull workflow target-ARM
           - emit-sonarqube-data --run_only_sonar_scan
