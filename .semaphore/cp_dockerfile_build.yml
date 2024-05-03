@@ -122,7 +122,7 @@ blocks:
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.x'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
@@ -137,16 +137,19 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
             - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
             - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$AMD_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.x'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-jmxterm ubi8
@@ -161,9 +164,12 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
             - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
             - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$AMD_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
@@ -199,7 +205,7 @@ blocks:
   - name: Deploy ARM confluentinc/cp-base-new
     dependencies: ["Build & Test ARM"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.x'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
     task:
       agent:
         machine:
@@ -217,16 +223,19 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
             - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
             - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.x'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
     task:
       agent:
         machine:
@@ -244,16 +253,19 @@ blocks:
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
             - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
             - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
             - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
             - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-jmxterm"]
     run:
-      when: "branch = 'master' or branch =~ '[0-9]+\\.[0-9]+\\.x'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
     task:
       jobs:
         - name: Create Manifest and Maven Deploy
@@ -271,9 +283,13 @@ blocks:
                 export GIT_TAG=$GIT_COMMIT$OS_TAG
                 docker manifest create $image:$GIT_TAG $image:$GIT_TAG$AMD_ARCH $image:$GIT_TAG$ARM_ARCH
                 docker manifest push $image:$GIT_TAG
+                docker pull $image:$GIT_TAG
+                sign-images $image:$GIT_TAG
                 export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG
                 docker manifest create $image:$BRANCH_BUILD_TAG $image:$BRANCH_BUILD_TAG$AMD_ARCH $image:$BRANCH_BUILD_TAG$ARM_ARCH
                 docker manifest push $image:$BRANCH_BUILD_TAG
+                docker pull $image:$BRANCH_BUILD_TAG
+                sign-images $image:$BRANCH_BUILD_TAG
                 export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG
                 docker manifest create $image:$PACKAGE_TAG $image:$PACKAGE_TAG$AMD_ARCH $image:$PACKAGE_TAG$ARM_ARCH
                 docker manifest push $image:$PACKAGE_TAG
