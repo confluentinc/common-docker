@@ -100,7 +100,7 @@ RUN microdnf --nodocs install yum \
         "libcurl${CURL_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
-        "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "zulu17-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu17-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
