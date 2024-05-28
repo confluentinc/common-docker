@@ -85,7 +85,6 @@ blocks:
     dependencies: []
     run:
       when: "pull_request =~ '.*'"
-      # don't run the tests on non-functional changes...
     task:
       jobs:
         - name: Build, Test, & Scan ubi8
@@ -140,7 +139,6 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-ARM
-
 after_pipeline:
   task:
     agent:
