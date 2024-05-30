@@ -38,7 +38,7 @@
         <ubi.openssl.version>1.1.1k-12.el8_9</ubi.openssl.version>
         <ubi.wget.version>1.19.5-11.el8</ubi.wget.version>
         <ubi.netcat.version>7.92-1.el8</ubi.netcat.version>
-        <ubi.python39.version>3.9.18-3.module+el8.10.0+21142+453d2b75</ubi.python39.version>
+        <ubi.python39.version>3.9.19-1.module+el8.10.0+21815+bb024982</ubi.python39.version>
         <ubi.tar.version>1.30-9.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-14.el8</ubi.procps.version>
         <ubi.krb5.workstation.version>1.18.2-27.el8_10</ubi.krb5.workstation.version>
