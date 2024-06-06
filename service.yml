@@ -7,7 +7,7 @@ semaphore:
   enable: true
   execution_time_limit: {"hours": 1}
   pipeline_type: cp-dockerfile
-  docker_repos: ['confluentinc/cp-base-new', 'confluentinc/cp-jmxterm']
+  docker_repos: ['confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
   build_arm: true
   os_types: ["ubi8"]
   nano_version: true
@@ -69,6 +69,7 @@ code_artifact:
   enable: true
   package_paths:
     - maven-snapshots/maven/io.confluent/cp-jmxterm
+    - maven-snapshots/maven/io.confluent/cp-base-lite
     - maven-snapshots/maven/io.confluent/cp-base-new
     - maven-snapshots/maven/io.confluent/docker-utils
     - maven-snapshots/maven/io.confluent/utility-belt

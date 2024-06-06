@@ -7,21 +7,22 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.0.15-0, 7.0.16-0)</version>
+        <version>[7.8.0-0, 7.8.1-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.0.15-0</version>
+    <version>7.8.0-0</version>
 
     <name>${project.artifactId}</name>
-    <description>Common Docker utilities, and new cp-base image</description>
+    <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
 
     <modules>
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
+        <module>base-lite</module>
         <module>jmxterm</module>
         <!-- <module>kerberos</module> -->
     </modules>
@@ -30,7 +31,7 @@
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.0.15-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>7.8.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi.image.version>8.9-1161.1715068733</ubi.image.version>
         <!-- Redhat Package Versions -->
@@ -46,12 +47,16 @@
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
         <ubi.glibc.version>2.28-251.el8_10.2</ubi.glibc.version>
         <ubi.curl.version>7.61.1-34.el8</ubi.curl.version>
+        <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
+        <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.zulu.openjdk.version>11.0.22-1</ubi.zulu.openjdk.version>
+        <ubi.zulu.openjdk.version>17.0.11-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>67.8.0</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.78</ubi.python.confluent.docker.utils.version>
+        <!-- Golang Version -->
+        <golang.version>1.21-bullseye</golang.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
