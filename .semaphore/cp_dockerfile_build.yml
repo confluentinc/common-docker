@@ -25,7 +25,6 @@ global_job_config:
     commands:
       - checkout
       - sem-version java 8
-      - sem-version python 3.9
       - . vault-setup
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -80,7 +79,7 @@ global_job_config:
         fi
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
-      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_DEV_REGISTRY
+      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
       - export LATEST_TAG=$BRANCH_TAG-latest
       - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
@@ -331,7 +330,10 @@ blocks:
             - export DOCKER_PROD_IMAGE_NAME=$DOCKER_PROD_REGISTRY${DOCKER_REPOS// / $DOCKER_PROD_REGISTRY}
             - ci-tools ci-update-version
             - ci-tools ci-push-tag
-            - echo "Skipping Maven Deploy"
+            - |-
+              if [[ ! $IS_RELEASE && ! $IS_PREVIEW ]]; then
+                mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker -DaltDeploymentRepository=confluent-codeartifact-internal::default::https://confluent-519856050701.d.codeartifact.us-west-2.amazonaws.com/maven/maven-snapshots/ -DrepositoryId=confluent-codeartifact-internal deploy -DskipTests -Ddocker.skip-build=true -Ddocker.skip-test=true 
+              fi
             # Create manifest
             - >-
               for image in $DOCKER_PROD_IMAGE_NAME;
