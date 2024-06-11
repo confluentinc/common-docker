@@ -24,7 +24,7 @@ global_job_config:
   prologue:
     commands:
       - checkout
-      - sem-version java 8
+      - sem-version java 8 || sem-version java 1.8 
       - sem-version python 3.9
       - . vault-setup
       - . cache-maven restore
@@ -86,6 +86,9 @@ blocks:
     run:
       when: "pull_request =~ '.*'"
     task:
+      agent:
+        machine:
+          type: s1-prod-rhel-9-amd64-1
       jobs:
         - name: Build, Test, & Scan ubi8
           commands:
@@ -118,7 +121,7 @@ blocks:
     task:
       agent:
         machine:
-          type: s1-prod-ubuntu20-04-arm64-1
+          type: s1-prod-rhel-9-arm64-1
       jobs:
         - name: Build & Test ubi8
           commands:
