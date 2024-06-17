@@ -76,14 +76,13 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
-RUN bash -c 'cat <<EOF > /etc/yum.repos.d/adoptium.repo
-[Adoptium]
-name=Adoptium
-baseurl=https://packages.adoptium.net/artifactory/rpm/${DISTRIBUTION_NAME:-$(. /etc/os-release; echo $ID)}/\$releasever/\$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public
-EOF'
+RUN printf "[Adoptium] \n\
+name=Adoptium \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
 
 RUN microdnf --nodocs install yum \
     && yum --nodocs update -y \
