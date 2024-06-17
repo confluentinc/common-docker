@@ -76,6 +76,15 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
+RUN bash -c 'cat <<EOF > /etc/yum.repos.d/adoptium.repo
+[Adoptium]
+name=Adoptium
+baseurl=https://packages.adoptium.net/artifactory/rpm/${DISTRIBUTION_NAME:-$(. /etc/os-release; echo $ID)}/\$releasever/\$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public
+EOF'
+
 RUN microdnf --nodocs install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
@@ -96,7 +105,7 @@ RUN microdnf --nodocs install yum \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
         "curl${CURL_VERSION}" \
         "libcurl${CURL_VERSION}" \
-        "java-17-openjdk" \
+        "temurin-17-jdk" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
