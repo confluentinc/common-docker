@@ -76,8 +76,6 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
-RUN microdnf --nodocs install java-17-openjdk
-
 RUN microdnf --nodocs install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
