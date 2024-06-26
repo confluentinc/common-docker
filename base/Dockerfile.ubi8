@@ -75,10 +75,11 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
+#&& yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jre11.0.23-linux.$(uname -m).rpm \
 
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
-    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jre11.0.23-linux.$(uname -m).rpm \
+    && rpm -ivh --nodigest --nofiledigest https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
@@ -98,6 +99,7 @@ RUN microdnf --nodocs install yum \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
         "curl${CURL_VERSION}" \
         "libcurl${CURL_VERSION}" \
+        "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
