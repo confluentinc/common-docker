@@ -22,7 +22,7 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
-<!--        <module>jmxterm</module>-->
+        <module>jmxterm</module>
         <!-- <module>kerberos</module> -->
     </modules>
 
