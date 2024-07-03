@@ -112,6 +112,7 @@ blocks:
 #                cve-scan $dev_image
 #              done
             - echo "Pushing docker image 519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/confluentinc/cp-base-new:$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH"
+            - . assume-iam-role arn:aws:iam::519856050701:role/semaphore-oidc
             - docker push 519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/confluentinc/cp-base-new:$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH
 #            - for image in $AMD_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
