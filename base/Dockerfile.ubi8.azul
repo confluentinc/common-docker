@@ -111,7 +111,7 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 RUN yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jre11.0.23-linux.$(uname -m).rpm \
-    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jre11.0.23-linux.$(uname -m).rpm
+    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux.$(uname -m).rpm
 
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
