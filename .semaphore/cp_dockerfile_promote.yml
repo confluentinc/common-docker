@@ -56,7 +56,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -68,7 +68,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   echo "Passed"
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
@@ -91,7 +91,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -102,7 +102,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
                   docker push $DOCKER_REPO:$APPLY_TAG
@@ -121,7 +121,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -132,7 +132,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
                   docker push $DOCKER_REPO:$APPLY_TAG
@@ -155,7 +155,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -166,7 +166,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
                   docker push $DOCKER_REPO:$APPLY_TAG
@@ -185,7 +185,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -196,7 +196,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
                   docker push $DOCKER_REPO:$APPLY_TAG
@@ -215,7 +215,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
@@ -226,7 +226,7 @@ blocks:
             - echo $OS_TAG
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
                   docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$APPLY_TAG
                   docker push $DOCKER_REPO:$APPLY_TAG
@@ -249,7 +249,7 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - echo $OS_TAG
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-base-new"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
@@ -257,7 +257,7 @@ blocks:
             - echo $OS_TYPE
             - env
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   echo "Passed"
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
                   docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
@@ -279,14 +279,14 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - echo $OS_TAG
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-base-lite"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - env
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
                   docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
@@ -304,14 +304,14 @@ blocks:
           commands:
             - export OS_TYPE="ubi8"
             - echo $OS_TAG
-            - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
             - env
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
-              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
+              if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
                   docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
                   docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
