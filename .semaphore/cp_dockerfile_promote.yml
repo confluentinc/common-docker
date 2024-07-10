@@ -57,7 +57,7 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
@@ -65,6 +65,8 @@ blocks:
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
             - echo $OS_TYPE
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   echo "Passed"
@@ -90,13 +92,15 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run --rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
@@ -118,13 +122,15 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run --rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$AMD_ARCH
@@ -150,13 +156,15 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-new"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run --rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
@@ -178,13 +186,15 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run --rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
@@ -206,13 +216,15 @@ blocks:
             - export OS_TYPE="ubi8"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
-            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG"
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$ARM_ARCH"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$ARM_ARCH"
             - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
             - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $DOCKER_REPO:$PROMOTED_TAG
             - docker run --rm $DOCKER_REPO:$PROMOTED_TAG sh -c "grep staging /etc/yum.repos.d/confluent.repo || grep staging /etc/apt/sources.list" || export STAGING_CHECK_SUCCEED="true"
             - if [[ ! "$STAGING_CHECK_SUCCEED" ]]; then echo "Detected there was a staging repo in image $DOCKER_REPO:$PROMOTED_TAG refusing to promote." && exit 1; fi
             - docker push $DOCKER_REPO:$PROMOTED_TAG
+            - echo $OS_TAG
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   export APPLY_TAG=$CONFLUENT_VERSION$ARM_ARCH
@@ -243,6 +255,7 @@ blocks:
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - echo $OS_TYPE
+            - env
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ "ubi*" ]]; then
                   echo "Passed"
@@ -269,6 +282,7 @@ blocks:
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-base-lite"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
+            - env
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
@@ -293,6 +307,7 @@ blocks:
             - if [[ "$OS_TYPE" =~ "$PROMOTE_OS_TYPE*" || ! "$OS_TYPE" ]]; then export OS_TAG=""; else export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
+            - env
             - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
