@@ -25,7 +25,6 @@ global_job_config:
     commands:
       - checkout
       - sem-version java 8
-      - sem-version python 3.9
       - . vault-setup
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -73,7 +72,7 @@ global_job_config:
         fi
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
-      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_DEV_REGISTRY
+      - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
       - export LATEST_TAG=$BRANCH_TAG-latest
       - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
@@ -81,8 +80,17 @@ global_job_config:
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
 blocks:
-  - name: Build, Test, & Scan AMD
+  - name: Validation
     dependencies: []
+    run:
+      when: "branch = 'master'"
+    task:
+      jobs:
+        - name: Validation
+          commands:
+            - . sem-pint -c
+  - name: Build, Test, & Scan AMD
+    dependencies: ["Validation"]
     run:
       when: "pull_request =~ '.*'"
     task:
@@ -112,7 +120,7 @@ blocks:
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-AMD
   - name: Build & Test ARM
-    dependencies: []
+    dependencies: ["Validation"]
     run:
       when: "pull_request =~ '.*'"
     task:
