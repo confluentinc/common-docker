@@ -50,7 +50,7 @@
         <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
         <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.zulu.openjdk.version>17.0.11-1</ubi.zulu.openjdk.version>
+        <ubi.zulu.openjdk.version>17.0.12-2</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>67.8.0</ubi.python.setuptools.version>
