@@ -51,7 +51,7 @@
         <ubi.zulu.openjdk.version>11.0.23-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
-        <ubi.python.setuptools.version>67.8.0</ubi.python.setuptools.version>
+        <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.82</ubi.python.confluent.docker.utils.version>
         <!-- Golang Version -->
         <golang.version>1.21-bullseye</golang.version>
