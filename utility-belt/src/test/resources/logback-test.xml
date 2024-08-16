@@ -1,0 +1,14 @@
+<configuration>
+
+    <!-- Console Appender using the default pattern -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- Default encoder without specifying a pattern -->
+        <encoder/>
+    </appender>
+
+    <!-- Set the root logger level to ERROR -->
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
