@@ -131,7 +131,7 @@ blocks:
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
@@ -158,7 +158,7 @@ blocks:
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
     run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-jmxterm ubi8
@@ -214,7 +214,7 @@ blocks:
   - name: Deploy ARM confluentinc/cp-base-new
     dependencies: ["Build & Test ARM"]
     run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       agent:
         machine:
@@ -244,7 +244,7 @@ blocks:
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
     run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       agent:
         machine:
@@ -274,7 +274,7 @@ blocks:
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-jmxterm"]
     run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?-rc[0-9]+$'"
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Create Manifest and Maven Deploy
