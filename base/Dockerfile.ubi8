@@ -63,8 +63,8 @@ ARG XZ_LIBS_VERSION=""
 ARG GLIBC_VERSION=""
 ARG CURL_VERSION=""
 
-# Zulu OpenJDK version
-ARG ZULU_OPENJDK_VERSION=""
+# Temurin JDK version
+ARG TEMURIN_JDK_VERSION=""
 
 # Python Module Versions
 ARG PYTHON_PIP_VERSION=""
@@ -76,9 +76,15 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
+RUN printf "[temurin-jdk] \n\
+name=temurin-jdk \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+
 RUN microdnf --nodocs install yum \
-    && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
-    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
@@ -100,7 +106,7 @@ RUN microdnf --nodocs install yum \
         "libcurl${CURL_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
-        "zulu17-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu17-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "temurin-17-jdk${TEMURIN_JDK_VERSION}" "temurin-17-jre${TEMURIN_JDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
@@ -118,10 +124,10 @@ RUN update-crypto-policies --set FIPS
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
 # is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
 # hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
-# security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
-# such as identified bugs in ZuluJDK's software.
+# security update is availible. We skip checks from TemurinJDK repos because Confluent pins those upstream versions for various reasons
+# such as identified bugs in TemurinJDK's software.
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
-RUN yum --disablerepo="zulu-openjdk" check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
+RUN yum --disablerepo="temurin-jdk" check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
