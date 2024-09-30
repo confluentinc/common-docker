@@ -84,11 +84,34 @@ gpgcheck=1 \n\
 gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
+# ENV required when manually installing openssl
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+# Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
+# Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
+# Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
+# For details on the necessary configuration changes in openssl.cnf, please refer to the documentation at: https://docs.openssl.org/3.0/man7/fips_module/#description
 RUN microdnf --nodocs install yum \
-    && yum --nodocs update -y \
+    && yum --nodocs -q update -y \
+    && yum --nodocs -q install -y wget tar gzip make perl gcc \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
+    && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
+    && cd openssl${OPENSSL_VERSION} \
+    && echo "installing FIPS compliant openssl" \
+    && ./Configure enable-fips \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
+    && echo "successfully installed FIPS compliant openssl" \
+    && cd .. \
+    && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
+    && echo "updating openssl config for FIPS" \
+    && sed -i '/# .include fipsmodule.cnf/a\.include /usr/local/ssl/fipsmodule.cnf' /usr/local/ssl/openssl.cnf \
+    && sed -i 's/^default = default_sect$/fips = fips_sect/' /usr/local/ssl/openssl.cnf \
+    && sed -i 's/\[default_sect\]/[fips_sect]/' /usr/local/ssl/openssl.cnf \
+    && sed -i '/\[fips_sect\]/a\activate = 1' /usr/local/ssl/openssl.cnf \
+    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
-        "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
         "python39${PYTHON39_VERSION}" \
