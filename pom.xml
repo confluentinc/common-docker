@@ -51,7 +51,7 @@
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
-        <ubi.python.confluent.docker.utils.version>v0.0.82</ubi.python.confluent.docker.utils.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.85</ubi.python.confluent.docker.utils.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
