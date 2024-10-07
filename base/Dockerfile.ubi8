@@ -107,8 +107,8 @@ RUN microdnf --nodocs install yum \
     && echo "updating openssl config for FIPS" \
     && sed -i '/# .include fipsmodule.cnf/a\.include /usr/local/ssl/fipsmodule.cnf' /usr/local/ssl/openssl.cnf \
     && sed -i 's/^default = default_sect$/fips = fips_sect/' /usr/local/ssl/openssl.cnf \
-    && sed -i 's/\[default_sect\]/[fips_sect]/' /usr/local/ssl/openssl.cnf \
-    && sed -i '/\[fips_sect\]/a\activate = 1' /usr/local/ssl/openssl.cnf \
+    && sed -i '/providers = provider_sect/a alg_section = alg_sect' /usr/local/ssl/openssl.cnf \
+    && sed -i '/# fips = fips_sect/a \\n\[alg_sect]\n\default_properties = fips=yes' /usr/local/ssl/openssl.cnf \
     && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
