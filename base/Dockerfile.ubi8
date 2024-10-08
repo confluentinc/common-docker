@@ -76,13 +76,34 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
+# ENV required when manually installing openssl,
+# for arm64 required binaries are present in /usr/local/lib
+# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
+ENV LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+# Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
+# Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
+# Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
+# For details on the necessary configuration changes in openssl.cnf, please refer to the documentation at: https://docs.openssl.org/3.0/man7/fips_module/#description
 RUN microdnf --nodocs install yum \
+    && yum --nodocs -q update -y \
+    && yum --nodocs -q install -y wget tar gzip make perl gcc \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
+    && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
+    && cd openssl${OPENSSL_VERSION} \
+    && echo "installing FIPS compliant openssl" \
+    && ./Configure enable-fips \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
+    && echo "successfully installed FIPS compliant openssl" \
+    && cd .. \
+    && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
+    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
-        "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
         "python39${PYTHON39_VERSION}" \
@@ -125,6 +146,7 @@ RUN yum --disablerepo="zulu-openjdk" check-update || "${SKIP_SECURITY_UPDATE_CHE
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+COPY openssl-fips.cnf  /usr/local/ssl/openssl-fips.cnf
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
