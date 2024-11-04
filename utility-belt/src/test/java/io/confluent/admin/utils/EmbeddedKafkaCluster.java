@@ -39,6 +39,7 @@ import kafka.security.minikdc.MiniKdc;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.CoreUtils;
+import kafka.security.JaasTestUtils;
 import kafka.utils.TestUtils;
 import scala.Option;
 import scala.Option$;
@@ -221,7 +222,7 @@ public class EmbeddedKafkaCluster {
     principals.add(principal);
     kdc.createPrincipal(
         keytabFile,
-        JavaConverters.asScalaBuffer(principals).toList()
+        principals
     );
 
     log.debug("Keytab file for " + principal + " : " + keytabFile.getAbsolutePath());
@@ -281,7 +282,7 @@ public class EmbeddedKafkaCluster {
 
   public Properties getClientSecurityConfig() {
     if (enableSASLSSL) {
-      Properties clientSecurityProps = TestUtils.producerSecurityConfigs(
+      Properties clientSecurityProps = JaasTestUtils.producerSecurityConfigs(
           SecurityProtocol.SASL_SSL,
           Option.apply(trustStoreFile),
           Option.apply(saslProperties)
