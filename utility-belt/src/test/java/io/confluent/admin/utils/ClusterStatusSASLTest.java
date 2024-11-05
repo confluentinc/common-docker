@@ -41,7 +41,7 @@ public class ClusterStatusSASLTest {
 
 
   @BeforeClass
-  public static void setup() throws IOException {
+  public static void setup() throws Exception {
     Configuration.setConfiguration(null);
 
     kafka = new EmbeddedKafkaCluster(3, 3, true);

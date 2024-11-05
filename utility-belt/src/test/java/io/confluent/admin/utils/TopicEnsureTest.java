@@ -48,7 +48,7 @@ public class TopicEnsureTest {
   private static TopicEnsure topicEnsure;
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() throws Exception {
     kafka = new EmbeddedKafkaCluster(NUM_BROKERS, NUM_ZK);
     kafka.start();
 

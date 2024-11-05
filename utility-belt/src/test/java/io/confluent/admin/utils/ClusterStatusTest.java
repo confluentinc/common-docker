@@ -35,7 +35,7 @@ public class ClusterStatusTest {
   private static int numZookeeperPeers = 3;
 
   @BeforeClass
-  public static void setup() throws IOException {
+  public static void setup() throws Exception {
 
     kafka = new EmbeddedKafkaCluster(numBrokers, numZookeeperPeers);
     kafka.start();
