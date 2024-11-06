@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 package io.confluent.admin.utils;
+
 import kafka.security.JaasTestUtils;
-import org.apache.kafka.common.utils.Time;
+import kafka.security.minikdc.MiniKdc;
+import kafka.server.KafkaConfig;
+import kafka.server.KafkaServer;
+import kafka.utils.CoreUtils;
+import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.apache.kafka.common.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Option;
+import scala.Option$;
+import scala.collection.JavaConverters;
 
+import javax.security.auth.login.Configuration;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -30,17 +40,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.security.auth.login.Configuration;
-
-import kafka.security.minikdc.MiniKdc;
-import kafka.server.KafkaConfig;
-import kafka.server.KafkaServer;
-import kafka.utils.CoreUtils;
-import kafka.utils.TestUtils;
-import scala.Option;
-import scala.Option$;
-import scala.collection.JavaConverters;
 
 /**
  * This class is based on code from
@@ -219,7 +218,7 @@ public class EmbeddedKafkaCluster {
     principals.add(principal);
     kdc.createPrincipal(
         keytabFile,
-            (List<String>) JavaConverters.asScalaBuffer(principals)
+            principals
     );
 
     log.debug("Keytab file for " + principal + " : " + keytabFile.getAbsolutePath());
