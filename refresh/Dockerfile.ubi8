@@ -1,0 +1,53 @@
+ARG MICRODIR=/microdir
+ARG UBI_MICRO_VERSION=8.10-13
+ARG TEMURIN_JDK_VERSION="17.0.13.0.0.11-2"
+FROM registry.access.redhat.com/ubi8 AS BUILD
+
+RUN printf "[temurin-jre] \n\
+name=temurin-jre \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+RUN echo "installing temurin-17-jre:${TEMURIN_JDK_VERSION}"
+RUN yum --nodocs install -y --setopt=install_weak_deps=False temurin-17-jre
+
+RUN yum clean all
+
+FROM registry.access.redhat.com/ubi8-micro:${UBI_MICRO_VERSION} AS REFRESH
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
+
+# Remember where we came from
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
+
+ARG GIT_COMMIT
+LABEL io.confluent.docker.git.id=$GIT_COMMIT
+
+ARG BUILD_NUMBER=-1
+LABEL io.confluent.docker.build.number=$BUILD_NUMBER
+
+LABEL maintainer="tools@confluent.io"
+LABEL vendor="Confluent"
+LABEL version=$GIT_COMMIT
+LABEL release=$PROJECT_VERSION
+LABEL name=$ARTIFACT_ID
+LABEL summary="Common base image for new Confluent lightweight Docker images."
+LABEL description="Common base image for Confluent lightweight Docker images."
+LABEL io.confluent.docker=true
+# This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
+# base image that supports it
+ENV LANG="C.UTF-8"
+
+#ARG MICRODIR
+COPY --from=BUILD /usr/lib/jvm/temurin-17-jre/ .
+
+ENV PATH="jre/bin:${PATH}"
+
+RUN echo "appuser:x:1001:1001::/home/appuser:/bin/sh" >> /etc/passwd && \
+    mkdir -p /home/appuser && \
+    chown 1001:1001 /home/appuser
+
+USER appuser
+WORKDIR /home/appuser
