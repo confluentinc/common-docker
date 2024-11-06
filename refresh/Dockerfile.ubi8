@@ -41,9 +41,9 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 
 #ARG MICRODIR
-COPY --from=BUILD /usr/lib/jvm/temurin-17-jre/ .
+COPY --from=BUILD /usr/lib/jvm/temurin-17-jre/ usr/lib
 
-ENV PATH="jre/bin:${PATH}"
+ENV PATH="/usr/lib/bin:${PATH}"
 
 RUN echo "appuser:x:1001:1001::/home/appuser:/bin/sh" >> /etc/passwd && \
     mkdir -p /home/appuser && \
