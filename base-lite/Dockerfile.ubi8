@@ -68,7 +68,7 @@ RUN microdnf --nodocs install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         "curl${CURL_VERSION}" \
-        "temurin-17-jre${TEMURIN_JDK_VERSION}" \
+        "temurin-21-jre${TEMURIN_JDK_VERSION}" \
     && microdnf clean all \
     && yum clean all \
     && rm -rf /tmp/* \
