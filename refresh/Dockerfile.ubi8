@@ -1,6 +1,9 @@
 ARG MICRODIR=/microdir
 ARG UBI_MICRO_VERSION=8.10-13
 ARG TEMURIN_JDK_VERSION="17.0.13.0.0.11-2"
+ARG DOCKER_UPSTREAM_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
+ARG DOCKER_UPSTREAM_TAG="7.9.x-latest-ubi8"
+
 FROM registry.access.redhat.com/ubi8 AS BUILD
 
 RUN printf "[temurin-jre] \n\
@@ -14,6 +17,8 @@ RUN echo "installing temurin-17-jre:${TEMURIN_JDK_VERSION}"
 RUN yum --nodocs install -y --setopt=install_weak_deps=False temurin-17-jre
 
 RUN yum clean all
+
+FROM ${DOCKER_UPSTREAM_REGISTRY}confluentinc/cp-base-lite:${DOCKER_UPSTREAM_TAG} AS BASE-LITE
 
 FROM registry.access.redhat.com/ubi8-micro:${UBI_MICRO_VERSION} AS REFRESH
 ARG PROJECT_VERSION
@@ -42,6 +47,7 @@ ENV LANG="C.UTF-8"
 
 #ARG MICRODIR
 COPY --from=BUILD /usr/lib/jvm/temurin-17-jre/ usr/lib
+COPY --from=BASE-LITE /usr/bin /usr/bin
 
 ENV PATH="/usr/lib/bin:${PATH}"
 
