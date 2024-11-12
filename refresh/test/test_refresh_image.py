@@ -17,5 +17,12 @@ class BaseRefreshImageTest(unittest.TestCase):
         result = utils.run_docker_command(image=self.image, command=jre_cmd)
         self.assertTrue(b'17' in result)
 
+    def test_ub_exists(self):
+        self.assertTrue(utils.path_exists_in_image(self.image, "/usr/bin/ub"))
+
+    def test_ub_runnable(self):
+        ub_cmd = "bash -c '/usr/bin/ub -h'"
+        self.assertTrue(b"utility commands" in utils.run_docker_command(image=self.image, command=ub_cmd))    
+
 if __name__ == '__main__':
     unittest.main()
