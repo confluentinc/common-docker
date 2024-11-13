@@ -18,7 +18,7 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False temurin-17-jre
 
 RUN yum clean all
 
-FROM ${DOCKER_UPSTREAM_REGISTRY}confluentinc/cp-base-lite:${DOCKER_UPSTREAM_TAG} AS BASE-LITE
+FROM ${DOCKER_UPSTREAM_REGISTRY}confluentinc/cp-base-lite AS BASE-LITE
 
 FROM registry.access.redhat.com/ubi8-micro:${UBI_MICRO_VERSION} AS REFRESH
 ARG PROJECT_VERSION
