@@ -18,7 +18,7 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False temurin-17-jre
 
 RUN yum clean all
 
-FROM ${DOCKER_UPSTREAM_REGISTRY}confluentinc/cp-base-lite AS BASE-LITE
+FROM 519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/confluentinc/cp-base-lite:7.9.x-latest-ubi8 AS BASE-LITE
 
 FROM registry.access.redhat.com/ubi8-micro:${UBI_MICRO_VERSION} AS REFRESH
 ARG PROJECT_VERSION
