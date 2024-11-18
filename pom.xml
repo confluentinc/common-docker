@@ -33,7 +33,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.7.0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1086</ubi.image.version>
+        <ubi.image.version>8.10-1130</ubi.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
@@ -43,7 +43,7 @@
         <ubi.python39.version>3.9.20-1.module+el8.10.0+22342+478c159e</ubi.python39.version>
         <ubi.tar.version>1.30-9.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-14.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-29.el8_10</ubi.krb5.workstation.version>
+        <ubi.krb5.workstation.version>1.18.2-30.el8_10</ubi.krb5.workstation.version>
         <ubi.iputils.version>20180629-11.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
