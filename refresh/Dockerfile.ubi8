@@ -3,6 +3,7 @@ ARG UBI_MICRO_VERSION=8.10-13
 ARG TEMURIN_JDK_VERSION="17.0.13.0.0.11-2"
 ARG DOCKER_UPSTREAM_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
 ARG DOCKER_UPSTREAM_TAG
+ARG GOLANG_VERSION
 
 FROM registry.access.redhat.com/ubi8 AS BUILD
 
@@ -54,6 +55,16 @@ ENV PATH="/usr/lib/bin:${PATH}"
 RUN echo "appuser:x:1001:1001::/home/appuser:/bin/sh" >> /etc/passwd && \
     mkdir -p /home/appuser && \
     chown 1001:1001 /home/appuser
+    
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+RUN cd /usr/share/java \
+      && package_dedupe $(pwd)
+
+FROM docker.io/golang:${GOLANG_VERSION} AS build_package_dedupe
+WORKDIR /build
+RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+COPY --chown=appuser:appuser package_dedupe/package_dedupe.go ./
+RUN go build -ldflags="-w -s" ./package_dedupe.go      
 
 USER appuser
 WORKDIR /home/appuser
