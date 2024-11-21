@@ -59,6 +59,7 @@ global_job_config:
         if [[ $IS_RC ]]; then
           export MAVEN_PACKAGES_URL="https://s3.us-west-2.amazonaws.com/staging-confluent-packages-maven-654654529379-us-west-2/v$BRANCH_NAME/maven"
         fi
+      - >-
         if [[ $PACKAGES_MAVEN_URL ]]; then
           export MAVEN_PACKAGES_URL=$PACKAGES_MAVEN_URL # If not empty, use the provided URL
         fi
