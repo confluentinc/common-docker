@@ -28,6 +28,7 @@ global_job_config:
       - sem-version python 3.9
       - . vault-setup
       - . cache-maven restore
+      - . assume-iam-role arn:aws:iam::891377121322:role/packaging-repo
       - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
       - export BUILD_NUMBER=$(echo $SEMAPHORE_WORKFLOW_ID | cut -f1 -d"-")
@@ -57,11 +58,11 @@ global_job_config:
       - export MAVEN_PACKAGES_URL="https://s3.us-west-2.amazonaws.com/dev-confluent-packages-maven-654654529379-us-west-2/maven" # This is default set for PR builds not having a packaging build number
       - >- 
         if [[ $IS_RC ]]; then
-          export MAVEN_PACKAGES_URL="https://s3.us-west-2.amazonaws.com/staging-confluent-packages-maven-654654529379-us-west-2/v$BRANCH_NAME/maven"
+            export MAVEN_PACKAGES_URL="https://s3.us-west-2.amazonaws.com/staging-confluent-packages-maven-654654529379-us-west-2/v$BRANCH_NAME/maven"
         fi
       - >-
         if [[ $PACKAGES_MAVEN_URL ]]; then
-          export MAVEN_PACKAGES_URL=$PACKAGES_MAVEN_URL # If not empty, use the provided URL
+            export MAVEN_PACKAGES_URL=$PACKAGES_MAVEN_URL # If not empty, use the provided URL
         fi
       - . vault-sem-get-secret maven-settings-cp-dockerfile
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
