@@ -33,7 +33,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.5.7-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1086</ubi.image.version>
+        <ubi.image.version>8.10-1130</ubi.image.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1:1.1.1k-14.el8_6</ubi.openssl.version>
         <ubi.wget.version>1.19.5-12.el8_10</ubi.wget.version>
