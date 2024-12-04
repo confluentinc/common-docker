@@ -221,7 +221,7 @@ public class EmbeddedKafkaCluster {
     principals.add(principal);
     kdc.createPrincipal(
         keytabFile,
-        JavaConverters.asScalaBuffer(principals).toList()
+        principals
     );
 
     log.debug("Keytab file for " + principal + " : " + keytabFile.getAbsolutePath());
