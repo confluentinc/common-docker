@@ -14,35 +14,32 @@
  * limitations under the License.
  */
 package io.confluent.admin.utils;
-import org.apache.kafka.common.utils.Time;
-import org.apache.kafka.common.config.SaslConfigs;
-import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
-import org.apache.kafka.common.config.types.Password;
-import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.security.auth.login.Configuration;
-
+import kafka.security.JaasTestUtils;
 import kafka.security.minikdc.MiniKdc;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.CoreUtils;
 import kafka.utils.TestUtils;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
+import org.apache.kafka.common.config.types.Password;
+import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.apache.kafka.common.utils.Time;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Option;
 import scala.Option$;
 import scala.collection.JavaConverters;
+
+import javax.security.auth.login.Configuration;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is based on code from
@@ -84,20 +81,20 @@ public class EmbeddedKafkaCluster {
   private int numZookeeperPeers;
   private boolean isRunning = false;
 
-  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers) throws IOException {
+  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers) throws Exception {
     this(numBrokers, numZookeeperPeers, false);
 
   }
 
   public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers, boolean enableSASLSSL)
-      throws IOException {
+          throws Exception {
     this(numBrokers, numZookeeperPeers, enableSASLSSL, null, null);
   }
 
   public EmbeddedKafkaCluster(
       int numBrokers, int numZookeeperPeers, boolean enableSASLSSL,
       String jaasFilePath, String miniKDCDir
-  ) throws IOException {
+  ) throws Exception {
     this.enableSASLSSL = enableSASLSSL;
 
     if (numBrokers <= 0 || numZookeeperPeers <= 0) {
@@ -213,7 +210,7 @@ public class EmbeddedKafkaCluster {
 
   }
 
-  private String createKeytab(String principal) {
+  private String createKeytab(String principal) throws IOException {
 
     File keytabFile = TestUtils.tempFile();
 
@@ -221,14 +218,14 @@ public class EmbeddedKafkaCluster {
     principals.add(principal);
     kdc.createPrincipal(
         keytabFile,
-        JavaConverters.asScalaBuffer(principals).toList()
+            principals
     );
 
     log.debug("Keytab file for " + principal + " : " + keytabFile.getAbsolutePath());
     return keytabFile.getAbsolutePath();
   }
 
-  public static void main(String... args) throws IOException {
+  public static void main(String... args) throws Exception {
 
     if (args.length != 6) {
       System.err.println(
@@ -279,12 +276,12 @@ public class EmbeddedKafkaCluster {
 
   }
 
-  public Properties getClientSecurityConfig() {
+  public Properties getClientSecurityConfig() throws Exception {
     if (enableSASLSSL) {
-      Properties clientSecurityProps = TestUtils.producerSecurityConfigs(
+      Properties clientSecurityProps = JaasTestUtils.producerSecurityConfigs(
           SecurityProtocol.SASL_SSL,
-          Option.apply(trustStoreFile),
-          Option.apply(saslProperties)
+          Optional.of(trustStoreFile),
+          Optional.of(saslProperties)
       );
 
       return clientSecurityProps;
