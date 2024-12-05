@@ -33,7 +33,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1086</ubi.image.version>
+        <ubi.image.version>8.10-1130</ubi.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
