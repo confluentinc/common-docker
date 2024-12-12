@@ -23,7 +23,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class TopicEnsureTest {
   private static TopicEnsure topicEnsure;
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() throws Exception {
     kafka = new EmbeddedKafkaCluster(NUM_BROKERS, NUM_ZK);
     kafka.start();
 
