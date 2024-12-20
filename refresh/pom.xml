@@ -28,7 +28,7 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base-refresh</artifactId>
+    <artifactId>cp-base-jre17</artifactId>
 
     <description>Refreshed Base for Confluent Docker images</description>
     <name>${project.artifactId}</name>
