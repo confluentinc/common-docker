@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.7.3-0</version>
+        <version>7.8.1-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -123,7 +123,7 @@
                 <configuration>
                     <buildArgs>
                         <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                        <OPENSSL_VERSION>-${ubi.openssl.version}</OPENSSL_VERSION>
+                        <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                         <WGET_VERSION>-${ubi.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi.netcat.version}</NETCAT_VERSION>
                         <PYTHON39_VERSION>-${ubi.python39.version}</PYTHON39_VERSION>
@@ -135,7 +135,7 @@
                         <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
                         <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
-                        <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
+                        <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
@@ -153,7 +153,7 @@
                   <build>
                     <args>
                       <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                      <OPENSSL_VERSION>-${ubi.openssl.version}</OPENSSL_VERSION>
+                      <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                       <WGET_VERSION>-${ubi.wget.version}</WGET_VERSION>
                       <NETCAT_VERSION>-${ubi.netcat.version}</NETCAT_VERSION>
                       <PYTHON39_VERSION>-${ubi.python39.version}</PYTHON39_VERSION>
@@ -168,7 +168,7 @@
                       <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
                       <FINDUTILS_VERSION>-${ubi.iputils.version}</FINDUTILS_VERSION>
                       <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
-                      <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
+                      <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                       <PYTHON_PIP_VERSION>-${ubi.python.pip.version}</PYTHON_PIP_VERSION>
                       <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}
                       </PYTHON_SETUPTOOLS_VERSION>
