@@ -18,7 +18,7 @@ package io.confluent.admin.utils;
 import kafka.security.JaasTestUtils;
 import kafka.security.minikdc.MiniKdc;
 import kafka.server.KafkaConfig;
-import kafka.server.KafkaServer;
+import kafka.server.KafkaRaftServer;
 import kafka.utils.CoreUtils;
 import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -72,7 +72,7 @@ public class EmbeddedKafkaCluster {
   private static MiniKdc kdc;
   private static File trustStoreFile;
   private static Properties saslProperties;
-  private final Map<Integer, KafkaServer> brokersById = new ConcurrentHashMap<>();
+  private final Map<Integer, KafkaRaftServer> brokersById = new ConcurrentHashMap<>();
   private File jaasFilePath = null;
   private Option<File> brokerTrustStoreFile = Option$.MODULE$.<File>empty();
   private boolean enableSASLSSL = false;
@@ -352,13 +352,13 @@ public class EmbeddedKafkaCluster {
             false
         );
 
-    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
+    KafkaRaftServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
     brokersById.put(brokerId, broker);
   }
 
   private void stopBroker(int brokerId) {
     if (brokersById.containsKey(brokerId)) {
-      KafkaServer broker = brokersById.get(brokerId);
+      KafkaRaftServer broker = brokersById.get(brokerId);
       broker.shutdown();
       broker.awaitShutdown();
       CoreUtils.delete(broker.config().logDirs());
