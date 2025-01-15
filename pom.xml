@@ -21,7 +21,7 @@
     <modules>
         <module>utility-belt</module>
         <module>docker-utils</module>
-        <module>refresh</module>
+        <module>cp-base-jre17</module>
         <module>base</module>
         <module>base-lite</module>
         <module>jmxterm</module>
