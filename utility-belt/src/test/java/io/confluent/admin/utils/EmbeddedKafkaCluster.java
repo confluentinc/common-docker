@@ -330,7 +330,6 @@ public class EmbeddedKafkaCluster {
     Properties props = TestUtils
         .createBrokerConfig(
             brokerId,
-            zkConnectString,
             ENABLE_CONTROLLED_SHUTDOWN,
             ENABLE_DELETE_TOPIC,
             0,
