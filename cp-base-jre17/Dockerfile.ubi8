@@ -5,6 +5,7 @@ ARG DOCKER_UPSTREAM_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docke
 ARG DOCKER_UPSTREAM_TAG
 ARG GOLANG_VERSION
 ARG UBI_MINIMAL_VERSION="latest"
+ARG UBI9_MINIMAL_VERSION="latest"
 
 FROM docker.io/golang:${GOLANG_VERSION} AS build_package_dedupe
 WORKDIR /build
@@ -28,7 +29,7 @@ RUN yum clean all
 
 FROM 519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/confluentinc/cp-base-lite:7.9.x-latest-ubi8 AS BASE-LITE
 
-FROM registry.access.redhat.com/ubi8-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
+FROM registry.access.redhat.com/ubi9-minimal:${UBI9_MINIMAL_VERSION} AS REFRESH
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 

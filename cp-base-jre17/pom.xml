@@ -86,6 +86,7 @@
                 <configuration>
                     <buildArgs>
                         <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
+                        <UBI9_MINIMAL_VERSION>${ubi9.image.version}</UBI9_MINIMAL_VERSION>
                         <UBI_MICRO_VERSION>${ubi.micro.image.version}</UBI_MICRO_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
