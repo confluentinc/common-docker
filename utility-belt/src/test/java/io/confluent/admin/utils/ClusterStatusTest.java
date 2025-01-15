@@ -21,7 +21,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class ClusterStatusTest {
   private static int numZookeeperPeers = 3;
 
   @BeforeClass
-  public static void setup() throws IOException {
+  public static void setup() throws Exception {
 
     kafka = new EmbeddedKafkaCluster(numBrokers, numZookeeperPeers);
     kafka.start();

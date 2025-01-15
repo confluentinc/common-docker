@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.9.0-0, 7.9.1-0)</version>
+        <version>[8.0.0-0, 8.0.1-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.9.0-0</version>
+    <version>8.0.0-0</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -32,9 +32,9 @@
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.9.0-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>8.0.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1086</ubi.image.version>
+        <ubi.image.version>8.10-1154</ubi.image.version>
         <ubi9.image.version>9.5-1736404155</ubi9.image.version>
         <ubi.micro.image.version>8.10-13</ubi.micro.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
@@ -46,7 +46,7 @@
         <ubi.python39.version>3.9.20-1.module+el8.10.0+22342+478c159e</ubi.python39.version>
         <ubi.tar.version>1.30-9.el8</ubi.tar.version>
         <ubi.procps.version>3.3.15-14.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-29.el8_10</ubi.krb5.workstation.version>
+        <ubi.krb5.workstation.version>1.18.2-30.el8_10</ubi.krb5.workstation.version>
         <ubi.iputils.version>20180629-11.el8</ubi.iputils.version>
         <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
         <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
@@ -55,11 +55,11 @@
         <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
         <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.temurin.jdk.version>17.0.12.0.0.7-2</ubi.temurin.jdk.version>
+        <ubi.temurin.jdk.version>17.0.13.0.0.11-2</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
-        <ubi.python.confluent.docker.utils.version>v0.0.96</ubi.python.confluent.docker.utils.version>
+        <ubi.python.confluent.docker.utils.version>v0.0.144</ubi.python.confluent.docker.utils.version>
         <!-- Golang Version -->
         <golang.version>1.22.7-bullseye</golang.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
