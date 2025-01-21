@@ -7,7 +7,7 @@ import confluent.docker_utils as utils
 class BaseRefreshImageTest(unittest.TestCase):
 
     def setUp(self):
-        self.image = "{0}confluentinc/cp-base-refresh:{1}".format(os.environ["DOCKER_REGISTRY"], os.environ["DOCKER_TAG"])
+        self.image = "{0}confluentinc/cp-base-jre17:{1}".format(os.environ["DOCKER_REGISTRY"], os.environ["DOCKER_TAG"])
 
     def test_image_build(self):
         self.assertTrue(utils.image_exists(self.image))
