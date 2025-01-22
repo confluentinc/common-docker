@@ -40,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,8 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * https://github.com/confluentinc/support-metrics-common/support-metrics-common/
  *
  * Starts an embedded Kafka cluster including a backing ZooKeeper ensemble. It adds support for
- * 1. Zookeeper in clustered mode with SASL security
- * 2. Kafka with SASL_SSL security
+ * 1. Kafka with SASL_SSL security
  * <p>
  * This class should be used for unit/integration testing only.
  */
