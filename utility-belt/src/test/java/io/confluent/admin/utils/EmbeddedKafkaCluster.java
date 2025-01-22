@@ -26,6 +26,7 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.common.test.KafkaClusterTestKit;
 import org.apache.kafka.common.test.TestKitNodes;
+import org.apache.kafka.common.KafkaException;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,6 @@ public class EmbeddedKafkaCluster {
   private static MiniKdc kdc;
   private static File trustStoreFile;
   private static Properties saslProperties;
-  private final Map<Integer, KafkaRaftServer> brokersById = new ConcurrentHashMap<>();
   private File jaasFilePath = null;
   private Option<File> brokerTrustStoreFile = Option$.MODULE$.<File>empty();
   private boolean enableSASLSSL = false;
@@ -81,23 +81,23 @@ public class EmbeddedKafkaCluster {
   private boolean isRunning = false;
   private KafkaClusterTestKit cluster;
 
-  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers) throws Exception {
-    this(numBrokers, numZookeeperPeers, false);
+  public EmbeddedKafkaCluster(int numBrokers) throws Exception {
+    this(numBrokers, false);
 
   }
 
-  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers, boolean enableSASLSSL)
+  public EmbeddedKafkaCluster(int numBrokers, boolean enableSASLSSL)
           throws Exception {
-    this(numBrokers, numZookeeperPeers, enableSASLSSL, null, null);
+    this(numBrokers, enableSASLSSL, null, null);
   }
 
   public EmbeddedKafkaCluster(
-      int numBrokers, int numZookeeperPeers, boolean enableSASLSSL,
+      int numBrokers, boolean enableSASLSSL,
       String jaasFilePath, String miniKDCDir
   ) throws Exception {
     this.enableSASLSSL = enableSASLSSL;
 
-    if (numBrokers <= 0 || numZookeeperPeers <= 0) {
+    if (numBrokers <= 0) {
       throw new IllegalArgumentException("number of servers must be >= 1");
     }
 
@@ -225,9 +225,9 @@ public class EmbeddedKafkaCluster {
 
   public static void main(String... args) throws Exception {
 
-    if (args.length != 6) {
+    if (args.length != 5) {
       System.err.println(
-          "Usage : <command> <num_kafka_brokers> <num_zookeeper_nodes> " +
+          "Usage : <command> <num_kafka_brokers> " +
           "<sasl_ssl_enabled> <client properties path> <jaas_file> " +
           "<minikdc_working_dir>"
       );
@@ -235,10 +235,10 @@ public class EmbeddedKafkaCluster {
     }
 
     int numBrokers = Integer.parseInt(args[0]);
-    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[2]);
-    String clientPropsPath = args[3];
-    String jaasConfigPath = args[4];
-    String miniKDCDir = args[5];
+    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[1]);
+    String clientPropsPath = args[2];
+    String jaasConfigPath = args[3];
+    String miniKDCDir = args[4];
 
     System.out.println(
         "Starting a " + numBrokers + " node Kafka cluster"
@@ -307,7 +307,6 @@ public class EmbeddedKafkaCluster {
       throw new KafkaException("Failed to create test Kafka cluster", e);
     }
     log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
-  }
   }
 
   public void shutdown() {
@@ -379,9 +378,14 @@ public class EmbeddedKafkaCluster {
   }
 
   public String getBootstrapBroker(SecurityProtocol securityProtocol) {
-    return TestUtils.getBrokerListStrFromServers(JavaConverters.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
+    return cluster.bootstrapServers();
   }
 
   public boolean isRunning() {
     return isRunning;
   }
+  String brokerList() {
+    return cluster.bootstrapServers();
+  }
+
+}
