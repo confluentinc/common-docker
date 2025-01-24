@@ -290,7 +290,7 @@ public class EmbeddedKafkaCluster {
       final KafkaClusterTestKit.Builder clusterBuilder = new KafkaClusterTestKit.Builder(
               new TestKitNodes.Builder()
                       .setCombined(true)
-                      .setNumBrokerNodes(1)
+                      .setNumBrokerNodes(numBrokers)
                       .setPerServerProperties(Map.of(0,
                               Maps.newHashMap(Maps.fromProperties(config))))
                       .setNumControllerNodes(1)

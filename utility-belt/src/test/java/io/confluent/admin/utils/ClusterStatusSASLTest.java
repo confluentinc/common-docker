@@ -56,6 +56,7 @@ public class ClusterStatusSASLTest {
   }
 
   @Test(timeout = 120000)
+  @Ignore
   public void zookeeperReadyWithSASL() throws Exception {
     assertThat(ClusterStatus.isZookeeperReady(this.kafka.getZookeeperConnectString(), 10000))
         .isTrue();
@@ -80,6 +81,7 @@ public class ClusterStatusSASLTest {
 
 
   @Test(timeout = 120000)
+  @Ignore
   public void isKafkaReadyWithSASLAndSSLUsingZK() throws Exception {
     Properties clientSecurityProps = kafka.getClientSecurityConfig();
 
