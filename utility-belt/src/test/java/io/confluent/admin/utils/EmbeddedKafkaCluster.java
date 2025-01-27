@@ -17,8 +17,6 @@ package io.confluent.admin.utils;
 
 import kafka.security.JaasTestUtils;
 import kafka.security.minikdc.MiniKdc;
-import kafka.server.KafkaConfig;
-import kafka.server.KafkaServer;
 import kafka.utils.CoreUtils;
 import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -26,6 +24,10 @@ import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.common.test.KafkaClusterTestKit;
+import org.apache.kafka.common.test.TestKitNodes;
+import org.apache.kafka.common.KafkaException;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -38,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,8 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * https://github.com/confluentinc/support-metrics-common/support-metrics-common/
  *
  * Starts an embedded Kafka cluster including a backing ZooKeeper ensemble. It adds support for
- * 1. Zookeeper in clustered mode with SASL security
- * 2. Kafka with SASL_SSL security
+ * 1. Kafka with SASL_SSL security
  * <p>
  * This class should be used for unit/integration testing only.
  */
@@ -72,32 +74,30 @@ public class EmbeddedKafkaCluster {
   private static MiniKdc kdc;
   private static File trustStoreFile;
   private static Properties saslProperties;
-  private final Map<Integer, KafkaServer> brokersById = new ConcurrentHashMap<>();
   private File jaasFilePath = null;
   private Option<File> brokerTrustStoreFile = Option$.MODULE$.<File>empty();
   private boolean enableSASLSSL = false;
-  private EmbeddedZookeeperEnsemble zookeeper = null;
   private int numBrokers;
-  private int numZookeeperPeers;
   private boolean isRunning = false;
+  private KafkaClusterTestKit cluster;
 
-  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers) throws Exception {
-    this(numBrokers, numZookeeperPeers, false);
+  public EmbeddedKafkaCluster(int numBrokers) throws Exception {
+    this(numBrokers, false);
 
   }
 
-  public EmbeddedKafkaCluster(int numBrokers, int numZookeeperPeers, boolean enableSASLSSL)
+  public EmbeddedKafkaCluster(int numBrokers, boolean enableSASLSSL)
           throws Exception {
-    this(numBrokers, numZookeeperPeers, enableSASLSSL, null, null);
+    this(numBrokers, enableSASLSSL, null, null);
   }
 
   public EmbeddedKafkaCluster(
-      int numBrokers, int numZookeeperPeers, boolean enableSASLSSL,
+      int numBrokers, boolean enableSASLSSL,
       String jaasFilePath, String miniKDCDir
   ) throws Exception {
     this.enableSASLSSL = enableSASLSSL;
 
-    if (numBrokers <= 0 || numZookeeperPeers <= 0) {
+    if (numBrokers <= 0) {
       throw new IllegalArgumentException("number of servers must be >= 1");
     }
 
@@ -105,7 +105,6 @@ public class EmbeddedKafkaCluster {
       this.jaasFilePath = new File(jaasFilePath);
     }
     this.numBrokers = numBrokers;
-    this.numZookeeperPeers = numZookeeperPeers;
 
     if (this.enableSASLSSL) {
       File workDir;
@@ -138,7 +137,6 @@ public class EmbeddedKafkaCluster {
       this.brokerSaslProperties = Option.apply(saslProperties);
     }
 
-    zookeeper = new EmbeddedZookeeperEnsemble(numZookeeperPeers);
   }
 
   private String createJAASFile() throws IOException {
@@ -227,9 +225,9 @@ public class EmbeddedKafkaCluster {
 
   public static void main(String... args) throws Exception {
 
-    if (args.length != 6) {
+    if (args.length != 5) {
       System.err.println(
-          "Usage : <command> <num_kafka_brokers> <num_zookeeper_nodes> " +
+          "Usage : <command> <num_kafka_brokers> " +
           "<sasl_ssl_enabled> <client properties path> <jaas_file> " +
           "<minikdc_working_dir>"
       );
@@ -237,15 +235,13 @@ public class EmbeddedKafkaCluster {
     }
 
     int numBrokers = Integer.parseInt(args[0]);
-    int numZKNodes = Integer.parseInt(args[1]);
-    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[2]);
-    String clientPropsPath = args[3];
-    String jaasConfigPath = args[4];
-    String miniKDCDir = args[5];
+    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[1]);
+    String clientPropsPath = args[2];
+    String jaasConfigPath = args[3];
+    String miniKDCDir = args[4];
 
     System.out.println(
-        "Starting a " + numBrokers + " node Kafka cluster with " + numZKNodes +
-        " zookeeper nodes."
+        "Starting a " + numBrokers + " node Kafka cluster"
     );
     if (isSASLSSLEnabled) {
       System.out.println("SASL_SSL is enabled. jaas.conf=" + jaasConfigPath);
@@ -253,7 +249,6 @@ public class EmbeddedKafkaCluster {
     }
     final EmbeddedKafkaCluster kafka = new EmbeddedKafkaCluster(
         numBrokers,
-        numZKNodes,
         isSASLSSLEnabled,
         jaasConfigPath,
         miniKDCDir
@@ -291,37 +286,48 @@ public class EmbeddedKafkaCluster {
   }
 
   public void start() throws IOException {
-    initializeZookeeper();
-    for (int brokerId = 0; brokerId < numBrokers; brokerId++) {
-      log.debug("Starting broker with id {} ...", brokerId);
-      startBroker(brokerId, zookeeper.connectString());
+    try {
+      final KafkaClusterTestKit.Builder clusterBuilder = new KafkaClusterTestKit.Builder(
+              new TestKitNodes.Builder()
+                      .setCombined(true)
+                      .setNumBrokerNodes(numBrokers)
+                      .setPerServerProperties(Map.of(0,
+                              Maps.newHashMap(Maps.fromProperties(config))))
+                      .setNumControllerNodes(1)
+                      .build()
+      );
+
+      cluster = clusterBuilder.build();
+      //cluster.nonFatalFaultHandler().setIgnore(true);
+
+      cluster.format();
+      cluster.startup();
+      cluster.waitForReadyBrokers();
+    } catch (final Exception e) {
+      throw new KafkaException("Failed to create test Kafka cluster", e);
     }
-    isRunning = true;
+    log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
   }
 
   public void shutdown() {
-    for (int brokerId : brokersById.keySet()) {
-      log.debug("Stopping broker with id {} ...", brokerId);
-      stopBroker(brokerId);
+    log.debug("Shutting down embedded Kafka broker at {} ...", brokerList());
+    try {
+      cluster.close();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      log.debug("Deleting logs.dir at {} ...", logDir());
+      try {
+        Files.delete(Paths.get(logDir()));
+      } catch (final IOException e) {
+        log.error("Failed to delete log dir {}", logDir(), e);
+      }
+      log.debug("Shutdown of embedded Kafka broker at {} completed ...", brokerList());
     }
-    zookeeper.shutdown();
-    if (kdc != null) {
-      kdc.stop();
-    }
-    System.clearProperty("java.security.auth.login.config");
-    System.clearProperty("zookeeper.authProvider.1");
-    Configuration.setConfiguration(null);
     isRunning = false;
   }
 
-  private void initializeZookeeper() {
-    try {
-      zookeeper.start();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
+/**
   private void startBroker(int brokerId, String zkConnectString) throws IOException {
     if (brokerId < 0) {
       throw new IllegalArgumentException("broker id must not be negative");
@@ -330,7 +336,6 @@ public class EmbeddedKafkaCluster {
     Properties props = TestUtils
         .createBrokerConfig(
             brokerId,
-            zkConnectString,
             ENABLE_CONTROLLED_SHUTDOWN,
             ENABLE_DELETE_TOPIC,
             0,
@@ -352,33 +357,35 @@ public class EmbeddedKafkaCluster {
             false
         );
 
-    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
+    KafkaRaftServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
     brokersById.put(brokerId, broker);
   }
-
+ **/
+/**
   private void stopBroker(int brokerId) {
     if (brokersById.containsKey(brokerId)) {
-      KafkaServer broker = brokersById.get(brokerId);
+      KafkaRaftServer broker = brokersById.get(brokerId);
       broker.shutdown();
       broker.awaitShutdown();
       CoreUtils.delete(broker.config().logDirs());
       brokersById.remove(brokerId);
     }
   }
+ **/
 
   public void setJaasFilePath(File jaasFilePath) {
     this.jaasFilePath = jaasFilePath;
   }
 
   public String getBootstrapBroker(SecurityProtocol securityProtocol) {
-    return TestUtils.getBrokerListStrFromServers(JavaConverters.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
+    return cluster.bootstrapServers();
   }
 
   public boolean isRunning() {
     return isRunning;
   }
-
-  public String getZookeeperConnectString() {
-    return this.zookeeper.connectString();
+  String brokerList() {
+    return cluster.bootstrapServers();
   }
+
 }
