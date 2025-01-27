@@ -1,31 +1,38 @@
-#
-# Copyright 2017 Confluent Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-ARG UBI_MINIMAL_VERSION="latest"
+ARG MICRODIR=/microdir
+ARG UBI_MICRO_VERSION=8.10-13
+ARG TEMURIN_JDK_VERSION="21.0.6.0.0.7-1"
+ARG DOCKER_UPSTREAM_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
+ARG DOCKER_UPSTREAM_TAG
 ARG GOLANG_VERSION
+ARG UBI_MINIMAL_VERSION="latest"
+ARG UBI9_MINIMAL_VERSION="latest"
 
-FROM golang:${GOLANG_VERSION} AS build-ub
+FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser ub/ ./
 RUN go build -ldflags="-w -s" ./ub.go
 USER appuser
 RUN go test ./...
+COPY --chown=appuser:appuser package_dedupe/package_dedupe.go ./
+USER root
+RUN go build -ldflags="-w -s" ./package_dedupe.go
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
+FROM registry.access.redhat.com/ubi8 AS BUILD
 
+RUN printf "[temurin-jre] \n\
+name=temurin-jre \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}"
+RUN yum --nodocs install -y --setopt=install_weak_deps=False temurin-21-jre
+
+RUN yum clean all
+
+FROM registry.access.redhat.com/ubi9-minimal:${UBI9_MINIMAL_VERSION} AS REFRESH
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 
@@ -46,54 +53,26 @@ LABEL name=$ARTIFACT_ID
 LABEL summary="Common base image for new Confluent lightweight Docker images."
 LABEL description="Common base image for Confluent lightweight Docker images."
 LABEL io.confluent.docker=true
-
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
 
-# Temurin JDK version
-ARG TEMURIN_JDK_VERSION=""
+#ARG MICRODIR
+COPY --from=BUILD /usr/lib/jvm/temurin-21-jre/ usr/lib
+COPY --from=build-ub-package-dedupe /build/package_dedupe /usr/lib/bin/package_dedupe
+COPY --from=build-ub-package-dedupe /build/ub /usr/bin
 
-ENV UB_CLASSPATH=/usr/share/java/cp-base-lite/*
+ENV PATH="/usr/lib/bin:${PATH}"
 
-RUN printf "[temurin-jdk] \n\
-name=temurin-jdk \n\
-baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
-" > /etc/yum.repos.d/adoptium.repo
+RUN echo "appuser:x:1001:1001::/home/appuser:/bin/sh" >> /etc/passwd && \
+    mkdir -p /home/appuser && \
+    chown 1001:1001 /home/appuser
 
-RUN microdnf --nodocs install yum \
-    && yum --nodocs update -y \
-    && yum --nodocs install -y --setopt=install_weak_deps=False \
-        "curl${CURL_VERSION}" \
-        "temurin-17-jre${TEMURIN_JDK_VERSION}" \
-    && microdnf clean all \
-    && yum clean all \
-    && rm -rf /tmp/* \
-    && mkdir -p /etc/confluent/docker /usr/logs \
-    && useradd --no-log-init --create-home --shell /bin/bash appuser \
-    && chown appuser:appuser -R /etc/confluent/ /usr/logs
+COPY target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-# This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
-# The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
-# is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
-# hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
-# security update is availible. We skip checks from TemurinJDK repos because Confluent pins those upstream versions for various reasons
-# such as identified bugs in TemurinJDK's software.
-ARG SKIP_SECURITY_UPDATE_CHECK="false"
-RUN yum --disablerepo="temurin-jdk" check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
-
-COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
-COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
-
-COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite
-COPY --from=build-ub /build/ub /usr/bin
-
-RUN mkdir /licenses
-COPY license.txt /licenses
+RUN cd /usr/share/java \
+      && package_dedupe $(pwd)
 
 USER appuser
 WORKDIR /home/appuser

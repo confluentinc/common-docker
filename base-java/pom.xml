@@ -28,7 +28,7 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base-lite</artifactId>
+    <artifactId>cp-base-java</artifactId>
 
     <description>Base for new Confluent lightweight Docker images</description>
     <name>${project.artifactId}</name>
