@@ -20,7 +20,7 @@ class BaseJavaImageTest(unittest.TestCase):
         self.assertTrue(b"utility commands" in utils.run_docker_command(image=self.image, command=ub_cmd))
 
     def test_kafka_ready_jar(self):
-        java_cmd = "bash -c 'java -cp \"/usr/share/java/cp-base-lite/*\" io.confluent.admin.utils.cli.KafkaReadyCommand -h'"
+        java_cmd = "bash -c 'java -cp \"/usr/share/java/cp-base-java/*\" io.confluent.admin.utils.cli.KafkaReadyCommand -h'"
         self.assertTrue(b"Check if Kafka is ready" in utils.run_docker_command(image=self.image, command=java_cmd))
 
 
