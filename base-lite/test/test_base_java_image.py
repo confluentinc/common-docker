@@ -16,7 +16,7 @@ class BaseJavaImageTest(unittest.TestCase):
         self.assertTrue(utils.path_exists_in_image(self.image, "/usr/bin/ub"))
 
     def test_ub_runnable(self):
-        ub_cmd = "bash -c '/usr/bin/ub -h'"
+        ub_cmd = "bash -c '/usr/bin/ub/ub -h'"
         self.assertTrue(b"utility commands" in utils.run_docker_command(image=self.image, command=ub_cmd))
 
     def test_kafka_ready_jar(self):
