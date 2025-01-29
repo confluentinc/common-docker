@@ -49,7 +49,7 @@ gpgcheck=1 \n\
 gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-RUN microdnf install yum \
+RUN microdnf install -y yum \
     && echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && yum --nodocs install -y --setopt=install_weak_deps=False temurin-21-jre${TEMURIN_JDK_VERSION} \
     && yum clean all \
