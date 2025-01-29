@@ -48,9 +48,11 @@ enabled=1 \n\
 gpgcheck=1 \n\
 gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
-RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
-    && yum --nodocs install -y --setopt=install_weak_deps=False temurin-21-jre
-    && yum clean all
+
+RUN microdnf install yum \
+    && echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
+    && yum --nodocs install -y --setopt=install_weak_deps=False temurin-21-jre${TEMURIN_JDK_VERSION} \
+    && yum clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser
 
 COPY --from=build-ub-package-dedupe /build/package_dedupe /usr/bin/package_dedupe
