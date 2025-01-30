@@ -1,13 +1,13 @@
-# Docker images for cp-base-lite
+# Docker images for cp-base-java
 
 This repo provides build files for the new base image for Confluent lightweight Docker images.
-This will build the image `cp-base-lite`, which is the lighter version of `cp-base-new`. 
+This will build the image `cp-base-java`, which is the lighter version of `cp-base-new`. 
 `cub-dub` commands aren't supported in this image as Python is not installed.
 Instead of `JDK`, the `JRE` is being installed.
 
 ## Properties
 
-This project contains a Dockerfile for building *cp-base-lite*, the common base image for new Confluent lightweight Docker images.
+This project contains a Dockerfile for building *cp-base-java*, the common base image for new Confluent lightweight Docker images.
 
 Properties are inherited from a top-level POM. Properties may be overridden on the command line (`-Ddocker.registry=testing.example.com:8080/`), or in a subproject's POM.
 
