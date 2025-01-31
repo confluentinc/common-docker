@@ -74,29 +74,4 @@ public class ClusterStatusSASLTest {
     assertThat(ClusterStatus.isKafkaReady(config, 3, 10000)).isTrue();
   }
 
-
-  @Test(timeout = 120000)
-  @Ignore
-  public void isKafkaReadyWithSASLAndSSLUsingZK() throws Exception {
-    Properties clientSecurityProps = kafka.getClientSecurityConfig();
-    Map<String, String> endpoints = Collections.emptyMap();
-    //Map<String, String> endpoints = ClusterStatus.getKafkaEndpointFromZookeeper(
-    //    this.kafka.getZookeeperConnectString(),
-    //    30000
-    //);
-
-    String bootstrap_broker = endpoints.get("SASL_SSL");
-    Map<String, String> config = Utils.propsToStringMap(clientSecurityProps);
-    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrap_broker);
-
-    // Set password and enabled protocol as the Utils.propsToStringMap just returns toString()
-    // representations and these properties don't have a valid representation.
-    Password trustStorePassword = (Password) clientSecurityProps.get("ssl.truststore.password");
-    config.put("ssl.truststore.password", trustStorePassword.value());
-    config.put("ssl.enabled.protocols", "TLSv1.2");
-
-    assertThat(ClusterStatus.isKafkaReady(config, 3, 10000)).isTrue();
-  }
-
-
 }
