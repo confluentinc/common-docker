@@ -30,38 +30,6 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class ClusterWaitTest {
 
-  @Test(timeout = 180000)
-  public void isZookeeperReadyWait() throws IOException, InterruptedException {
-    final EmbeddedZookeeperEnsemble zookeeperWait = new EmbeddedZookeeperEnsemble(3, 22222);
-    Thread zkClusterThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Thread.sleep(20000);
-          zookeeperWait.start();
-          while (zookeeperWait.isRunning()) {
-            Thread.sleep(1000);
-          }
-        } catch (Exception e) {
-          // Just fail.
-          fail("Unexpected error." + e.getMessage());
-        }
-      }
-    });
-
-    zkClusterThread.start();
-
-    try {
-      assertThat(ClusterStatus.isZookeeperReady(zookeeperWait.connectString(), 30000))
-          .isTrue();
-
-    } catch (Exception e) {
-      fail("Unexpected error." + e.getMessage());
-    } finally {
-      zookeeperWait.shutdown();
-    }
-    zkClusterThread.join(60000);
-  }
 
   @Test(timeout = 180000)
   public void isKafkaReadyWait() throws Exception {
