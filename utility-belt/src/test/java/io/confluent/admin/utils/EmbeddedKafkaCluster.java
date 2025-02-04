@@ -17,6 +17,9 @@ package io.confluent.admin.utils;
 
 import kafka.security.JaasTestUtils;
 import kafka.security.minikdc.MiniKdc;
+import kafka.server.KafkaConfig;
+import kafka.server.KafkaRaftServer;
+import kafka.server.KafkaServer;
 import kafka.utils.CoreUtils;
 import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -42,6 +45,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.Properties;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -74,6 +79,7 @@ public class EmbeddedKafkaCluster {
   private static MiniKdc kdc;
   private static File trustStoreFile;
   private static Properties saslProperties;
+  private final Map<Integer, KafkaServer> brokersById = new ConcurrentHashMap<>();
   private File jaasFilePath = null;
   private Option<File> brokerTrustStoreFile = Option$.MODULE$.<File>empty();
   private boolean enableSASLSSL = false;
@@ -327,40 +333,39 @@ public class EmbeddedKafkaCluster {
     isRunning = false;
   }
 
-/**
-  private void startBroker(int brokerId, String zkConnectString) throws IOException {
+  private void startBroker(int brokerId) throws IOException {
     if (brokerId < 0) {
       throw new IllegalArgumentException("broker id must not be negative");
     }
 
     Properties props = TestUtils
-        .createBrokerConfig(
-            brokerId,
-            ENABLE_CONTROLLED_SHUTDOWN,
-            ENABLE_DELETE_TOPIC,
-            0,
-            INTER_BROKER_SECURITY_PROTOCOL,
-            this.brokerTrustStoreFile,
-            this.brokerSaslProperties,
-            ENABLE_PLAINTEXT,
-            ENABLE_SASL_PLAINTEXT,
-            SASL_PLAINTEXT_PORT,
-            ENABLE_SSL,
-            SSL_PORT,
-            this.enableSASLSSL,
-            0,
-            Option.<String>empty(),
-            1,
-            false,
-            NUM_PARTITIONS,
-            DEFAULT_REPLICATION_FACTOR,
-            false
-        );
+            .createBrokerConfig(
+                    brokerId,
+                    ENABLE_CONTROLLED_SHUTDOWN,
+                    ENABLE_DELETE_TOPIC,
+                    0,
+                    INTER_BROKER_SECURITY_PROTOCOL,
+                    this.brokerTrustStoreFile,
+                    this.brokerSaslProperties,
+                    ENABLE_PLAINTEXT,
+                    ENABLE_SASL_PLAINTEXT,
+                    SASL_PLAINTEXT_PORT,
+                    ENABLE_SSL,
+                    SSL_PORT,
+                    this.enableSASLSSL,
+                    0,
+                    Option.<String>empty(),
+                    1,
+                    false,
+                    NUM_PARTITIONS,
+                    DEFAULT_REPLICATION_FACTOR,
+                    false
+            );
 
-    KafkaRaftServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
+    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
     brokersById.put(brokerId, broker);
   }
- **/
+
 /**
   private void stopBroker(int brokerId) {
     if (brokersById.containsKey(brokerId)) {
@@ -387,5 +392,43 @@ public class EmbeddedKafkaCluster {
   String brokerList() {
     return cluster.bootstrapServers();
   }
+/**
+  private Properties buildBrokerConfig(final String logDir) {
+    final Properties config = new Properties();
+    config.putAll(customBrokerConfig);
+    // Only single node, so broker id always:
+    config.put(BROKER_ID_CONFIG, "0");
+    // Set the log dir for the node:
+    config.put(LOG_DIR_PROP, logDir);
+    // Default to small number of partitions for auto-created topics:
+    config.put(NUM_PARTITIONS_PROP, "1");
+    // Allow tests to delete topics:
+    config.put(DELETE_TOPIC_ENABLE_CONFIG, "true");
+    // Do not clean logs from under the tests or waste resources doing so:
+    config.put(LOG_CLEANER_ENABLE_PROP, "false");
+    // Only single node, so only single RF on offset topic partitions:
+    config.put(OFFSETS_TOPIC_REPLICATION_FACTOR, "1");
+    // Tests do not need large numbers of offset topic partitions:
+    config.put(OFFSETS_TOPIC_PARTITIONS_PROP, "1");
+    // Shutdown quick:
+    config.put(CONTROLLED_SHUTDOWN_ENABLE_CONFIG, "false");
+    // Explicitly set to be less that the default 30 second timeout of KSQL functional tests
+    config.put(CONTROLLER_SOCKET_TIMEOUT_MS_PROP, "20000");
+    // Streams runs multiple consumers, so let's give them all a chance to join.
+    // (Tests run quicker and with a more stable consumer group):
+    config.put(GROUP_INITIAL_REBALANCE_DELAY_MS_PROP, "100");
+    // Stop people writing silly data in tests:
+    config.put(MESSAGE_MAX_BYTES_CONFIG, "100000");
+    // Stop logs being deleted due to retention limits:
+    config.put(LOG_RETENTION_TIME_MILLIS_PROP, "-1");
+    // Stop logs marked for deletion from being deleted
+    config.put(LOG_DELETE_DELAY_MS_PROP, "100000000");
+    // Set to 1 because only 1 broker
+    config.put(TRANSACTIONS_TOPIC_REPLICATION_FACTOR_PROP, "1");
+    // Set to 1 because only 1 broker
+    config.put(TRANSACTIONS_TOPIC_MIN_ISR_PROP, "1");
 
+    return config;
+  }
+**/
 }
