@@ -7,7 +7,7 @@ semaphore:
   enable: true
   execution_time_limit: {"hours": 1}
   pipeline_type: cp-dockerfile
-  docker_repos: ['confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
+  docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
   build_arm: true
   os_types: ["ubi8"]
   nano_version: true
