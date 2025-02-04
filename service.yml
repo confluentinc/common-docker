@@ -74,3 +74,4 @@ code_artifact:
     - maven-snapshots/maven/io.confluent/docker-utils
     - maven-snapshots/maven/io.confluent/utility-belt
     - maven-snapshots/maven/io.confluent/common-docker
+    - maven-snapshots/maven/io.confluent/cp-base-java
