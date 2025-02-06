@@ -38,7 +38,6 @@ import io.confluent.admin.utils.EmbeddedKafkaCluster;
 public class TopicEnsureTest {
 
   private static final int NUM_BROKERS = 3;
-  private static final int NUM_ZK = 3;
   private static final int DEFAULT_PARTITIONS = 2;
   private static final int DEFAULT_REPLICATION_FACTOR = 3;
   private static final Integer TIMEOUT_MS = 20000;
@@ -48,7 +47,7 @@ public class TopicEnsureTest {
 
   @Before
   public void setUp() throws Exception {
-    kafka = new EmbeddedKafkaCluster(NUM_BROKERS, NUM_ZK);
+    kafka = new EmbeddedKafkaCluster(NUM_BROKERS);
     kafka.start();
 
     Properties adminClientProps = new Properties();
