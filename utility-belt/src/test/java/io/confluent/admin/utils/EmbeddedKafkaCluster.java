@@ -143,7 +143,8 @@ public class EmbeddedKafkaCluster {
 
       this.brokerTrustStoreFile = Option.apply(trustStoreFile);
       this.brokerSaslProperties = Option.apply(saslProperties);
-      this.config = this.buildBrokerConfig(logdir)
+      this.config = this.buildBrokerConfig(logDir());
+
     }
 
   }
@@ -355,11 +356,45 @@ public class EmbeddedKafkaCluster {
       return config.getProperty(LOG_DIR_PROP);
     }
 
+  private void startBroker(int brokerId, String zkConnectString) throws IOException {
+    if (brokerId < 0) {
+      throw new IllegalArgumentException("broker id must not be negative");
+    }
+
+    Properties props = TestUtils
+            .createBrokerConfigZkArg(
+                    brokerId,
+                    zkConnectString,
+                    ENABLE_CONTROLLED_SHUTDOWN,
+                    ENABLE_DELETE_TOPIC,
+                    0,
+                    INTER_BROKER_SECURITY_PROTOCOL,
+                    this.brokerTrustStoreFile,
+                    this.brokerSaslProperties,
+                    ENABLE_PLAINTEXT,
+                    ENABLE_SASL_PLAINTEXT,
+                    SASL_PLAINTEXT_PORT,
+                    ENABLE_SSL,
+                    SSL_PORT,
+                    this.enableSASLSSL,
+                    0,
+                    Option.<String>empty(),
+                    1,
+                    false,
+                    NUM_PARTITIONS,
+                    DEFAULT_REPLICATION_FACTOR,
+                    false
+            );
+
+    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
+    brokersById.put(brokerId, broker);
+  }
     private Properties buildBrokerConfig (final String logDir){
       final Properties config = new Properties();
       //config.put(BROKER_ID_CONFIG, "0");
       // Set the log dir for the node:
       config.put(LOG_DIR_PROP, logDir);
+
       // Default to small number of partitions for auto-created topics:
       /**config.put(NUM_PARTITIONS_PROP, "1");
       // Allow tests to delete topics:
