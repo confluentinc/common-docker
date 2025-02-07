@@ -7,12 +7,15 @@ ARG UBI_MINIMAL_VERSION
 
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+
 WORKDIR /build/package_dedupe
 COPY --chown=appuser:appuser package_dedupe/ ./
 RUN go build -ldflags="-w -s" ./package_dedupe.go
+
 WORKDIR /build/ub
 COPY --chown=appuser:appuser ub/ ./
 RUN go build -ldflags="-w -s" ./ub.go
+
 USER appuser
 RUN go test ./...
 
@@ -54,12 +57,12 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser
 
-COPY --from=build-ub-package-dedupe /build/package_dedupe /usr/bin/package_dedupe
-COPY --from=build-ub-package-dedupe /build/ub /usr/bin/ub
+COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
+COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
 
 
-COPY target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
-COPY target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 
