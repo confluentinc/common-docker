@@ -23,7 +23,7 @@ class BaseJavaImageTest(unittest.TestCase):
 
     def test_package_dedupe_runnable(self):
         package_dedupe_cmd = "bash -c 'package_dedupe -h'"
-        self.assertTrue(b"dedupe" in utils.run_docker_command(image=self.image, command=package_dedupe_cmd))
+        self.assertTrue(b"package_dedupe" in utils.run_docker_command(image=self.image, command=package_dedupe_cmd))
 
     def test_kafka_ready_jar(self):
         java_cmd = "bash -c 'java -cp \"/usr/share/java/cp-base-java/*\" io.confluent.admin.utils.cli.KafkaReadyCommand -h'"

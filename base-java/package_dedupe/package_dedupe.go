@@ -65,7 +65,7 @@ func main() {
 	}
 	if os.Args[1] == "-h" || os.Args[1] == "--help" {
 		fmt.Println("Replaces multiple occurrences of a file with symlinks to the first instance of the file.\n" +
-			"Usage: dedupe_packages <directory_name>")
+			"Usage: package_dedupe <directory_name>")
 		return
 	}
 	basePath := os.Args[1]
