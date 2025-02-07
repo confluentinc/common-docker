@@ -66,6 +66,8 @@ COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/sh
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 
+# Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
+RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
 
 USER appuser
 WORKDIR /home/appuser
