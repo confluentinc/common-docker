@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func dedupe_packages(rootPath string) {
+func dedupePackages(rootPath string) {
 	sha2path := make(map[string]string)
 	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -63,6 +63,11 @@ func main() {
 		fmt.Println("Usage: dedupe_packages <directory_name>")
 		os.Exit(1)
 	}
+	if os.Args[1] == "-h" || os.Args[1] == "--help" {
+		fmt.Println("Replaces multiple occurrences of a file with symlinks to the first instance of the file.\n" +
+			"Usage: dedupe_packages <directory_name>")
+		return
+	}
 	basePath := os.Args[1]
-	dedupe_packages(basePath)
+	dedupePackages(basePath)
 }
