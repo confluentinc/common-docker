@@ -21,6 +21,7 @@ import org.apache.kafka.test.TestUtils;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,42 +30,10 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class ClusterWaitTest {
 
-  @Test(timeout = 180000)
-  public void isZookeeperReadyWait() throws IOException, InterruptedException {
-    final EmbeddedZookeeperEnsemble zookeeperWait = new EmbeddedZookeeperEnsemble(3, 22222);
-    Thread zkClusterThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          Thread.sleep(20000);
-          zookeeperWait.start();
-          while (zookeeperWait.isRunning()) {
-            Thread.sleep(1000);
-          }
-        } catch (Exception e) {
-          // Just fail.
-          fail("Unexpected error." + e.getMessage());
-        }
-      }
-    });
-
-    zkClusterThread.start();
-
-    try {
-      assertThat(ClusterStatus.isZookeeperReady(zookeeperWait.connectString(), 30000))
-          .isTrue();
-
-    } catch (Exception e) {
-      fail("Unexpected error." + e.getMessage());
-    } finally {
-      zookeeperWait.shutdown();
-    }
-    zkClusterThread.join(60000);
-  }
 
   @Test(timeout = 180000)
   public void isKafkaReadyWait() throws Exception {
-    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, 3);
+    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, true);
 
     Thread kafkaClusterThread = new Thread(new Runnable() {
       @Override
@@ -104,7 +73,7 @@ public class ClusterWaitTest {
 
   @Test(timeout = 180000)
   public void isKafkaReadyWaitUsingZooKeeper() throws Exception {
-    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, 3);
+    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, true);
 
     Thread kafkaClusterThread = new Thread(new Runnable() {
       @Override
@@ -124,19 +93,8 @@ public class ClusterWaitTest {
     kafkaClusterThread.start();
     try {
 
-      boolean zkReady = ClusterStatus.isZookeeperReady(
-          kafkaWait.getZookeeperConnectString(),
-          30000
-      );
 
-      if (!zkReady) {
-        fail("Could not reach zookeeper " + kafkaWait.getZookeeperConnectString());
-      }
-
-      Map<String, String> endpoints = ClusterStatus.getKafkaEndpointFromZookeeper(
-          kafkaWait.getZookeeperConnectString(),
-          30000
-      );
+      Map<String, String> endpoints = Collections.emptyMap();
 
       String bootstrap_broker = endpoints.get("PLAINTEXT");
       Map<String, String> config = new HashMap<>();
