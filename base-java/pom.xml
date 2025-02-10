@@ -51,6 +51,41 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Operator dependencies for metrics integration -->
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-jvm</artifactId>
+            <version>${jolokia-jvm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus.jmx</groupId>
+            <artifactId>jmx_prometheus_javaagent</artifactId>
+            <version>${jmx_prometheus_javaagent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>disk-usage-agent</artifactId>
+            <version>${io.confluent.common.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>logredactor</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
