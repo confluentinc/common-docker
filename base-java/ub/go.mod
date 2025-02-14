@@ -4,9 +4,9 @@ module ub
 go 1.19
 
 require (
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.1
 	golang.org/x/exp v0.0.0-20230419192730-864b3d6c5c2c
-	golang.org/x/sys v0.7.0
+	golang.org/x/sys v0.30.0
 )
 
 require (
