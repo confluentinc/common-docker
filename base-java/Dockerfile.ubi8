@@ -1,0 +1,73 @@
+ARG UBI_MICRO_VERSION
+ARG TEMURIN_JDK_VERSION
+ARG DOCKER_UPSTREAM_REGISTRY
+ARG DOCKER_UPSTREAM_TAG
+ARG GOLANG_VERSION
+ARG UBI_MINIMAL_VERSION
+
+FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
+RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+
+WORKDIR /build/package_dedupe
+COPY --chown=appuser:appuser package_dedupe/ ./
+RUN go build -ldflags="-w -s" ./package_dedupe.go
+
+WORKDIR /build/ub
+COPY --chown=appuser:appuser ub/ ./
+RUN go build -ldflags="-w -s" ./ub.go
+
+USER appuser
+RUN go test ./...
+
+FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
+
+# Remember where we came from
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
+
+ARG GIT_COMMIT
+LABEL io.confluent.docker.git.id=$GIT_COMMIT
+
+ARG BUILD_NUMBER=-1
+LABEL io.confluent.docker.build.number=$BUILD_NUMBER
+
+LABEL maintainer="tools@confluent.io"
+LABEL vendor="Confluent"
+LABEL version=$GIT_COMMIT
+LABEL release=$PROJECT_VERSION
+LABEL name=$ARTIFACT_ID
+LABEL summary="Common base image for new Confluent lightweight Docker images."
+LABEL description="Common base image for Confluent lightweight Docker images."
+LABEL io.confluent.docker=true
+# This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
+# base image that supports it
+ENV LANG="C.UTF-8"
+
+RUN printf "[temurin-jre] \n\
+name=temurin-jre \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+
+RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
+    && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
+    && microdnf clean all \
+    && useradd --no-log-init --create-home --shell /bin/bash appuser
+
+COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
+COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
+
+
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
+
+# Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
+RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
+
+USER appuser
+WORKDIR /home/appuser

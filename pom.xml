@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.9.0-0, 7.9.1-0)</version>
+        <version>[8.0.0-0, 8.0.1-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.9.0-0</version>
+    <version>8.0.0-0</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -21,6 +21,7 @@
     <modules>
         <module>utility-belt</module>
         <module>docker-utils</module>
+        <module>base-java</module>
         <module>base</module>
         <module>base-lite</module>
         <module>jmxterm</module>
@@ -31,7 +32,7 @@
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.9.0-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>8.0.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi.image.version>8.10-1179</ubi.image.version>
         <ubi9.micro.image.version>9.5-1739467664</ubi9.micro.image.version>
@@ -53,7 +54,7 @@
         <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
         <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.temurin.jdk.version>17.0.14.0.0.7-1</ubi.temurin.jdk.version>
+        <ubi.temurin.jdk.version>21.0.6.0.0.7-1</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi.python.pip.version>20.*</ubi.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
