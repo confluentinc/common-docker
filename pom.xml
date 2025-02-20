@@ -36,6 +36,7 @@
         <!-- Versions-->
         <ubi.image.version>8.10-1179</ubi.image.version>
         <ubi9.micro.image.version>9.5-1739467664</ubi9.micro.image.version>
+        <ubi9.minimal.image.version>9.5-1739420147</ubi9.minimal.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
