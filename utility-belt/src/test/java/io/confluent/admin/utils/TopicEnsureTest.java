@@ -38,23 +38,22 @@ import io.confluent.admin.utils.EmbeddedKafkaCluster;
 public class TopicEnsureTest {
 
   private static final int NUM_BROKERS = 3;
-  private static final int NUM_ZK = 3;
   private static final int DEFAULT_PARTITIONS = 2;
   private static final int DEFAULT_REPLICATION_FACTOR = 3;
   private static final Integer TIMEOUT_MS = 20000;
 
   private static EmbeddedKafkaCluster kafka;
-  private static TopicEnsure topicEnsure;
+  private static io.confluent.kafkaensure.TopicEnsure topicEnsure;
 
   @Before
   public void setUp() throws Exception {
-    kafka = new EmbeddedKafkaCluster(NUM_BROKERS, NUM_ZK);
+    kafka = new EmbeddedKafkaCluster(NUM_BROKERS);
     kafka.start();
 
     Properties adminClientProps = new Properties();
     adminClientProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
                          kafka.getBootstrapBroker(SecurityProtocol.PLAINTEXT));
-    topicEnsure = new TopicEnsure(adminClientProps);
+    topicEnsure = new io.confluent.kafkaensure.TopicEnsure(adminClientProps);
   }
 
   @After

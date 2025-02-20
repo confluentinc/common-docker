@@ -31,12 +31,11 @@ public class ClusterStatusTest {
 
   private static EmbeddedKafkaCluster kafka;
   private static int numBrokers = 3;
-  private static int numZookeeperPeers = 3;
 
   @BeforeClass
   public static void setup() throws Exception {
 
-    kafka = new EmbeddedKafkaCluster(numBrokers, numZookeeperPeers);
+    kafka = new EmbeddedKafkaCluster(numBrokers);
     kafka.start();
   }
 

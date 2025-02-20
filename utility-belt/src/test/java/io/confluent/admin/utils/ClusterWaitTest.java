@@ -64,7 +64,7 @@ public class ClusterWaitTest {
 
   @Test(timeout = 180000)
   public void isKafkaReadyWait() throws Exception {
-    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, 3);
+    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3);
 
     Thread kafkaClusterThread = new Thread(new Runnable() {
       @Override
@@ -104,7 +104,7 @@ public class ClusterWaitTest {
 
   @Test(timeout = 180000)
   public void isKafkaReadyWaitUsingZooKeeper() throws Exception {
-    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3, 3);
+    final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3);
 
     Thread kafkaClusterThread = new Thread(new Runnable() {
       @Override
