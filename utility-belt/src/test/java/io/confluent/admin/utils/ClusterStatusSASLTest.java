@@ -45,7 +45,7 @@ public class ClusterStatusSASLTest {
   public static void setup() throws Exception {
     Configuration.setConfiguration(null);
 
-    kafka = new EmbeddedKafkaCluster(3, 3, true);
+    kafka = new EmbeddedKafkaCluster(3, true);
     kafka.start();
   }
 
