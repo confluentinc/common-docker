@@ -289,10 +289,10 @@ public class EmbeddedKafkaCluster {
   }
 
   public void start() throws IOException {
-    initializeZookeeper();
     for (int brokerId = 0; brokerId < numBrokers; brokerId++) {
       log.debug("Starting broker with id {} ...", brokerId);
-      startBroker(brokerId, zookeeper.connectString());
+      startBroker(brokerId);
+      break;
     }
     isRunning = true;
   }
@@ -325,7 +325,7 @@ public class EmbeddedKafkaCluster {
     }
   }
 
-  private void startBroker(int brokerId, String zkConnectString) throws IOException {
+  private void startBroker(int brokerId) throws IOException {
     if (brokerId < 0) {
       throw new IllegalArgumentException("broker id must not be negative");
     }
@@ -357,7 +357,7 @@ public class EmbeddedKafkaCluster {
       final KafkaClusterTestKit.Builder clusterBuilder = new KafkaClusterTestKit.Builder(
               new TestKitNodes.Builder()
                       .setCombined(true)
-                      .setNumBrokerNodes(1)
+                      .setNumBrokerNodes(this.numBrokers)
                       .setPerServerProperties(Map.of(0,
                               Maps.newHashMap(Maps.fromProperties(props))))
                       .setNumControllerNodes(1)
@@ -394,7 +394,7 @@ public class EmbeddedKafkaCluster {
   }
 
   public String getBootstrapBroker(SecurityProtocol securityProtocol) {
-    return TestUtils.getBrokerListStrFromServers(JavaConverters.collectionAsScalaIterable(brokersById.values()).toSeq() , securityProtocol);
+    return brokerList();
   }
 
   public boolean isRunning() {

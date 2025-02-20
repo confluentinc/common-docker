@@ -45,7 +45,7 @@ public class ClusterStatusSASLTest {
   public static void setup() throws Exception {
     Configuration.setConfiguration(null);
 
-    kafka = new EmbeddedKafkaCluster(3, true);
+    kafka = new EmbeddedKafkaCluster(3, false);
     kafka.start();
   }
 
@@ -60,6 +60,7 @@ public class ClusterStatusSASLTest {
     assertThat(ClusterStatus.isZookeeperReady(this.kafka.getZookeeperConnectString(), 10000))
         .isTrue();
   }
+
 
   @Test(timeout = 120000)
   public void isKafkaReadyWithSASLAndSSL() throws Exception {
