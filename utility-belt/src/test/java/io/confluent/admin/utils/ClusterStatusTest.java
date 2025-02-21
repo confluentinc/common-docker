@@ -31,32 +31,17 @@ public class ClusterStatusTest {
 
   private static EmbeddedKafkaCluster kafka;
   private static int numBrokers = 3;
-  private static int numZookeeperPeers = 3;
 
   @BeforeClass
   public static void setup() throws Exception {
 
-    kafka = new EmbeddedKafkaCluster(numBrokers, numZookeeperPeers);
+    kafka = new EmbeddedKafkaCluster(numBrokers);
     kafka.start();
   }
 
   @AfterClass
   public static void tearDown() {
     kafka.shutdown();
-  }
-
-  @Test(timeout = 120000)
-  public void zookeeperReady() throws Exception {
-    assertThat(
-        ClusterStatus.isZookeeperReady(this.kafka.getZookeeperConnectString(), 10000))
-        .isTrue();
-  }
-
-  @Test(timeout = 120000)
-  public void zookeeperReadyWithBadConnectString() throws Exception {
-    assertThat(
-        ClusterStatus.isZookeeperReady("localhost:3245", 10000))
-        .isFalse();
   }
 
   @Test(timeout = 120000)
