@@ -57,7 +57,7 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
-    && chown appuser:appuser -R /etc/confluent/ /usr/logs
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses
 
 COPY license.txt /licenses
