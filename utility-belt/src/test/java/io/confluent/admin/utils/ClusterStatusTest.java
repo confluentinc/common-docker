@@ -45,20 +45,6 @@ public class ClusterStatusTest {
   }
 
   @Test(timeout = 120000)
-  public void zookeeperReady() throws Exception {
-    assertThat(
-        ClusterStatus.isZookeeperReady(this.kafka.getZookeeperConnectString(), 10000))
-        .isTrue();
-  }
-
-  @Test(timeout = 120000)
-  public void zookeeperReadyWithBadConnectString() throws Exception {
-    assertThat(
-        ClusterStatus.isZookeeperReady("localhost:3245", 10000))
-        .isFalse();
-  }
-
-  @Test(timeout = 120000)
   public void isKafkaReady() throws Exception {
 
     Map<String, String> config = new HashMap<>();
