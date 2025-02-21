@@ -61,7 +61,7 @@ public class EmbeddedKafkaCluster {
 
   private static final Logger log = LoggerFactory.getLogger(EmbeddedKafkaCluster.class);
 
-  private static final Option<SecurityProtocol> INTER_BROKER_SECURITY_PROTOCOL = Option.apply(SecurityProtocol.PLAINTEXT);
+  private static final Option<SecurityProtocol> INTER_BROKER_SECURITY_PROTOCOL = Option.apply(SecurityProtocol.SASL_PLAINTEXT);
   private static final boolean ENABLE_CONTROLLED_SHUTDOWN = true;
   private static final boolean ENABLE_DELETE_TOPIC = false;
   private static final boolean ENABLE_PLAINTEXT = true;
@@ -343,13 +343,15 @@ public class EmbeddedKafkaCluster {
                     DEFAULT_REPLICATION_FACTOR,
                     false
             );
+    // Check if both inter.broker.listener.name and security.inter.broker.protocol are set
+    if (props.containsKey("inter.broker.listener.name") && props.containsKey("security.inter.broker.protocol")) {
+      throw new IllegalArgumentException("Only one of inter.broker.listener.name and security.inter.broker.protocol should be set.");
+    }
     try {
       final KafkaClusterTestKit.Builder clusterBuilder = new KafkaClusterTestKit.Builder(
               new TestKitNodes.Builder()
                       .setCombined(true)
                       .setNumBrokerNodes(this.numBrokers)
-                      .setPerServerProperties(Map.of(0,
-                              Maps.newHashMap(Maps.fromProperties(props))))
                       .setNumControllerNodes(1)
                       .build()
       );
