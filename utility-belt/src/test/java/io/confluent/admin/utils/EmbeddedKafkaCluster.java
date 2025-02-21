@@ -61,8 +61,7 @@ public class EmbeddedKafkaCluster {
 
   private static final Logger log = LoggerFactory.getLogger(EmbeddedKafkaCluster.class);
 
-  private static final Option<SecurityProtocol> INTER_BROKER_SECURITY_PROTOCOL = Option.apply
-          (SecurityProtocol.PLAINTEXT);
+  private static final Option<SecurityProtocol> INTER_BROKER_SECURITY_PROTOCOL = Option.apply(SecurityProtocol.PLAINTEXT);
   private static final boolean ENABLE_CONTROLLED_SHUTDOWN = true;
   private static final boolean ENABLE_DELETE_TOPIC = false;
   private static final boolean ENABLE_PLAINTEXT = true;
@@ -228,9 +227,9 @@ public class EmbeddedKafkaCluster {
 
   public static void main(String... args) throws Exception {
 
-    if (args.length != 6) {
+    if (args.length != 5) {
       System.err.println(
-              "Usage : <command> <num_kafka_brokers> <num_zookeeper_nodes> " +
+              "Usage : <command> <num_kafka_brokers> " +
                       "<sasl_ssl_enabled> <client properties path> <jaas_file> " +
                       "<minikdc_working_dir>"
       );
@@ -238,10 +237,10 @@ public class EmbeddedKafkaCluster {
     }
 
     int numBrokers = Integer.parseInt(args[0]);
-    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[2]);
-    String clientPropsPath = args[3];
-    String jaasConfigPath = args[4];
-    String miniKDCDir = args[5];
+    boolean isSASLSSLEnabled = Boolean.parseBoolean(args[1]);
+    String clientPropsPath = args[2];
+    String jaasConfigPath = args[3];
+    String miniKDCDir = args[4];
 
     System.out.println(
             "Starting a " + numBrokers + " node Kafka cluster"
@@ -317,19 +316,10 @@ public class EmbeddedKafkaCluster {
     isRunning = false;
   }
 
-  private void initializeZookeeper() {
-    try {
-      zookeeper.start();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private void startBroker(int brokerId) throws IOException {
     if (brokerId < 0) {
       throw new IllegalArgumentException("broker id must not be negative");
     }
-
     Properties props = TestUtils
             .createBrokerConfig(
                     brokerId,
@@ -376,18 +366,8 @@ public class EmbeddedKafkaCluster {
     log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
 
     //KafkaBroker broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
-    brokersById.put(brokerId, null);
   }
 
-  private void stopBroker(int brokerId) {
-    if (brokersById.containsKey(brokerId)) {
-      KafkaBroker broker = brokersById.get(brokerId);
-      broker.shutdown();
-      broker.awaitShutdown();
-      CoreUtils.delete(broker.config().logDirs());
-      brokersById.remove(brokerId);
-    }
-  }
 
   public void setJaasFilePath(File jaasFilePath) {
     this.jaasFilePath = jaasFilePath;
