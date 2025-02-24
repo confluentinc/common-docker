@@ -18,6 +18,7 @@ package io.confluent.admin.utils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.test.TestUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -88,6 +89,8 @@ public class ClusterWaitTest {
     });
 
     kafkaClusterThread.start();
+    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBroker(SecurityProtocol.PLAINTEXT).isEmpty(),
+            "unable to get bootstrap server list.");
     try {
       String bootstrap_broker = kafkaWait.getBootstrapBroker(SecurityProtocol.PLAINTEXT);
       Map<String, String> config = new HashMap<>();
