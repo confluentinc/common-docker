@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.confluent.kafkaensure;
+package io.confluent.admin.utils;
 
 import org.junit.After;
 import org.junit.Before;
