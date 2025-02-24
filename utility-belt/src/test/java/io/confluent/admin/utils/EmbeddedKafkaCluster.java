@@ -365,6 +365,7 @@ public class EmbeddedKafkaCluster {
     } catch (final Exception e) {
       throw new KafkaException("Failed to create test Kafka cluster", e);
     }
+    isRunning=true;
     log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
 
     //KafkaBroker broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
