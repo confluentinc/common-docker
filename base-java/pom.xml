@@ -143,6 +143,7 @@
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
+                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                 </args>
                             </build>
                         </image>
