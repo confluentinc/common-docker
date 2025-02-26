@@ -55,6 +55,7 @@ gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+    && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
