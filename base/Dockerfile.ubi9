@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ARG UBI_MINIMAL_VERSION="latest"
-FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
+FROM registry.access.redhat.com/ubi9/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -93,7 +93,7 @@ ENV LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 # Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
 # Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
 # For details on the necessary configuration changes in openssl.cnf, please refer to the documentation at: https://docs.openssl.org/3.0/man7/fips_module/#description
-RUN microdnf --nodocs install yum \
+RUN microdnf --nodocs -y install yum \
     && yum --nodocs -q update -y \
     && yum --nodocs -q install -y wget tar gzip make perl gcc \
     && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
