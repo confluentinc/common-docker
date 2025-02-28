@@ -29,12 +29,12 @@
     </modules>
 
     <properties>
-        <docker.os_type>ubi8</docker.os_type>
+        <docker.os_type>ubi9</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1179</ubi.image.version>
+        <ubi.image.version>9.5-1739420147</ubi.image.version>
         <ubi9.micro.image.version>9.5-1739467664</ubi9.micro.image.version>
         <ubi9.minimal.image.version>9.5-1739420147</ubi9.minimal.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
