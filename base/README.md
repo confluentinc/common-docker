@@ -17,8 +17,8 @@ Properties are inherited from a top-level POM. Properties may be overridden on t
 - *docker.upstream-tag*: (Optional) Use the given tag when pulling base images. Used as `DOCKER_UPSTREAM_TAG` during `docker build`. Defaults to the value of `docker.tag`.
 - *docker.test-registry*: (Optional) Registry to pull test dependency images from. Trailing `/` is required. Used as `DOCKER_TEST_REGISTRY` during testing. Defaults to the value of `docker.upstream-registry`.
 - *docker.test-tag*: (Optional) Use the given tag when pulling test dependency images. Used as `DOCKER_TEST_TAG` during testing. Defaults to the value of `docker.upstream-tag`.
-- *docker.os_type*: (Optional) Specify which operating system to use as the base image by using the Dockerfile with this extension. Valid values are `ubi8`. Default value is `ubi8`.
-- *docker.skip-security-update-check*: (Optional) The Dockerfile.ubi8 will run a security update check. If left to the default (false) and there is a pending security update that is not installed, then the build will fail, enforcing good security practices. If set to true, the check will pass no matter what. NOT ADVISABLE USE AT YOUR OWN RISK. Default value is `false`.
+- *docker.os_type*: (Optional) Specify which operating system to use as the base image by using the Dockerfile with this extension. Valid values are `ubi9`. Default value is `ubi9`.
+- *docker.skip-security-update-check*: (Optional) The Dockerfile.ubi9 will run a security update check. If left to the default (false) and there is a pending security update that is not installed, then the build will fail, enforcing good security practices. If set to true, the check will pass no matter what. NOT ADVISABLE USE AT YOUR OWN RISK. Default value is `false`.
 
 ## Build arguments
 

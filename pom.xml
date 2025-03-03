@@ -29,35 +29,37 @@
     </modules>
 
     <properties>
-        <docker.os_type>ubi8</docker.os_type>
+        <docker.os_type>ubi9</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi.image.version>8.10-1179</ubi.image.version>
+        <ubi.image.version>9.5-1739420147</ubi.image.version>
         <ubi9.micro.image.version>9.5-1739467664</ubi9.micro.image.version>
         <ubi9.minimal.image.version>9.5-1739420147</ubi9.minimal.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1:1.1.1k-14.el8_6</ubi.openssl.version>
-        <ubi.wget.version>1.19.5-12.el8_10</ubi.wget.version>
-        <ubi.netcat.version>7.92-1.el8</ubi.netcat.version>
-        <ubi.python39.version>3.9.20-1.module+el8.10.0+22342+478c159e</ubi.python39.version>
-        <ubi.tar.version>1.30-9.el8</ubi.tar.version>
-        <ubi.procps.version>3.3.15-14.el8</ubi.procps.version>
-        <ubi.krb5.workstation.version>1.18.2-30.el8_10</ubi.krb5.workstation.version>
-        <ubi.iputils.version>20180629-11.el8</ubi.iputils.version>
-        <ubi.hostname.version>3.20-6.el8</ubi.hostname.version>
-        <ubi.xzlibs.version>5.2.4-4.el8_6</ubi.xzlibs.version>
-        <ubi.glibc.version>2.28-251.el8_10.13</ubi.glibc.version>
-        <ubi.curl.version>7.61.1-34.el8_10.3</ubi.curl.version>
-        <ubi.findutils.version>1:4.6.0-21.el8</ubi.findutils.version>
-        <ubi.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi.crypto.policies.scripts.version>
+        <ubi.wget.version>1.21.1-8.el9_4</ubi.wget.version>
+        <ubi.netcat.version>7.92-3.el9</ubi.netcat.version>
+        <ubi.python39.version>3.9.21-1.el9_5</ubi.python39.version>
+        <ubi.tar.version>1.34-7.el9</ubi.tar.version>
+        <ubi.wget.version>1.21.1-8.el9_4</ubi.wget.version>
+        <ubi.netcat.version>7.92-3.el9</ubi.netcat.version>
+        <ubi.procps.version>3.3.17-14.el9</ubi.procps.version>
+        <ubi.krb5.workstation.version>1.21.1-4.el9_5</ubi.krb5.workstation.version>
+        <ubi.iputils.version>20210202-10.el9_5</ubi.iputils.version>
+        <ubi.hostname.version>3.23-6.el9</ubi.hostname.version>
+        <ubi.xzlibs.version>5.2.5-8.el9_0</ubi.xzlibs.version>
+        <ubi.glibc.version>2.34-125.el9_5.1</ubi.glibc.version>
+        <ubi.curl.version>7.76.1-31.el9</ubi.curl.version>
+        <ubi.findutils.version>1:4.8.0-7.el9</ubi.findutils.version>
+        <ubi.crypto.policies.scripts.version>20240828-2.git626aa59.el9_5</ubi.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
         <ubi.temurin.jdk.version>21.0.6.0.0.7-1</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
-        <ubi.python.pip.version>20.*</ubi.python.pip.version>
+        <ubi.python.pip.version>21.3.1-1.el9</ubi.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.156</ubi.python.confluent.docker.utils.version>
         <!-- Golang Version -->
