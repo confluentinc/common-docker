@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -45,7 +44,7 @@ public class ClusterStatusSASLTest {
   public static void setup() throws Exception {
     Configuration.setConfiguration(null);
 
-    kafka = new EmbeddedKafkaCluster(3, 3, true);
+    kafka = new EmbeddedKafkaCluster(3, true);
     kafka.start();
   }
 
@@ -66,7 +65,7 @@ public class ClusterStatusSASLTest {
     Properties clientSecurityProps = kafka.getClientSecurityConfig();
 
     Map<String, String> config = Utils.propsToStringMap(clientSecurityProps);
-    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBroker
+    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBrokers
         (SecurityProtocol.SASL_SSL));
 
     // Set password and enabled protocol as the Utils.propsToStringMap just returns toString()
