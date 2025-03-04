@@ -33,8 +33,6 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.TopicConfig;
 import io.confluent.kafkaensure.TopicSpec;
 
-import io.confluent.admin.utils.EmbeddedKafkaCluster;
-
 public class TopicEnsureTest {
 
   private static final int NUM_BROKERS = 3;
@@ -52,7 +50,7 @@ public class TopicEnsureTest {
 
     Properties adminClientProps = new Properties();
     adminClientProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-                         kafka.getBootstrapBroker(SecurityProtocol.PLAINTEXT));
+                         kafka.getBootstrapBrokers(SecurityProtocol.PLAINTEXT));
     topicEnsure = new io.confluent.kafkaensure.TopicEnsure(adminClientProps);
   }
 

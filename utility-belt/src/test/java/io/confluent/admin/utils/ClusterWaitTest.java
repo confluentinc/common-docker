@@ -18,10 +18,8 @@ package io.confluent.admin.utils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.test.TestUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,12 +48,12 @@ public class ClusterWaitTest {
     });
 
     kafkaClusterThread.start();
-    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBroker(SecurityProtocol.PLAINTEXT).isEmpty(),
+    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
         "unable to get bootstrap server list.");
 
     try {
       Map<String, String> config = new HashMap<>();
-      config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaWait.getBootstrapBroker
+      config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaWait.getBootstrapBrokers
           (SecurityProtocol.PLAINTEXT));
 
       assertThat(ClusterStatus.isKafkaReady(config, 3, 20000))
@@ -71,7 +69,7 @@ public class ClusterWaitTest {
 
 
   @Test(timeout = 180000)
-  public void isKafkaReadyWaitWithoutZookeeper() throws Exception {
+  public void isKafkaReady() throws Exception {
     final EmbeddedKafkaCluster kafkaWait = new EmbeddedKafkaCluster(3);
     Thread kafkaClusterThread = new Thread(new Runnable() {
       @Override
@@ -89,10 +87,10 @@ public class ClusterWaitTest {
     });
 
     kafkaClusterThread.start();
-    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBroker(SecurityProtocol.PLAINTEXT).isEmpty(),
+    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
             "unable to get bootstrap server list.");
     try {
-      String bootstrap_broker = kafkaWait.getBootstrapBroker(SecurityProtocol.PLAINTEXT);
+      String bootstrap_broker = kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT);
       Map<String, String> config = new HashMap<>();
       config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrap_broker);
 

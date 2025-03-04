@@ -48,7 +48,7 @@ public class ClusterStatusTest {
   public void isKafkaReady() throws Exception {
 
     Map<String, String> config = new HashMap<>();
-    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBroker
+    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBrokers
         (SecurityProtocol.PLAINTEXT));
     assertThat(ClusterStatus.isKafkaReady(config, 3, 10000))
         .isTrue();
@@ -58,7 +58,7 @@ public class ClusterStatusTest {
   public void isKafkaReadyFailWithLessBrokers() throws Exception {
     try {
       Map<String, String> config = new HashMap<>();
-      config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBroker
+      config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapBrokers
           (SecurityProtocol.PLAINTEXT));
       assertThat(ClusterStatus.isKafkaReady(config, 5, 10000))
           .isFalse();

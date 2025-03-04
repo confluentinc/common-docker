@@ -17,20 +17,16 @@ package io.confluent.admin.utils;
 
 import kafka.security.JaasTestUtils;
 import kafka.security.minikdc.MiniKdc;
-import kafka.server.KafkaConfig;
 import kafka.server.KafkaBroker;
-import kafka.utils.CoreUtils;
 import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.common.utils.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
 import scala.Option$;
-import scala.collection.JavaConverters;
 
 import javax.security.auth.login.Configuration;
 import java.io.File;
@@ -42,7 +38,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.kafka.common.test.KafkaClusterTestKit;
 import org.apache.kafka.common.test.TestKitNodes;
-import com.google.common.collect.Maps;
 import org.apache.kafka.common.KafkaException;
 
 /**
@@ -123,10 +118,6 @@ public class EmbeddedKafkaCluster {
       String jaasFile = createJAASFile();
 
       System.setProperty("java.security.auth.login.config", jaasFile);
-      System.setProperty(
-              "zookeeper.authProvider.1",
-              "org.apache.zookeeper.server.auth.SASLAuthenticationProvider"
-      );
       // Uncomment this to debug Kerberos issues.
       // System.setProperty("sun.security.krb5.debug","true");
 
@@ -288,19 +279,12 @@ public class EmbeddedKafkaCluster {
   }
 
   public void start() throws IOException {
-    for (int brokerId = 0; brokerId < numBrokers; brokerId++) {
-      log.debug("Starting broker with id {} ...", brokerId);
-      startBroker(brokerId);
-      break;
-    }
+
+    startBroker();
     isRunning = true;
   }
 
   public void shutdown() {
-//    for (int brokerId : brokersById.keySet()) {
-//      log.debug("Stopping broker with id {} ...", brokerId);
-//      stopBroker(brokerId);
-//    }
     try {
       cluster.close();
     } catch (Exception e) {
@@ -310,19 +294,14 @@ public class EmbeddedKafkaCluster {
     if (kdc != null) {
       kdc.stop();
     }
-    System.clearProperty("java.security.auth.login.config");
-    System.clearProperty("zookeeper.authProvider.1");
     Configuration.setConfiguration(null);
     isRunning = false;
   }
 
-  private void startBroker(int brokerId) throws IOException {
-    if (brokerId < 0) {
-      throw new IllegalArgumentException("broker id must not be negative");
-    }
+  private void startBroker() throws IOException {
     Properties props = TestUtils
             .createBrokerConfig(
-                    brokerId,
+                    0,
                     ENABLE_CONTROLLED_SHUTDOWN,
                     ENABLE_DELETE_TOPIC,
                     0,
@@ -343,10 +322,6 @@ public class EmbeddedKafkaCluster {
                     DEFAULT_REPLICATION_FACTOR,
                     false
             );
-    // Check if both inter.broker.listener.name and security.inter.broker.protocol are set
-    if (props.containsKey("inter.broker.listener.name") && props.containsKey("security.inter.broker.protocol")) {
-      throw new IllegalArgumentException("Only one of inter.broker.listener.name and security.inter.broker.protocol should be set.");
-    }
     try {
       final KafkaClusterTestKit.Builder clusterBuilder = new KafkaClusterTestKit.Builder(
               new TestKitNodes.Builder()
@@ -367,8 +342,6 @@ public class EmbeddedKafkaCluster {
     }
     isRunning=true;
     log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
-
-    //KafkaBroker broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
   }
 
 
@@ -376,14 +349,13 @@ public class EmbeddedKafkaCluster {
     this.jaasFilePath = jaasFilePath;
   }
 
-  public String getBootstrapBroker(SecurityProtocol securityProtocol) {
+  public String getBootstrapBrokers(SecurityProtocol securityProtocol) {
     return brokerList();
   }
 
   public boolean isRunning() {
     return isRunning;
   }
-
   public String getZookeeperConnectString() {
     return this.zookeeper.connectString();
   }
