@@ -55,7 +55,7 @@ public class TopicEnsureTest {
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
     kafka.shutdown();
   }
 

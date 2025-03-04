@@ -134,8 +134,6 @@ public class EmbeddedKafkaCluster {
 
   private String createJAASFile() throws IOException {
 
-    String zkServerPrincipal = "zookeeper/localhost";
-    String zkClientPrincipal = "zkclient/localhost";
     String kafkaServerPrincipal = "kafka/localhost";
     String kafkaClientPrincipal = "client/localhost";
 
@@ -183,10 +181,6 @@ public class EmbeddedKafkaCluster {
                     "};" + "\n";
 
     String output = template
-            .replace("$ZK_SERVER_KEYTAB$", createKeytab(zkServerPrincipal))
-            .replace("$ZK_SERVER_PRINCIPAL$", zkServerPrincipal)
-            .replace("$ZK_CLIENT_KEYTAB$", createKeytab(zkClientPrincipal))
-            .replace("$ZK_CLIENT_PRINCIPAL$", zkClientPrincipal)
             .replace("$KAFKA_SERVER_KEYTAB$", createKeytab(kafkaServerPrincipal))
             .replace("$KAFKA_SERVER_PRINCIPAL$", kafkaServerPrincipal)
             .replace("$KAFKA_CLIENT_KEYTAB$", createKeytab(kafkaClientPrincipal))
@@ -258,7 +252,11 @@ public class EmbeddedKafkaCluster {
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
-        kafka.shutdown();
+          try {
+              kafka.shutdown();
+          } catch (Exception e) {
+              throw new RuntimeException(e);
+          }
       }
     });
 
@@ -280,16 +278,12 @@ public class EmbeddedKafkaCluster {
 
   public void start() throws IOException {
 
-    startBroker();
+    createKafkaBrokers();
     isRunning = true;
   }
 
-  public void shutdown() {
-    try {
+  public void shutdown() throws Exception {
       cluster.close();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
 
     if (kdc != null) {
       kdc.stop();
@@ -298,7 +292,7 @@ public class EmbeddedKafkaCluster {
     isRunning = false;
   }
 
-  private void startBroker() throws IOException {
+  private void createKafkaBrokers() throws IOException {
     Properties props = TestUtils
             .createBrokerConfig(
                     0,
