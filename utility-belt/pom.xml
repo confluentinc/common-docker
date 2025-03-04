@@ -128,8 +128,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-test-common</artifactId>
-            <version>8.0.0-356-ccs</version>
+            <artifactId>kafka-test-common-runtime</artifactId>
+            <version>${kafka.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
