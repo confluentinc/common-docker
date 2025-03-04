@@ -37,6 +37,7 @@
         <docker.skip-build>false</docker.skip-build>
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
+        <docker.file>Dockerfile.ubi9</docker.file>
     </properties>
 
     <dependencies>
@@ -120,7 +121,7 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi9.image.version}</UBI_MINIMAL_VERSION>
+                        <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
@@ -136,12 +137,14 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi9.image.version}</UBI_MINIMAL_VERSION>
+                                    <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
+                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                                    <FINDUTILS_VERSION>-${ubi.iputils.version}</FINDUTILS_VERSION>
                                 </args>
                             </build>
                         </image>
