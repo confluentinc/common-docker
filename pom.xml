@@ -13,7 +13,7 @@
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.8.2</version>
+    <version>7.8.2-17</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -31,7 +31,7 @@
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.8.2</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>7.8.2-17</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi.image.version>8.10-1179</ubi.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
