@@ -32,8 +32,7 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.TopicConfig;
 import io.confluent.admin.utils.EmbeddedKafkaCluster;
-
-private static TopicEnsure topicEnsure;
+import io.confluent.kafkaensure.TopicSpec;
 
 public class TopicEnsureTest {
 
