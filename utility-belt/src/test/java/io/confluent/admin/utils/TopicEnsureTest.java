@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.confluent.admin.utils;
+package io.confluent.kafkaensure;
 
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +31,9 @@ import java.util.Properties;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.TopicConfig;
-import io.confluent.kafkaensure.TopicSpec;
+import io.confluent.admin.utils.EmbeddedKafkaCluster;
+
+private static TopicEnsure topicEnsure;
 
 public class TopicEnsureTest {
 
@@ -41,7 +43,7 @@ public class TopicEnsureTest {
   private static final Integer TIMEOUT_MS = 20000;
 
   private static EmbeddedKafkaCluster kafka;
-  private static io.confluent.kafkaensure.TopicEnsure topicEnsure;
+  private static TopicEnsure topicEnsure;
 
   @Before
   public void setUp() throws Exception {
@@ -51,7 +53,7 @@ public class TopicEnsureTest {
     Properties adminClientProps = new Properties();
     adminClientProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
                          kafka.getBootstrapBrokers(SecurityProtocol.PLAINTEXT));
-    topicEnsure = new io.confluent.kafkaensure.TopicEnsure(adminClientProps);
+    topicEnsure = new TopicEnsure(adminClientProps);
   }
 
   @After
