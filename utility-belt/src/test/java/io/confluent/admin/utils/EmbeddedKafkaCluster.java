@@ -326,8 +326,6 @@ public class EmbeddedKafkaCluster {
       );
 
       cluster = clusterBuilder.build();
-      //cluster.nonFatalFaultHandler().setIgnore(true);
-
       cluster.format();
       cluster.startup();
       cluster.waitForReadyBrokers();
