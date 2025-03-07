@@ -532,13 +532,16 @@ func TestEnvToProps(t *testing.T) {
 			for k, v := range tt.envVars {
 				os.Setenv(k, v)
 			}
+			defer func() {
+				for k, _ := range tt.envVars {
+					os.Unsetenv(k)
+				}
+			}()
 			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("envToProps() = %v, want %v", result, tt.expected)
 			}
-			for k, _ := range tt.envVars {
-				os.Unsetenv(k)
-			}
+
 		})
 	}
 }
