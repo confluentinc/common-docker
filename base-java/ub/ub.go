@@ -134,25 +134,17 @@ func path(filePath string, operation string) (bool, error) {
 }
 
 func renderTemplate(templateFilePath string) error {
+	// Define a function map to handle custom template functions
 	funcs := template.FuncMap{
-		"getEnv":             getEnvOrDefault,
-		"splitToMapDefaults": splitToMapDefaults,
-	}
-	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
-	if err != nil {
-		err = fmt.Errorf("error  %q: %w", templateFilePath, err)
-		return err
-	}
-	return buildTemplate(os.Stdout, *t)
-}
-
-func buildTemplate(writer io.Writer, template template.Template) error {
-	err := template.Execute(writer, GetEnvironment())
-	if err != nil {
+		func buildTemplate(writer io.Writer, template template.Template) error{
+		err := template.Execute(writer, GetEnvironment())
+		if err != nil{
 		err = fmt.Errorf("error building template file : %w", err)
 		return err
 	}
-	return nil
+		return nil
+	}
+	}
 }
 
 func renderConfig(writer io.Writer, configSpec ConfigSpec) error {
