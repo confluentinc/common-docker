@@ -459,3 +459,89 @@ func Test_waitForHttp(t *testing.T) {
 		})
 	}
 }
+
+func TestEnvToProps(t *testing.T) {
+	tests := []struct {
+		name       string
+		envVars    map[string]string
+		envPrefix  string
+		propPrefix string
+		exclude    []string
+		expected   map[string]string
+	}{
+		{
+			name: "Basic conversion with prefix",
+			envVars: map[string]string{
+				"APP_FOO_BAR": "value1",
+				"APP_BAZ":     "value2",
+				"OTHER_VAR":   "ignored",
+			},
+			envPrefix:  "APP_",
+			propPrefix: "app.",
+			exclude:    []string{},
+			expected: map[string]string{
+				"app.foo.bar": "value1",
+				"app.baz":     "value2",
+			},
+		},
+		{
+			name: "With exclusions",
+			envVars: map[string]string{
+				"APP_FOO_BAR": "value1",
+				"APP_SECRET":  "hidden",
+				"APP_BAZ":     "value2",
+			},
+			envPrefix:  "APP_",
+			propPrefix: "app.",
+			exclude:    []string{"APP_SECRET"},
+			expected: map[string]string{
+				"app.foo.bar": "value1",
+				"app.baz":     "value2",
+			},
+		},
+		{
+			name: "With special underscore conversions",
+			envVars: map[string]string{
+				"APP_SINGLE_UNDERSCORE":   "dot",
+				"APP_DOUBLE__UNDERSCORE":  "single_underscore",
+				"APP_TRIPLE___UNDERSCORE": "dash",
+			},
+			envPrefix:  "APP_",
+			propPrefix: "app.meta.",
+			exclude:    []string{},
+			expected: map[string]string{
+				"app.meta.single.underscore": "dot",
+				"app.meta.double_underscore": "single_underscore",
+				"app.meta.triple-underscore": "dash",
+			},
+		},
+		{
+			name: "Empty result",
+			envVars: map[string]string{
+				"OTHER_VAR": "ignored",
+			},
+			envPrefix:  "APP_",
+			propPrefix: "app.",
+			exclude:    []string{},
+			expected:   map[string]string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
+			}
+			defer func() {
+				for k, _ := range tt.envVars {
+					os.Unsetenv(k)
+				}
+			}()
+			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("envToProps() = %v, want %v", result, tt.expected)
+			}
+
+		})
+	}
+}

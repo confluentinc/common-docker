@@ -137,6 +137,7 @@ func renderTemplate(templateFilePath string) error {
 	funcs := template.FuncMap{
 		"getEnv":             getEnvOrDefault,
 		"splitToMapDefaults": splitToMapDefaults,
+		"envToProps":         envToProps,
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
@@ -230,6 +231,22 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 					}
 				}
 			}
+		}
+	}
+	return config
+}
+
+func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[string]string {
+	env := GetEnvironment()
+	config := make(map[string]string)
+	for envName, envValue := range env {
+		if slices.Contains(excludeEnvs, envName) {
+			continue
+		}
+		if strings.HasPrefix(envName, envPrefix) {
+			trimmedEnvName := strings.TrimPrefix(envName, envPrefix)
+			propertyName := propertyNamePrefix + ConvertKey(trimmedEnvName)
+			config[propertyName] = envValue
 		}
 	}
 	return config
