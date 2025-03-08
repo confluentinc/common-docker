@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.2.14-0, 7.2.15-0)</version>
+        <version>7.2.14-26</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.2.14-0</version>
+    <version>7.2.14-72</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, and new cp-base image</description>
@@ -30,7 +30,7 @@
         <docker.os_type>ubi8</docker.os_type>
         <docker.file>Dockerfile.${docker.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.2.14-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>7.2.14-72</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi.image.version>8.10-1179</ubi.image.version>
         <!-- Redhat Package Versions -->
