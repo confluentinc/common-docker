@@ -7,21 +7,22 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.3.12-0, 7.3.13-0)</version>
+        <version>[7.4.9-0, 7.4.10-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.3.12-0</version>
+    <version>7.4.9-0</version>
 
     <name>${project.artifactId}</name>
-    <description>Common Docker utilities, and new cp-base image</description>
+    <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
 
     <modules>
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base</module>
+        <module>base-lite</module>
         <module>jmxterm</module>
         <!-- <module>kerberos</module> -->
     </modules>
@@ -30,7 +31,7 @@
         <docker.ubi8.os_type>ubi8</docker.ubi8.os_type>
         <docker.file>Dockerfile.${docker.ubi8.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi8.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.3.12-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>7.4.9-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi8.image.version>8.10-1179</ubi8.image.version>
         <!-- Redhat Package Versions -->
@@ -52,6 +53,8 @@
         <ubi8.python.pip.version>20.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.156</ubi.python.confluent.docker.utils.version>
+        <!-- Golang Version -->
+        <golang.version>1.22.7-bullseye</golang.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
