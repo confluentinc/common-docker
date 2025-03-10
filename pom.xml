@@ -28,8 +28,8 @@
 
     <properties>
         <docker.ubi8.os_type>ubi8</docker.ubi8.os_type>
-        <docker.file>Dockerfile.${docker.os_type}</docker.file>
-        <docker.tag>${io.confluent.common-docker.version}-${docker.os_type}</docker.tag>
+        <docker.file>Dockerfile.${docker.ubi8.os_type}</docker.file>
+        <docker.tag>${io.confluent.common-docker.version}-${docker.ubi8.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.1.16-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi8.image.version>8.10-1179</ubi8.image.version>
