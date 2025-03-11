@@ -51,18 +51,24 @@ LABEL io.confluent.docker=true
 # base image that supports it
 ENV LANG="C.UTF-8"
 
-# Zulu OpenJDK version
-ARG ZULU_OPENJDK_VERSION=""
+# Temurin JDK version
+ARG TEMURIN_JDK_VERSION=""
 
 ENV UB_CLASSPATH=/usr/share/java/cp-base-lite/*
 
+RUN printf "[temurin-jdk] \n\
+name=temurin-jdk \n\
+baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+
 RUN microdnf --nodocs install yum \
-    && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
-    && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         "curl${CURL_VERSION}" \
-        "zulu17-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "temurin-17-jre${TEMURIN_JDK_VERSION}" \
     && microdnf clean all \
     && yum clean all \
     && rm -rf /tmp/* \
@@ -74,10 +80,10 @@ RUN microdnf --nodocs install yum \
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
 # is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left
 # hand of ||) this check will fail. If true (which triggers a right-hand || shell exit(0)), then this check will pass even if a
-# security update is availible. We skip checks from ZuluJDK repos because Confluent pins those upstream versions for various reasons 
-# such as identified bugs in ZuluJDK's software.
+# security update is availible. We skip checks from TemurinJDK repos because Confluent pins those upstream versions for various reasons
+# such as identified bugs in TemurinJDK's software.
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
-RUN yum --disablerepo="zulu-openjdk" check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
+RUN yum --disablerepo="temurin-jdk" check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
