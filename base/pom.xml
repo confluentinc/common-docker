@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.7.3-0</version>
+        <version>7.8.2-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -165,7 +165,9 @@
                           <XZ_LIBS_VERSION>-${ubi8.xzlibs.version}</XZ_LIBS_VERSION>
                           <GLIBC_VERSION>-${ubi8.glibc.version}</GLIBC_VERSION>
                           <CURL_VERSION>-${ubi8.curl.version}</CURL_VERSION>
-                          <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
+                          <FINDUTILS_VERSION>-${ubi8.iputils.version}</FINDUTILS_VERSION>
+                          <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi8.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                          <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                           <PYTHON_PIP_VERSION>-${ubi8.python.pip.version}</PYTHON_PIP_VERSION>
                           <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                           <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>

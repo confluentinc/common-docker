@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.7.3-0, 7.7.4-0)</version>
+        <version>[7.8.2-0, 7.8.3-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>7.7.3-0</version>
+    <version>7.8.2-0</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -31,9 +31,11 @@
         <docker.ubi8.os_type>ubi8</docker.ubi8.os_type>
         <docker.file>Dockerfile.${docker.ubi8.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi8.os_type}</docker.tag>
-        <io.confluent.common-docker.version>7.7.3-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>7.8.2-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi8.image.version>8.10-1179</ubi8.image.version>
+        <!-- OpenSSL version that is FIPS compliant -->
+        <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
         <ubi.openssl.version>1:1.1.1k-14.el8_6</ubi.openssl.version>
         <ubi8.wget.version>1.19.5-12.el8_10</ubi8.wget.version>
@@ -50,7 +52,7 @@
         <ubi8.findutils.version>1:4.6.0-21.el8</ubi8.findutils.version>
         <ubi8.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi8.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.zulu.openjdk.version>17.0.14-1</ubi.zulu.openjdk.version>
+        <ubi.temurin.jdk.version>17.0.14.0.0.7-1</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi8.python.pip.version>20.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
