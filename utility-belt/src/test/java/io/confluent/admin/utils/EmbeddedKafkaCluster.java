@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package io.confluent.admin.utils;
-
+import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
@@ -355,7 +355,7 @@ public class EmbeddedKafkaCluster {
             false
         );
 
-    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Option.empty());
+    KafkaServer broker = TestUtils.createServer(KafkaConfig.fromProps(props), Time.SYSTEM);
     brokersById.put(brokerId, broker);
   }
 
