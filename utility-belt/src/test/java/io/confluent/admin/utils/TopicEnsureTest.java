@@ -23,7 +23,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,14 +31,12 @@ import java.util.Properties;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.TopicConfig;
-import io.confluent.kafkaensure.TopicSpec;
-
 import io.confluent.admin.utils.EmbeddedKafkaCluster;
+import io.confluent.kafkaensure.TopicSpec;
 
 public class TopicEnsureTest {
 
   private static final int NUM_BROKERS = 3;
-  private static final int NUM_ZK = 3;
   private static final int DEFAULT_PARTITIONS = 2;
   private static final int DEFAULT_REPLICATION_FACTOR = 3;
   private static final Integer TIMEOUT_MS = 20000;
@@ -48,18 +45,18 @@ public class TopicEnsureTest {
   private static TopicEnsure topicEnsure;
 
   @Before
-  public void setUp() throws IOException {
-    kafka = new EmbeddedKafkaCluster(NUM_BROKERS, NUM_ZK);
+  public void setUp() throws Exception {
+    kafka = new EmbeddedKafkaCluster(NUM_BROKERS);
     kafka.start();
 
     Properties adminClientProps = new Properties();
     adminClientProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-                         kafka.getBootstrapBroker(SecurityProtocol.PLAINTEXT));
+                         kafka.getBootstrapBrokers(SecurityProtocol.PLAINTEXT));
     topicEnsure = new TopicEnsure(adminClientProps);
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
     kafka.shutdown();
   }
 
