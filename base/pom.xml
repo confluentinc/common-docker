@@ -122,67 +122,67 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
+                        <UBI_MINIMAL_VERSION>${ubi8.image.version}</UBI_MINIMAL_VERSION>
                         <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
-                        <WGET_VERSION>-${ubi.wget.version}</WGET_VERSION>
-                        <NETCAT_VERSION>-${ubi.netcat.version}</NETCAT_VERSION>
-                        <PYTHON39_VERSION>-${ubi.python39.version}</PYTHON39_VERSION>
-                        <TAR_VERSION>-${ubi.tar.version}</TAR_VERSION>
-                        <PROCPS_VERSION>-${ubi.procps.version}</PROCPS_VERSION>
-                        <KRB5_WORKSTATION_VERSION>-${ubi.krb5.workstation.version}</KRB5_WORKSTATION_VERSION>
-                        <IPUTILS_VERSION>-${ubi.iputils.version}</IPUTILS_VERSION>
-                        <HOSTNAME_VERSION>-${ubi.hostname.version}</HOSTNAME_VERSION>
-                        <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
-                        <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
-                        <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
+                        <WGET_VERSION>-${ubi8.wget.version}</WGET_VERSION>
+                        <NETCAT_VERSION>-${ubi8.netcat.version}</NETCAT_VERSION>
+                        <PYTHON39_VERSION>-${ubi8.python39.version}</PYTHON39_VERSION>
+                        <TAR_VERSION>-${ubi8.tar.version}</TAR_VERSION>
+                        <PROCPS_VERSION>-${ubi8.procps.version}</PROCPS_VERSION>
+                        <KRB5_WORKSTATION_VERSION>-${ubi8.krb5.workstation.version}</KRB5_WORKSTATION_VERSION>
+                        <IPUTILS_VERSION>-${ubi8.iputils.version}</IPUTILS_VERSION>
+                        <HOSTNAME_VERSION>-${ubi8.hostname.version}</HOSTNAME_VERSION>
+                        <XZ_LIBS_VERSION>-${ubi8.xzlibs.version}</XZ_LIBS_VERSION>
+                        <GLIBC_VERSION>-${ubi8.glibc.version}</GLIBC_VERSION>
+                        <CURL_VERSION>-${ubi8.curl.version}</CURL_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
-                        <PYTHON_PIP_VERSION>-${ubi.python.pip.version}</PYTHON_PIP_VERSION>
+                        <PYTHON_PIP_VERSION>-${ubi8.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                     </buildArgs>
                 </configuration>
             </plugin>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.43.4</version>
-            <configuration>
-              <images>
-                <image>
-                  <build>
-                    <args>
-                      <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                      <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
-                      <WGET_VERSION>-${ubi.wget.version}</WGET_VERSION>
-                      <NETCAT_VERSION>-${ubi.netcat.version}</NETCAT_VERSION>
-                      <PYTHON39_VERSION>-${ubi.python39.version}</PYTHON39_VERSION>
-                      <TAR_VERSION>-${ubi.tar.version}</TAR_VERSION>
-                      <PROCPS_VERSION>-${ubi.procps.version}</PROCPS_VERSION>
-                      <KRB5_WORKSTATION_VERSION>-${ubi.krb5.workstation.version}
-                      </KRB5_WORKSTATION_VERSION>
-                      <IPUTILS_VERSION>-${ubi.iputils.version}</IPUTILS_VERSION>
-                      <HOSTNAME_VERSION>-${ubi.hostname.version}</HOSTNAME_VERSION>
-                      <XZ_LIBS_VERSION>-${ubi.xzlibs.version}</XZ_LIBS_VERSION>
-                      <GLIBC_VERSION>-${ubi.glibc.version}</GLIBC_VERSION>
-                      <CURL_VERSION>-${ubi.curl.version}</CURL_VERSION>
-                      <FINDUTILS_VERSION>-${ubi.iputils.version}</FINDUTILS_VERSION>
-                      <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
-                      <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
-                      <PYTHON_PIP_VERSION>-${ubi.python.pip.version}</PYTHON_PIP_VERSION>
-                      <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}
-                      </PYTHON_SETUPTOOLS_VERSION>
-                      <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                        ${ubi.python.confluent.docker.utils.version}
-                      </PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                      <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}
-                      </SKIP_SECURITY_UPDATE_CHECK>
-                    </args>
-                  </build>
-                </image>
-              </images>
-            </configuration>
-          </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.43.4</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <build>
+                                <args>
+                                    <UBI_MINIMAL_VERSION>${ubi8.image.version}</UBI_MINIMAL_VERSION>
+                                    <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
+                                    <WGET_VERSION>-${ubi8.wget.version}</WGET_VERSION>
+                                    <NETCAT_VERSION>-${ubi8.netcat.version}</NETCAT_VERSION>
+                                    <PYTHON39_VERSION>-${ubi8.python39.version}</PYTHON39_VERSION>
+                                    <TAR_VERSION>-${ubi8.tar.version}</TAR_VERSION>
+                                    <PROCPS_VERSION>-${ubi8.procps.version}</PROCPS_VERSION>
+                                    <KRB5_WORKSTATION_VERSION>-${ubi8.krb5.workstation.version}
+                                    </KRB5_WORKSTATION_VERSION>
+                                    <IPUTILS_VERSION>-${ubi8.iputils.version}</IPUTILS_VERSION>
+                                    <HOSTNAME_VERSION>-${ubi8.hostname.version}</HOSTNAME_VERSION>
+                                    <XZ_LIBS_VERSION>-${ubi8.xzlibs.version}</XZ_LIBS_VERSION>
+                                    <GLIBC_VERSION>-${ubi8.glibc.version}</GLIBC_VERSION>
+                                    <CURL_VERSION>-${ubi8.curl.version}</CURL_VERSION>
+                                    <FINDUTILS_VERSION>-${ubi8.iputils.version}</FINDUTILS_VERSION>
+                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi8.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                                    <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
+                                    <PYTHON_PIP_VERSION>-${ubi8.python.pip.version}</PYTHON_PIP_VERSION>
+                                    <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}
+                                    </PYTHON_SETUPTOOLS_VERSION>
+                                    <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                                        ${ubi.python.confluent.docker.utils.version}
+                                    </PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                                    <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}
+                                    </SKIP_SECURITY_UPDATE_CHECK>
+                                </args>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
