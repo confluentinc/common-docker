@@ -135,6 +135,7 @@
                         <XZ_LIBS_VERSION>-${ubi9.xzlibs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi9.glibc.version}</GLIBC_VERSION>
                         <CURL_VERSION>-${ubi9.curl.version}</CURL_VERSION>
+                        <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi9.python.pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
@@ -166,7 +167,7 @@
                                     <XZ_LIBS_VERSION>-${ubi9.xzlibs.version}</XZ_LIBS_VERSION>
                                     <GLIBC_VERSION>-${ubi9.glibc.version}</GLIBC_VERSION>
                                     <CURL_VERSION>-${ubi9.curl.version}</CURL_VERSION>
-                                    <FINDUTILS_VERSION>-${ubi9.iputils.version}</FINDUTILS_VERSION>
+                                    <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                                     <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                                     <PYTHON_PIP_VERSION>-${ubi9.python.pip.version}</PYTHON_PIP_VERSION>
