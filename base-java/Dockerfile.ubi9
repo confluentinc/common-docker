@@ -54,11 +54,16 @@ gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 
 RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
+    && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+    && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses
+
+# enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
+RUN update-crypto-policies --set FIPS
 
 COPY license.txt /licenses
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
@@ -72,6 +77,10 @@ COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 
 # Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
 RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
+
+# Disable setuid/setgid bits
+RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
+RUN find / -perm /6000 -type f -exec chmod g-s {} \; || true
 
 USER appuser
 WORKDIR /home/appuser
