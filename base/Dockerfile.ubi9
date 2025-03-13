@@ -107,7 +107,7 @@ RUN microdnf --nodocs -y install yum \
     && cd .. \
     && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
     && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
-    && yum --nodocs install -y --setopt=install_weak_deps=False \
+    && yum --nodocs install -y --setopt=install_weak_deps=False --allowerasing \
         git \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
@@ -122,6 +122,8 @@ RUN microdnf --nodocs -y install yum \
         "glibc${GLIBC_VERSION}" \
         "glibc-common${GLIBC_VERSION}" \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "curl${CURL_VERSION}" \
+        "libcurl${CURL_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
