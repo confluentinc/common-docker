@@ -122,7 +122,7 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi8.image.version}</UBI_MINIMAL_VERSION>
+                        <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
                         <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                         <WGET_VERSION>-${ubi8.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi8.netcat.version}</NETCAT_VERSION>
@@ -152,7 +152,7 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi8.image.version}</UBI_MINIMAL_VERSION>
+                                    <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                                     <WGET_VERSION>-${ubi8.wget.version}</WGET_VERSION>
                                     <NETCAT_VERSION>-${ubi8.netcat.version}</NETCAT_VERSION>
