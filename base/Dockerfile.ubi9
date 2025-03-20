@@ -121,8 +121,8 @@ RUN microdnf --nodocs -y install yum \
         "xz-libs${XZ_LIBS_VERSION}" \
         "glibc${GLIBC_VERSION}" \
         "glibc-common${GLIBC_VERSION}" \
-        "glibc-minimal-langpack${GLIBC_VERSION}"\
-        "curl-minimal${CURL_VERSION}"
+        "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "curl-minimal${CURL_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
