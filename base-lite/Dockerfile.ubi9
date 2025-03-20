@@ -64,7 +64,7 @@ gpgcheck=1 \n\
 gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-RUN microdnf --nodocs install yum \
+RUN microdnf --nodocs -y install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         "curl${CURL_VERSION}" \
