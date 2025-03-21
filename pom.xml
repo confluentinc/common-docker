@@ -53,7 +53,6 @@
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.xzlibs.version>5.2.5-8.el9_0</ubi9.xzlibs.version>
         <ubi9.glibc.version>2.34-125.el9_5.3</ubi9.glibc.version>
-        <ubi9.curl.version>7.76.1-31.el9</ubi9.curl.version>
         <ubi9.findutils.version>1:4.8.0-7.el9</ubi9.findutils.version>
         <ubi9.crypto.policies.scripts.version>20240828-2.git626aa59.el9_5</ubi9.crypto.policies.scripts.version>
         <!-- Python Module Versions -->
