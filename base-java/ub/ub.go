@@ -286,7 +286,7 @@ func loadConfigSpec(path string) (ConfigSpec, error) {
 }
 
 func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
-	classPath := getEnvOrDefault("UB_CLASSPATH", "/usr/share/java/cp-base-lite/*")
+	classPath := getEnvOrDefault("UB_CLASSPATH", "/usr/share/java/cp-base-java/*")
 
 	opts := []string{}
 	if jvmOpts != "" {
