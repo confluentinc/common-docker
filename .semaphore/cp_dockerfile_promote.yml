@@ -77,6 +77,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
                   docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-base-new ubi9 AMD
           commands:
@@ -103,6 +105,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
                   docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi9 AMD
           commands:
@@ -129,6 +133,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
                   docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi9 AMD
           commands:
@@ -155,6 +161,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$AMD_ARCH
                   docker push $DOCKER_REPO:latest$AMD_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
   - name: Promote ARM
     dependencies: []
@@ -185,6 +193,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
                   docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-base-new ubi9 ARM
           commands:
@@ -211,6 +221,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
                   docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi9 ARM
           commands:
@@ -237,6 +249,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
                   docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi9 ARM
           commands:
@@ -263,6 +277,8 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest$ARM_ARCH
                   docker push $DOCKER_REPO:latest$ARM_ARCH
                   fi
+                  docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
   - name: Create Manifest
     dependencies: ["Promote AMD", "Promote ARM"]
@@ -288,6 +304,8 @@ blocks:
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest
                   fi
+                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-base-new ubi9
           commands:
@@ -309,6 +327,8 @@ blocks:
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest
                   fi
+                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-base-lite ubi9
           commands:
@@ -330,6 +350,8 @@ blocks:
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest
                   fi
+                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-jmxterm ubi9
           commands:
@@ -351,4 +373,6 @@ blocks:
                   docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest
                   fi
+                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
+                  docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
