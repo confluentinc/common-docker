@@ -80,7 +80,7 @@ global_job_config:
       - export LATEST_TAG=$BRANCH_TAG-latest
       - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-jmxterm"
-      - export COMMUNITY_DOCKER_REPOS=""
+      - export COMMUNITY_DOCKER_REPOS="confluentinc/cp-jmxterm"
       - |
         if [[ $SKIP_COMMUNITY == "True" ]]; then
           # Filter out community repos from DOCKER_REPOS
@@ -89,7 +89,7 @@ global_job_config:
           echo "DOCKER_REPOS after skipping community images - $DOCKER_REPOS"
 
           # Set Maven arguments for skipping community modules
-          export MAVEN_EXTRA_ARGS=""
+          export MAVEN_EXTRA_ARGS="-pl !jmxterm"
 
           # Check if current DOCKER_IMAGE is in community repos, skip job execution
           for skip_repo in $COMMUNITY_DOCKER_REPOS; do
