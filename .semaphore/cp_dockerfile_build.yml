@@ -80,7 +80,7 @@ global_job_config:
       - export LATEST_TAG=$BRANCH_TAG-latest
       - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
       - export DOCKER_REPOS="confluentinc/cp-base-new confluentinc/cp-jmxterm"
-      - export COMMUNITY_DOCKER_REPOS=""
+      - export COMMUNITY_DOCKER_REPOS="confluentinc/cp-jmxterm"
       - |
         if [[ $SKIP_COMMUNITY == "True" ]]; then
           # Filter out community repos from DOCKER_REPOS
@@ -89,7 +89,7 @@ global_job_config:
           echo "DOCKER_REPOS after skipping community images - $DOCKER_REPOS"
 
           # Set Maven arguments for skipping community modules
-          export MAVEN_EXTRA_ARGS=""
+          export MAVEN_EXTRA_ARGS="-pl !jmxterm"
 
           # Check if current DOCKER_IMAGE is in community repos, skip job execution
           for skip_repo in $COMMUNITY_DOCKER_REPOS; do
@@ -148,8 +148,6 @@ blocks:
             - artifact push workflow target --destination target-AMD
   - name: Deploy AMD confluentinc/cp-base-new
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-base-new ubi8
@@ -178,8 +176,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy AMD confluentinc/cp-jmxterm
     dependencies: ["Build, Test, & Scan AMD"]
-    run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Deploy AMD confluentinc/cp-jmxterm ubi8
@@ -208,9 +204,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Build & Test ARM
     dependencies: ["Validation"]
-    run:
-      # don't run the tests on non-functional changes...
-      when: "change_in('/', {exclude: ['/.deployed-versions/', '.github/']})"
     task:
       agent:
         machine:
@@ -237,8 +230,6 @@ blocks:
             - artifact push workflow target --destination target-ARM
   - name: Deploy ARM confluentinc/cp-base-new
     dependencies: ["Build & Test ARM"]
-    run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       agent:
         machine:
@@ -270,8 +261,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Deploy ARM confluentinc/cp-jmxterm
     dependencies: ["Build & Test ARM"]
-    run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       agent:
         machine:
@@ -303,8 +292,6 @@ blocks:
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-jmxterm", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-jmxterm"]
-    run:
-      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
       jobs:
         - name: Create Manifest and Maven Deploy
