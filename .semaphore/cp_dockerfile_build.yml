@@ -89,7 +89,7 @@ global_job_config:
           echo "DOCKER_REPOS after skipping community images - $DOCKER_REPOS"
 
           # Set Maven arguments for skipping community modules
-          export MAVEN_EXTRA_ARGS=""
+          export MAVEN_EXTRA_ARGS="-pl !jmxterm"
 
           # Check if current DOCKER_IMAGE is in community repos, skip job execution
           for skip_repo in $COMMUNITY_DOCKER_REPOS; do
