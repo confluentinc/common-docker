@@ -46,6 +46,17 @@ global_job_config:
       - docker login --username $DOCKERHUB_USER --password $DOCKERHUB_APIKEY
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export COMMUNITY_DOCKER_REPOS=""
+      - |
+        if [[ $SKIP_COMMUNITY == "True" ]]; then
+          for skip_repo in $COMMUNITY_DOCKER_REPOS; do
+            if [ "$skip_repo" = "$DOCKER_IMAGE" ]; then
+              echo "Skipping promotion for $DOCKER_IMAGE as it is in COMMUNITY_DOCKER_REPOS list"
+              export SEMAPHORE_JOB_RESULT=passed
+              return 130
+            fi
+          done
+        fi
 
 blocks:
   - name: Promote AMD
@@ -53,6 +64,9 @@ blocks:
     task:
       jobs:
         - name: Promote confluentinc/cp-base-java ubi9 AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-java"
@@ -81,6 +95,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-base-new ubi9 AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-new
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-new"
@@ -109,6 +126,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi9 AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-lite
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
@@ -137,6 +157,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi9 AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-jmxterm
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
@@ -169,6 +192,9 @@ blocks:
     task:
       jobs:
         - name: Promote confluentinc/cp-base-java ubi9 ARM
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-java"
@@ -197,6 +223,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-base-new ubi9 ARM
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-new
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-new"
@@ -225,6 +254,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-base-lite ubi9 ARM
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-lite
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-base-lite"
@@ -253,6 +285,9 @@ blocks:
                   docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
         - name: Promote confluentinc/cp-jmxterm ubi9 ARM
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-jmxterm
           commands:
             - export OS_TYPE="ubi9"
             - export DOCKER_REPO="confluentinc/cp-jmxterm"
@@ -285,6 +320,9 @@ blocks:
     task:
       jobs:
         - name: Create Manifest confluentinc/cp-base-java ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java
           commands:
             - export OS_TYPE="ubi9"
             - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
@@ -308,6 +346,9 @@ blocks:
                   docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-base-new ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-new
           commands:
             - export OS_TYPE="ubi9"
             - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
@@ -331,6 +372,9 @@ blocks:
                   docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-base-lite ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-lite
           commands:
             - export OS_TYPE="ubi9"
             - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
@@ -354,6 +398,9 @@ blocks:
                   docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-jmxterm ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-jmxterm
           commands:
             - export OS_TYPE="ubi9"
             - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi

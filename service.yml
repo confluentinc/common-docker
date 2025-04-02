@@ -8,6 +8,8 @@ semaphore:
   execution_time_limit: {"hours": 1}
   pipeline_type: cp-dockerfile
   docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
+  community_docker_repos: []
+  community_maven_modules: []
   build_arm: true
   os_types: ["ubi9"]
   nano_version: true
@@ -43,6 +45,13 @@ semaphore:
         - name: CONFLUENT_DEB_VERSION
           required: true
           default_value: '1'
+        - name: SKIP_COMMUNITY
+          required: false
+          default_value: 'False'
+          description: 'Skip building community docker images'
+          options:
+            - 'True'
+            - 'False'
     - name: cp-dockerfile-promote
       branch: master
       pipeline_file: .semaphore/cp_dockerfile_promote.yml
@@ -65,6 +74,13 @@ semaphore:
           options:
             - 'deb'
             - 'ubi'
+        - name: SKIP_COMMUNITY
+          required: false
+          default_value: 'False'
+          description: 'Skip publishing community docker images'
+          options:
+            - 'True'
+            - 'False'
 code_artifact:
   enable: true
   package_paths:
