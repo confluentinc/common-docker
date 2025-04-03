@@ -92,6 +92,27 @@ var (
 	}
 )
 
+// Helper function to create slices in templates
+func slice(values ...interface{}) []interface{} {
+	return values
+}
+
+// Helper function to create string slices in templates
+func stringSlice(values ...string) []string {
+	return values
+}
+
+// Helper function to create a map of string slices in templates
+func createStringSliceMap() map[string][]string {
+	return make(map[string][]string)
+}
+
+// Helper function to set a value in a string slice map
+func setStringSliceMapValue(m map[string][]string, key string, values []string) map[string][]string {
+	m[key] = values
+	return m
+}
+
 func ensure(envVar string) bool {
 	_, found := os.LookupEnv(envVar)
 	return found
@@ -135,9 +156,16 @@ func path(filePath string, operation string) (bool, error) {
 
 func renderTemplate(templateFilePath string) error {
 	funcs := template.FuncMap{
-		"getEnv":             getEnvOrDefault,
-		"splitToMapDefaults": splitToMapDefaults,
-		"envToProps":         envToProps,
+		"getEnv":                 getEnvOrDefault,
+		"splitToMapDefaults":     splitToMapDefaults,
+		"envToProps":             envToProps,
+		"setProperties":          setProperties,
+		"slice":                  slice,
+		"stringSlice":            stringSlice,
+		"createStringSliceMap":   createStringSliceMap,
+		"setStringSliceMapValue": setStringSliceMapValue,
+		"setPropertiesWithEnvToPropsWithTwoPrefixes": setPropertiesWithEnvToPropsWithTwoPrefixes,
+		"setPropertiesWithSkipPropCheck":             setPropertiesWithSkipPropCheck,
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
@@ -236,6 +264,82 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
+func setPropertiesWithSkipPropCheck(
+	envPrefix string,
+	propPrefix string,
+	excludes []string,
+	skipPropPrefix []string,
+	skipProps []string,
+) map[string]string {
+	// Convert environment variables to properties
+	props := envToProps(envPrefix, propPrefix, excludes)
+
+	// Create a local copy of skipProps to avoid modifying the input slice
+	skipPropsCopy := make([]string, len(skipProps))
+	copy(skipPropsCopy, skipProps)
+
+	// Check if property name starts with a property prefix that should be skipped
+	for name := range props {
+		for _, prefix := range skipPropPrefix {
+			if strings.HasPrefix(name, prefix) {
+				skipPropsCopy = append(skipPropsCopy, name)
+				break
+			}
+		}
+	}
+
+	// Build result with only the properties that shouldn't be skipped
+	result := make(map[string]string)
+	for name, value := range props {
+		shouldSkip := false
+		for _, skipProp := range skipPropsCopy {
+			if name == skipProp {
+				shouldSkip = true
+				break
+			}
+		}
+
+		if !shouldSkip {
+			result[name] = value
+		}
+	}
+
+	return result
+}
+
+// FormatProperties formats a map of properties as key=value strings
+func FormatProperties(props map[string]string) []string {
+	var result []string
+	for name, value := range props {
+		result = append(result, name+"="+value)
+	}
+	return result
+}
+
+func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string) map[string]string {
+	result := make(map[string]string)
+
+	// Get all environment variables matching the primary prefix
+	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes)
+
+	// Get all environment variables matching the secondary prefix
+	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes)
+
+	// First add all properties from the primary prefix (they take precedence)
+	for name, value := range primaryProps {
+		result[name] = value
+	}
+
+	// Then add properties from the secondary prefix only if not already present
+	for name, value := range secondaryProps {
+		if _, exists := result[name]; !exists {
+			result[name] = value
+		}
+	}
+
+	return result
+}
+
 func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[string]string {
 	env := GetEnvironment()
 	config := make(map[string]string)
@@ -250,6 +354,35 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[
 		}
 	}
 	return config
+}
+
+func setProperties(properties map[string][]string, required bool, excludes []string) map[string]string {
+	result := make(map[string]string)
+	env := GetEnvironment()
+
+	for property, ks := range properties {
+		var nsResult string
+		// Find first non-empty value
+		for _, k := range ks {
+			if slices.Contains(excludes, k) {
+				// If the key is in excludes, set empty string and break
+				nsResult = ""
+				break
+			}
+			if val, exists := env[k]; exists {
+				nsResult = val
+				break
+			}
+		}
+
+		// Fill the map based on conditions
+		if required {
+			result[property] = nsResult
+		} else if nsResult != "" {
+			result[property] = nsResult
+		}
+	}
+	return result
 }
 
 func writeConfig(writer io.Writer, config map[string]string) error {
