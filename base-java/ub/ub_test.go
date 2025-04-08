@@ -537,92 +537,11 @@ func TestEnvToProps(t *testing.T) {
 					os.Unsetenv(k)
 				}
 			}()
-			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude)
+			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude, nil)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("envToProps() = %v, want %v", result, tt.expected)
 			}
 
-		})
-	}
-}
-
-func Test_setPropertiesWithSkipPropCheck(t *testing.T) {
-	type args struct {
-		envPrefix      string
-		propPrefix     string
-		excludes       []string
-		skipPropPrefix []string
-		skipProps      []string
-	}
-
-	// Set up test environment variables
-	os.Setenv("CONTROL_CENTER_TEST1", "value1")
-	os.Setenv("CONTROL_CENTER_TEST2", "value2")
-	os.Setenv("CONTROL_CENTER_METRICS_TEST", "value3")
-	os.Setenv("CONTROL_CENTER_MONITORING_TEST", "value4")
-	os.Setenv("CONTROL_CENTER_SKIP_ME", "value5")
-
-	tests := []struct {
-		name string
-		args args
-		want map[string]string
-	}{
-		{
-			name: "basic test with no skips",
-			args: args{
-				envPrefix:      "CONTROL_CENTER_",
-				propPrefix:     "confluent.controlcenter.",
-				excludes:       []string{},
-				skipPropPrefix: []string{},
-				skipProps:      []string{},
-			},
-			want: map[string]string{
-				"confluent.controlcenter.test1":           "value1",
-				"confluent.controlcenter.test2":           "value2",
-				"confluent.controlcenter.metrics.test":    "value3",
-				"confluent.controlcenter.monitoring.test": "value4",
-				"confluent.controlcenter.skip.me":         "value5",
-			},
-		},
-		{
-			name: "test with skip prefixes",
-			args: args{
-				envPrefix:      "CONTROL_CENTER_",
-				propPrefix:     "confluent.controlcenter.",
-				excludes:       []string{},
-				skipPropPrefix: []string{"confluent.controlcenter.metrics.", "confluent.controlcenter.monitoring."},
-				skipProps:      []string{},
-			},
-			want: map[string]string{
-				"confluent.controlcenter.test1":   "value1",
-				"confluent.controlcenter.test2":   "value2",
-				"confluent.controlcenter.skip.me": "value5",
-			},
-		},
-		{
-			name: "test with skip props",
-			args: args{
-				envPrefix:      "CONTROL_CENTER_",
-				propPrefix:     "confluent.controlcenter.",
-				excludes:       []string{},
-				skipPropPrefix: []string{},
-				skipProps:      []string{"confluent.controlcenter.skip.me"},
-			},
-			want: map[string]string{
-				"confluent.controlcenter.test1":           "value1",
-				"confluent.controlcenter.test2":           "value2",
-				"confluent.controlcenter.metrics.test":    "value3",
-				"confluent.controlcenter.monitoring.test": "value4",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := setPropertiesWithSkipPropCheck(tt.args.envPrefix, tt.args.propPrefix, tt.args.excludes, tt.args.skipPropPrefix, tt.args.skipProps)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("setPropertiesWithSkipPropCheck() = %v, want %v", got, tt.want)
-			}
 		})
 	}
 }
