@@ -102,6 +102,11 @@ func stringSlice(values ...string) []string {
 	return values
 }
 
+// Helper function to append to a string slice in templates
+func appendStringSlice(slice []string, values ...string) []string {
+	return append(slice, values...)
+}
+
 // Helper function to create a map of string slices in templates
 func createStringSliceMap() map[string][]string {
 	return make(map[string][]string)
@@ -162,10 +167,10 @@ func renderTemplate(templateFilePath string) error {
 		"setProperties":          setProperties,
 		"slice":                  slice,
 		"stringSlice":            stringSlice,
+		"append":                 appendStringSlice,
 		"createStringSliceMap":   createStringSliceMap,
 		"setStringSliceMapValue": setStringSliceMapValue,
 		"setPropertiesWithEnvToPropsWithTwoPrefixes": setPropertiesWithEnvToPropsWithTwoPrefixes,
-		"setPropertiesWithSkipPropCheck":             setPropertiesWithSkipPropCheck,
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
@@ -264,66 +269,14 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
-func setPropertiesWithSkipPropCheck(
-	envPrefix string,
-	propPrefix string,
-	excludes []string,
-	skipPropPrefix []string,
-	skipProps []string,
-) map[string]string {
-	// Convert environment variables to properties
-	props := envToProps(envPrefix, propPrefix, excludes)
-
-	// Create a local copy of skipProps to avoid modifying the input slice
-	skipPropsCopy := make([]string, len(skipProps))
-	copy(skipPropsCopy, skipProps)
-
-	// Check if property name starts with a property prefix that should be skipped
-	for name := range props {
-		for _, prefix := range skipPropPrefix {
-			if strings.HasPrefix(name, prefix) {
-				skipPropsCopy = append(skipPropsCopy, name)
-				break
-			}
-		}
-	}
-
-	// Build result with only the properties that shouldn't be skipped
-	result := make(map[string]string)
-	for name, value := range props {
-		shouldSkip := false
-		for _, skipProp := range skipPropsCopy {
-			if name == skipProp {
-				shouldSkip = true
-				break
-			}
-		}
-
-		if !shouldSkip {
-			result[name] = value
-		}
-	}
-
-	return result
-}
-
-// FormatProperties formats a map of properties as key=value strings
-func FormatProperties(props map[string]string) []string {
-	var result []string
-	for name, value := range props {
-		result = append(result, name+"="+value)
-	}
-	return result
-}
-
 func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string) map[string]string {
 	result := make(map[string]string)
 
 	// Get all environment variables matching the primary prefix
-	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes)
+	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil)
 
 	// Get all environment variables matching the secondary prefix
-	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes)
+	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil)
 
 	// First add all properties from the primary prefix (they take precedence)
 	for name, value := range primaryProps {
@@ -340,7 +293,7 @@ func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPr
 	return result
 }
 
-func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[string]string {
+func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excludePropPrefixes []string) map[string]string {
 	env := GetEnvironment()
 	config := make(map[string]string)
 	for envName, envValue := range env {
@@ -350,7 +303,23 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[
 		if strings.HasPrefix(envName, envPrefix) {
 			trimmedEnvName := strings.TrimPrefix(envName, envPrefix)
 			propertyName := propertyNamePrefix + ConvertKey(trimmedEnvName)
-			config[propertyName] = envValue
+			
+			// Check if the property name is in excludes
+			if slices.Contains(excludeEnvs, propertyName) {
+				continue
+			}
+			
+			// Check if the property name starts with any of the excluded prefixes
+			shouldExclude := false
+			for _, prefix := range excludePropPrefixes {
+				if strings.HasPrefix(propertyName, prefix) {
+					shouldExclude = true
+					break
+				}
+			}
+			if !shouldExclude {
+				config[propertyName] = envValue
+			}
 		}
 	}
 	return config
