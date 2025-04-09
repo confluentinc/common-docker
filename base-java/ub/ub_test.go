@@ -575,26 +575,25 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 		excludes           []string
 	}
 
-	// Set up test environment variables
-	envVars := map[string]string{
-		"PRIMARY_TEST1":   "value1",
-		"PRIMARY_TEST2":   "value2",
-		"SECONDARY_TEST1": "value3",
-		"SECONDARY_TEST2": "value4",
-	}
-
 	tests := []struct {
-		name string
-		args args
-		want map[string]string
+		name    string
+		args    args
+		envVars map[string]string
+		want    map[string]string
 	}{
 		{
-			name: "test with both prefixes",
+			name: "primary prefix takes precedence",
 			args: args{
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
 				excludes:           []string{},
+			},
+			envVars: map[string]string{
+				"PRIMARY_TEST1":   "value1",
+				"PRIMARY_TEST2":   "value2",
+				"SECONDARY_TEST1": "value3",
+				"SECONDARY_TEST2": "value4",
 			},
 			want: map[string]string{
 				"test.test1": "value1", // Primary takes precedence
@@ -602,27 +601,104 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 			},
 		},
 		{
-			name: "test with excludes",
+			name: "secondary prefix used when primary missing",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.",
+				excludes:           []string{},
+			},
+			envVars: map[string]string{
+				"PRIMARY_TEST1":   "value1",
+				"SECONDARY_TEST2": "value4",
+				"SECONDARY_TEST3": "value5",
+			},
+			want: map[string]string{
+				"test.test1": "value1", // From primary
+				"test.test2": "value4", // From secondary
+				"test.test3": "value5", // From secondary
+			},
+		},
+		{
+			name: "with excludes",
 			args: args{
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
 				excludes:           []string{"PRIMARY_TEST1"},
 			},
+			envVars: map[string]string{
+				"PRIMARY_TEST1":   "value1",
+				"PRIMARY_TEST2":   "value2",
+				"SECONDARY_TEST1": "value3",
+				"SECONDARY_TEST2": "value4",
+			},
 			want: map[string]string{
-				"test.test1": "value3", // Secondary used because primary is excluded
-				"test.test2": "value2", // Primary still used
+				"test.test1": "value3", // From secondary because primary is excluded
+				"test.test2": "value2", // From primary
+			},
+		},
+		{
+			name: "special underscore conversions",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.",
+				excludes:           []string{},
+			},
+			envVars: map[string]string{
+				"PRIMARY_SINGLE_UNDERSCORE":   "dot",
+				"PRIMARY_DOUBLE__UNDERSCORE":  "single_underscore",
+				"PRIMARY_TRIPLE___UNDERSCORE": "dash",
+				"SECONDARY_SINGLE_UNDERSCORE": "secondary_dot",
+			},
+			want: map[string]string{
+				"test.single.underscore":   "dot",
+				"test.double_underscore":   "single_underscore",
+				"test.triple-underscore":   "dash",
+			},
+		},
+		{
+			name: "empty result when no matching env vars",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.",
+				excludes:           []string{},
+			},
+			envVars: map[string]string{
+				"OTHER_VAR1": "value1",
+				"OTHER_VAR2": "value2",
+			},
+			want: map[string]string{},
+		},
+		{
+			name: "with property prefix",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.meta.",
+				excludes:           []string{},
+			},
+			envVars: map[string]string{
+				"PRIMARY_TEST1":   "value1",
+				"SECONDARY_TEST2": "value2",
+			},
+			want: map[string]string{
+				"test.meta.test1": "value1",
+				"test.meta.test2": "value2",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			for k, v := range envVars {
+			for k, v := range tt.envVars {
 				os.Setenv(k, v)
 			}
 			defer func() {
-				for k := range envVars {
+				// Clean up environment variables
+				for k := range tt.envVars {
 					os.Unsetenv(k)
 				}
 			}()
