@@ -92,10 +92,6 @@ var (
 	}
 )
 
-// Helper function to create slices in templates
-func slice(values ...interface{}) []interface{} {
-	return values
-}
 
 // Helper function to create string slices in templates
 func stringSlice(values ...string) []string {
@@ -165,7 +161,6 @@ func renderTemplate(templateFilePath string) error {
 		"splitToMapDefaults":     splitToMapDefaults,
 		"envToProps":             envToProps,
 		"setProperties":          setProperties,
-		"slice":                  slice,
 		"stringSlice":            stringSlice,
 		"append":                 appendStringSlice,
 		"createStringSliceMap":   createStringSliceMap,
