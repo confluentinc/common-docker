@@ -92,7 +92,6 @@ var (
 	}
 )
 
-
 // Helper function to create string slices in templates
 func stringSlice(values ...string) []string {
 	return values
@@ -298,13 +297,10 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excl
 		if strings.HasPrefix(envName, envPrefix) {
 			trimmedEnvName := strings.TrimPrefix(envName, envPrefix)
 			propertyName := propertyNamePrefix + ConvertKey(trimmedEnvName)
-			
-			// Check if the property name is in excludes
+
 			if slices.Contains(excludeEnvs, propertyName) {
 				continue
 			}
-			
-			// Check if the property name starts with any of the excluded prefixes
 			shouldExclude := false
 			for _, prefix := range excludePropPrefixes {
 				if strings.HasPrefix(propertyName, prefix) {
@@ -324,22 +320,20 @@ func setProperties(properties map[string][]string, required bool, excludes []str
 	result := make(map[string]string)
 	env := GetEnvironment()
 
-	for property, ks := range properties {
+	for property, propertyTranslationList := range properties {
 		var nsResult string
 		// Find first non-empty value
-		for _, k := range ks {
-			if slices.Contains(excludes, k) {
-				// If the key is in excludes, set empty string and break
+		for _, envVar := range propertyTranslationList {
+			if slices.Contains(excludes, envVar) {
 				nsResult = ""
 				break
 			}
-			if val, exists := env[k]; exists {
+			if val, exists := env[envVar]; exists {
 				nsResult = val
 				break
 			}
 		}
 
-		// Fill the map based on conditions
 		if required {
 			result[property] = nsResult
 		} else if nsResult != "" {
