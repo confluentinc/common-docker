@@ -462,7 +462,7 @@ func Test_waitForHttp(t *testing.T) {
 
 func TestEnvToProps(t *testing.T) {
 	tests := []struct {
-		name               string
+		name              string
 		envVars           map[string]string
 		envPrefix         string
 		propPrefix        string
@@ -528,7 +528,7 @@ func TestEnvToProps(t *testing.T) {
 			propPrefix:        "app.",
 			exclude:           []string{},
 			excludePropPrefix: nil,
-			expected:         map[string]string{},
+			expected:          map[string]string{},
 		},
 		{
 			name: "With property prefix exclusions",
@@ -578,7 +578,7 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 	// Set up test environment variables
 	envVars := map[string]string{
 		"PRIMARY_TEST1":   "value1",
-		"PRIMARY_TEST2":   "value2", 
+		"PRIMARY_TEST2":   "value2",
 		"SECONDARY_TEST1": "value3",
 		"SECONDARY_TEST2": "value4",
 	}
@@ -626,7 +626,7 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 					os.Unsetenv(k)
 				}
 			}()
-			
+
 			got := setPropertiesWithEnvToPropsWithTwoPrefixes(tt.args.primaryEnvPrefix, tt.args.secondaryEnvPrefix, tt.args.propPrefix, tt.args.excludes)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setPropertiesWithEnvToPropsWithTwoPrefixes() = %v, want %v", got, tt.want)
@@ -641,12 +641,9 @@ func Test_setProperties(t *testing.T) {
 		required   bool
 		excludes   []string
 	}
-
-	// Set up test environment variables
 	os.Setenv("TEST1", "value1")
 	os.Setenv("TEST2", "value2")
 	os.Setenv("TEST3", "value3")
-
 	tests := []struct {
 		name string
 		args args

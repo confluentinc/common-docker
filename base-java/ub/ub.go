@@ -265,25 +265,16 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 
 func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string) map[string]string {
 	result := make(map[string]string)
-
-	// Get all environment variables matching the primary prefix
 	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil)
-
-	// Get all environment variables matching the secondary prefix
 	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil)
-
-	// First add all properties from the primary prefix (they take precedence)
 	for name, value := range primaryProps {
 		result[name] = value
 	}
-
-	// Then add properties from the secondary prefix only if not already present
 	for name, value := range secondaryProps {
 		if _, exists := result[name]; !exists {
 			result[name] = value
 		}
 	}
-
 	return result
 }
 
@@ -322,7 +313,6 @@ func setProperties(properties map[string][]string, required bool, excludes []str
 
 	for property, propertyTranslationList := range properties {
 		var nsResult string
-		// Find first non-empty value
 		for _, envVar := range propertyTranslationList {
 			if slices.Contains(excludes, envVar) {
 				nsResult = ""
@@ -333,7 +323,6 @@ func setProperties(properties map[string][]string, required bool, excludes []str
 				break
 			}
 		}
-
 		if required {
 			result[property] = nsResult
 		} else if nsResult != "" {
