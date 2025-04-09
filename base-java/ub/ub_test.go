@@ -462,12 +462,13 @@ func Test_waitForHttp(t *testing.T) {
 
 func TestEnvToProps(t *testing.T) {
 	tests := []struct {
-		name       string
-		envVars    map[string]string
-		envPrefix  string
-		propPrefix string
-		exclude    []string
-		expected   map[string]string
+		name              string
+		envVars           map[string]string
+		envPrefix         string
+		propPrefix        string
+		exclude           []string
+		excludePropPrefix []string
+		expected          map[string]string
 	}{
 		{
 			name: "Basic conversion with prefix",
@@ -476,9 +477,10 @@ func TestEnvToProps(t *testing.T) {
 				"APP_BAZ":     "value2",
 				"OTHER_VAR":   "ignored",
 			},
-			envPrefix:  "APP_",
-			propPrefix: "app.",
-			exclude:    []string{},
+			envPrefix:         "APP_",
+			propPrefix:        "app.",
+			exclude:           []string{},
+			excludePropPrefix: nil,
 			expected: map[string]string{
 				"app.foo.bar": "value1",
 				"app.baz":     "value2",
@@ -491,9 +493,10 @@ func TestEnvToProps(t *testing.T) {
 				"APP_SECRET":  "hidden",
 				"APP_BAZ":     "value2",
 			},
-			envPrefix:  "APP_",
-			propPrefix: "app.",
-			exclude:    []string{"APP_SECRET"},
+			envPrefix:         "APP_",
+			propPrefix:        "app.",
+			exclude:           []string{"APP_SECRET"},
+			excludePropPrefix: nil,
 			expected: map[string]string{
 				"app.foo.bar": "value1",
 				"app.baz":     "value2",
@@ -506,9 +509,10 @@ func TestEnvToProps(t *testing.T) {
 				"APP_DOUBLE__UNDERSCORE":  "single_underscore",
 				"APP_TRIPLE___UNDERSCORE": "dash",
 			},
-			envPrefix:  "APP_",
-			propPrefix: "app.meta.",
-			exclude:    []string{},
+			envPrefix:         "APP_",
+			propPrefix:        "app.meta.",
+			exclude:           []string{},
+			excludePropPrefix: nil,
 			expected: map[string]string{
 				"app.meta.single.underscore": "dot",
 				"app.meta.double_underscore": "single_underscore",
@@ -520,10 +524,27 @@ func TestEnvToProps(t *testing.T) {
 			envVars: map[string]string{
 				"OTHER_VAR": "ignored",
 			},
-			envPrefix:  "APP_",
-			propPrefix: "app.",
-			exclude:    []string{},
-			expected:   map[string]string{},
+			envPrefix:         "APP_",
+			propPrefix:        "app.",
+			exclude:           []string{},
+			excludePropPrefix: nil,
+			expected:          map[string]string{},
+		},
+		{
+			name: "With property prefix exclusions",
+			envVars: map[string]string{
+				"APP_FOO_BAR":    "value1",
+				"APP_TEST_VALUE": "test",
+				"APP_BAZ":        "value2",
+			},
+			envPrefix:         "APP_",
+			propPrefix:        "app.",
+			exclude:           []string{},
+			excludePropPrefix: []string{"app.test"},
+			expected: map[string]string{
+				"app.foo.bar": "value1",
+				"app.baz":     "value2",
+			},
 		},
 	}
 
@@ -537,11 +558,156 @@ func TestEnvToProps(t *testing.T) {
 					os.Unsetenv(k)
 				}
 			}()
-			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude)
+			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude, tt.excludePropPrefix)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("envToProps() = %v, want %v", result, tt.expected)
 			}
 
+		})
+	}
+}
+
+func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
+	type args struct {
+		primaryEnvPrefix   string
+		secondaryEnvPrefix string
+		propPrefix         string
+		excludes           []string
+	}
+
+	// Set up test environment variables
+	envVars := map[string]string{
+		"PRIMARY_TEST1":   "value1",
+		"PRIMARY_TEST2":   "value2",
+		"SECONDARY_TEST1": "value3",
+		"SECONDARY_TEST2": "value4",
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "test with both prefixes",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.",
+				excludes:           []string{},
+			},
+			want: map[string]string{
+				"test.test1": "value1", // Primary takes precedence
+				"test.test2": "value2", // Primary takes precedence
+			},
+		},
+		{
+			name: "test with excludes",
+			args: args{
+				primaryEnvPrefix:   "PRIMARY_",
+				secondaryEnvPrefix: "SECONDARY_",
+				propPrefix:         "test.",
+				excludes:           []string{"PRIMARY_TEST1"},
+			},
+			want: map[string]string{
+				"test.test1": "value3", // Secondary used because primary is excluded
+				"test.test2": "value2", // Primary still used
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range envVars {
+				os.Setenv(k, v)
+			}
+			defer func() {
+				for k := range envVars {
+					os.Unsetenv(k)
+				}
+			}()
+
+			got := setPropertiesWithEnvToPropsWithTwoPrefixes(tt.args.primaryEnvPrefix, tt.args.secondaryEnvPrefix, tt.args.propPrefix, tt.args.excludes)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("setPropertiesWithEnvToPropsWithTwoPrefixes() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_setProperties(t *testing.T) {
+	type args struct {
+		properties map[string][]string
+		required   bool
+		excludes   []string
+	}
+	os.Setenv("TEST1", "value1")
+	os.Setenv("TEST2", "value2")
+	os.Setenv("TEST3", "value3")
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			name: "test with required true",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"TEST1"},
+					"prop2": {"TEST2"},
+					"prop3": {"NONEXISTENT"},
+				},
+				required: true,
+				excludes: []string{},
+			},
+			want: map[string]string{
+				"prop1": "value1",
+				"prop2": "value2",
+				"prop3": "", // Empty string for required but non-existent
+			},
+		},
+		{
+			name: "test with required false",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"TEST1"},
+					"prop2": {"TEST2"},
+					"prop3": {"NONEXISTENT"},
+				},
+				required: false,
+				excludes: []string{},
+			},
+			want: map[string]string{
+				"prop1": "value1",
+				"prop2": "value2",
+				// prop3 not included because it's not required and doesn't exist
+			},
+		},
+		{
+			name: "test with excludes",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"TEST1"},
+					"prop2": {"TEST2"},
+					"prop3": {"TEST3"},
+				},
+				required: true,
+				excludes: []string{"TEST3"},
+			},
+			want: map[string]string{
+				"prop1": "value1",
+				"prop2": "value2",
+				"prop3": "", // Empty string because TEST3 is excluded
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := setProperties(tt.args.properties, tt.args.required, tt.args.excludes)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("setProperties() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }
