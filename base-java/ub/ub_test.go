@@ -596,8 +596,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				"SECONDARY_TEST2": "value4",
 			},
 			want: map[string]string{
-				"test.test1": "value1", // Primary takes precedence
-				"test.test2": "value2", // Primary takes precedence
+				"test.test1": "value1",
+				"test.test2": "value2",
 			},
 		},
 		{
@@ -614,9 +614,9 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				"SECONDARY_TEST3": "value5",
 			},
 			want: map[string]string{
-				"test.test1": "value1", // From primary
-				"test.test2": "value4", // From secondary
-				"test.test3": "value5", // From secondary
+				"test.test1": "value1",
+				"test.test2": "value4",
+				"test.test3": "value5",
 			},
 		},
 		{
@@ -634,8 +634,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				"SECONDARY_TEST2": "value4",
 			},
 			want: map[string]string{
-				"test.test1": "value3", // From secondary because primary is excluded
-				"test.test2": "value2", // From primary
+				"test.test1": "value3",
+				"test.test2": "value2",
 			},
 		},
 		{
@@ -764,7 +764,7 @@ func Test_setProperties(t *testing.T) {
 			want: map[string]string{
 				"prop1": "value1",
 				"prop2": "value2",
-				"prop3": "", // Empty string for required but missing
+				"prop3": "",
 			},
 		},
 		{
@@ -807,7 +807,6 @@ func Test_setProperties(t *testing.T) {
 			want: map[string]string{
 				"prop1": "value1",
 				"prop2": "value2",
-				// prop3 not included because it's optional and missing
 			},
 		},
 		{
@@ -827,9 +826,9 @@ func Test_setProperties(t *testing.T) {
 				"EXCLUDED_PROP3": "value3",
 			},
 			want: map[string]string{
-				"prop1": "", // Empty string because EXCLUDED_PROP1 is excluded
+				"prop1": "",
 				"prop2": "value2",
-				"prop3": "", // Empty string because EXCLUDED_PROP3 is excluded
+				"prop3": "",
 			},
 		},
 		{
@@ -848,8 +847,8 @@ func Test_setProperties(t *testing.T) {
 				"PRIMARY_PROP2": "value3",
 			},
 			want: map[string]string{
-				"prop1": "value1", // Uses first available value
-				"prop2": "value3", // Uses first available value
+				"prop1": "value1",
+				"prop2": "value3",
 			},
 		},
 		{
@@ -887,12 +886,10 @@ func Test_setProperties(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set up environment variables
 			for k, v := range tt.envVars {
 				os.Setenv(k, v)
 			}
 			defer func() {
-				// Clean up environment variables
 				for k := range tt.envVars {
 					os.Unsetenv(k)
 				}
