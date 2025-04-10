@@ -307,14 +307,14 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excl
 	return config
 }
 
-func setProperties(properties map[string][]string, required bool, excludes []string) map[string]string {
+func setProperties(properties map[string][]string, required bool, excludeEnvs []string) map[string]string {
 	result := make(map[string]string)
 	env := GetEnvironment()
 
 	for property, propertyTranslationList := range properties {
 		var nsResult string
 		for _, envVar := range propertyTranslationList {
-			if slices.Contains(excludes, envVar) {
+			if slices.Contains(excludeEnvs, envVar) {
 				nsResult = ""
 				break
 			}
