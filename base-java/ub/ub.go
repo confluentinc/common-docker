@@ -92,6 +92,27 @@ var (
 	}
 )
 
+// Helper function to create string slices in templates
+func stringSlice(values ...string) []string {
+	return values
+}
+
+// Helper function to append to a string slice in templates
+func appendStringSlice(slice []string, values ...string) []string {
+	return append(slice, values...)
+}
+
+// Helper function to create a map of string slices in templates
+func createStringSliceMap() map[string][]string {
+	return make(map[string][]string)
+}
+
+// Helper function to set a value in a string slice map
+func setStringSliceMapValue(m map[string][]string, key string, values []string) map[string][]string {
+	m[key] = values
+	return m
+}
+
 func ensure(envVar string) bool {
 	_, found := os.LookupEnv(envVar)
 	return found
@@ -135,9 +156,15 @@ func path(filePath string, operation string) (bool, error) {
 
 func renderTemplate(templateFilePath string) error {
 	funcs := template.FuncMap{
-		"getEnv":             getEnvOrDefault,
-		"splitToMapDefaults": splitToMapDefaults,
-		"envToProps":         envToProps,
+		"getEnv":                 getEnvOrDefault,
+		"splitToMapDefaults":     splitToMapDefaults,
+		"envToProps":             envToProps,
+		"setProperties":          setProperties,
+		"stringSlice":            stringSlice,
+		"append":                 appendStringSlice,
+		"createStringSliceMap":   createStringSliceMap,
+		"setStringSliceMapValue": setStringSliceMapValue,
+		"setPropertiesWithEnvToPropsWithTwoPrefixes": setPropertiesWithEnvToPropsWithTwoPrefixes,
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
@@ -236,7 +263,22 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
-func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[string]string {
+func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string) map[string]string {
+	result := make(map[string]string)
+	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil)
+	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil)
+	for name, value := range primaryProps {
+		result[name] = value
+	}
+	for name, value := range secondaryProps {
+		if _, exists := result[name]; !exists {
+			result[name] = value
+		}
+	}
+	return result
+}
+
+func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excludePropPrefixes []string) map[string]string {
 	env := GetEnvironment()
 	config := make(map[string]string)
 	for envName, envValue := range env {
@@ -246,10 +288,48 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string) map[
 		if strings.HasPrefix(envName, envPrefix) {
 			trimmedEnvName := strings.TrimPrefix(envName, envPrefix)
 			propertyName := propertyNamePrefix + ConvertKey(trimmedEnvName)
-			config[propertyName] = envValue
+
+			if slices.Contains(excludeEnvs, propertyName) {
+				continue
+			}
+			shouldExclude := false
+			for _, prefix := range excludePropPrefixes {
+				if strings.HasPrefix(propertyName, prefix) {
+					shouldExclude = true
+					break
+				}
+			}
+			if !shouldExclude {
+				config[propertyName] = envValue
+			}
 		}
 	}
 	return config
+}
+
+func setProperties(properties map[string][]string, required bool, excludes []string) map[string]string {
+	result := make(map[string]string)
+	env := GetEnvironment()
+
+	for property, propertyTranslationList := range properties {
+		var nsResult string
+		for _, envVar := range propertyTranslationList {
+			if slices.Contains(excludes, envVar) {
+				nsResult = ""
+				break
+			}
+			if val, exists := env[envVar]; exists {
+				nsResult = val
+				break
+			}
+		}
+		if required {
+			result[property] = nsResult
+		} else if nsResult != "" {
+			result[property] = nsResult
+		}
+	}
+	return result
 }
 
 func writeConfig(writer io.Writer, config map[string]string) error {
