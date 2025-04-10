@@ -717,69 +717,187 @@ func Test_setProperties(t *testing.T) {
 		required   bool
 		excludes   []string
 	}
-	os.Setenv("TEST1", "value1")
-	os.Setenv("TEST2", "value2")
-	os.Setenv("TEST3", "value3")
+
 	tests := []struct {
-		name string
-		args args
-		want map[string]string
+		name    string
+		args    args
+		envVars map[string]string
+		want    map[string]string
 	}{
 		{
-			name: "test with required true",
+			name: "required properties with all present",
 			args: args{
 				properties: map[string][]string{
-					"prop1": {"TEST1"},
-					"prop2": {"TEST2"},
-					"prop3": {"NONEXISTENT"},
+					"prop1": {"REQUIRED_PROP1"},
+					"prop2": {"REQUIRED_PROP2"},
+					"prop3": {"REQUIRED_PROP3"},
 				},
 				required: true,
 				excludes: []string{},
 			},
+			envVars: map[string]string{
+				"REQUIRED_PROP1": "value1",
+				"REQUIRED_PROP2": "value2",
+				"REQUIRED_PROP3": "value3",
+			},
 			want: map[string]string{
 				"prop1": "value1",
 				"prop2": "value2",
-				"prop3": "", // Empty string for required but non-existent
+				"prop3": "value3",
 			},
 		},
 		{
-			name: "test with required false",
+			name: "required properties with some missing",
 			args: args{
 				properties: map[string][]string{
-					"prop1": {"TEST1"},
-					"prop2": {"TEST2"},
-					"prop3": {"NONEXISTENT"},
+					"prop1": {"REQUIRED_PROP1"},
+					"prop2": {"REQUIRED_PROP2"},
+					"prop3": {"REQUIRED_PROP3"},
+				},
+				required: true,
+				excludes: []string{},
+			},
+			envVars: map[string]string{
+				"REQUIRED_PROP1": "value1",
+				"REQUIRED_PROP2": "value2",
+			},
+			want: map[string]string{
+				"prop1": "value1",
+				"prop2": "value2",
+				"prop3": "", // Empty string for required but missing
+			},
+		},
+		{
+			name: "optional properties with all present",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"OPTIONAL_PROP1"},
+					"prop2": {"OPTIONAL_PROP2"},
+					"prop3": {"OPTIONAL_PROP3"},
 				},
 				required: false,
 				excludes: []string{},
 			},
+			envVars: map[string]string{
+				"OPTIONAL_PROP1": "value1",
+				"OPTIONAL_PROP2": "value2",
+				"OPTIONAL_PROP3": "value3",
+			},
 			want: map[string]string{
 				"prop1": "value1",
 				"prop2": "value2",
-				// prop3 not included because it's not required and doesn't exist
+				"prop3": "value3",
 			},
 		},
 		{
-			name: "test with excludes",
+			name: "optional properties with some missing",
 			args: args{
 				properties: map[string][]string{
-					"prop1": {"TEST1"},
-					"prop2": {"TEST2"},
-					"prop3": {"TEST3"},
+					"prop1": {"OPTIONAL_PROP1"},
+					"prop2": {"OPTIONAL_PROP2"},
+					"prop3": {"OPTIONAL_PROP3"},
 				},
-				required: true,
-				excludes: []string{"TEST3"},
+				required: false,
+				excludes: []string{},
+			},
+			envVars: map[string]string{
+				"OPTIONAL_PROP1": "value1",
+				"OPTIONAL_PROP2": "value2",
 			},
 			want: map[string]string{
 				"prop1": "value1",
 				"prop2": "value2",
-				"prop3": "", // Empty string because TEST3 is excluded
+				// prop3 not included because it's optional and missing
 			},
+		},
+		{
+			name: "with excludes",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"EXCLUDED_PROP1"},
+					"prop2": {"EXCLUDED_PROP2"},
+					"prop3": {"EXCLUDED_PROP3"},
+				},
+				required: true,
+				excludes: []string{"EXCLUDED_PROP1", "EXCLUDED_PROP3"},
+			},
+			envVars: map[string]string{
+				"EXCLUDED_PROP1": "value1",
+				"EXCLUDED_PROP2": "value2",
+				"EXCLUDED_PROP3": "value3",
+			},
+			want: map[string]string{
+				"prop1": "", // Empty string because EXCLUDED_PROP1 is excluded
+				"prop2": "value2",
+				"prop3": "", // Empty string because EXCLUDED_PROP3 is excluded
+			},
+		},
+		{
+			name: "multiple env vars for same property",
+			args: args{
+				properties: map[string][]string{
+					"prop1": {"PRIMARY_PROP1", "SECONDARY_PROP1"},
+					"prop2": {"PRIMARY_PROP2", "SECONDARY_PROP2"},
+				},
+				required: true,
+				excludes: []string{},
+			},
+			envVars: map[string]string{
+				"PRIMARY_PROP1": "value1",
+				"SECONDARY_PROP1": "value2",
+				"PRIMARY_PROP2": "value3",
+			},
+			want: map[string]string{
+				"prop1": "value1", // Uses first available value
+				"prop2": "value3", // Uses first available value
+			},
+		},
+		{
+			name: "nested properties",
+			args: args{
+				properties: map[string][]string{
+					"prop1.nested": {"NESTED_PROP1"},
+					"prop2.nested": {"NESTED_PROP2"},
+				},
+				required: true,
+				excludes: []string{},
+			},
+			envVars: map[string]string{
+				"NESTED_PROP1": "value1",
+				"NESTED_PROP2": "value2",
+			},
+			want: map[string]string{
+				"prop1.nested": "value1",
+				"prop2.nested": "value2",
+			},
+		},
+		{
+			name: "empty properties map",
+			args: args{
+				properties: map[string][]string{},
+				required: true,
+				excludes: []string{},
+			},
+			envVars: map[string]string{
+				"SOME_PROP": "value",
+			},
+			want: map[string]string{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Set up environment variables
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
+			}
+			defer func() {
+				// Clean up environment variables
+				for k := range tt.envVars {
+					os.Unsetenv(k)
+				}
+			}()
+
 			got := setProperties(tt.args.properties, tt.args.required, tt.args.excludes)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setProperties() = %v, want %v", got, tt.want)
