@@ -42,6 +42,7 @@ ENV LANG="C.UTF-8"
 
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
+ENV USE_LOG4J_2="True"
 
 # These ARGs are left blank indicating to the Dnf package manager to install the latest package
 # version that happens to be availible at this time. For reproducible builds, versions should be specified

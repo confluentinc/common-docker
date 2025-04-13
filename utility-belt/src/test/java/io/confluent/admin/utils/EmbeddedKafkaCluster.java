@@ -23,8 +23,8 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import scala.Option;
 import scala.Option$;
 
@@ -54,7 +54,7 @@ import org.apache.kafka.common.KafkaException;
  */
 public class EmbeddedKafkaCluster {
 
-  private static final Logger log = LoggerFactory.getLogger(EmbeddedKafkaCluster.class);
+  private static final Logger log = LogManager.getLogger(EmbeddedKafkaCluster.class);
 
   private static final Option<SecurityProtocol> INTER_BROKER_SECURITY_PROTOCOL = Option.apply(SecurityProtocol.SASL_PLAINTEXT);
   private static final boolean ENABLE_CONTROLLED_SHUTDOWN = true;
