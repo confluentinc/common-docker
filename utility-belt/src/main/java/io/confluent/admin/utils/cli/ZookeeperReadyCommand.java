@@ -21,8 +21,8 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import io.confluent.admin.utils.ClusterStatus;
 
@@ -36,7 +36,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class ZookeeperReadyCommand {
 
-  private static final Logger log = LoggerFactory.getLogger(ZookeeperReadyCommand.class);
+  private static final Logger log = LogManager.getLogger(ZookeeperReadyCommand.class);
   public static final String ZK_READY = "zk-ready";
 
   private static ArgumentParser createArgsParser() {
