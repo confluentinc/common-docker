@@ -30,8 +30,8 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClusterStatus {
 
-  private static final Logger log = LoggerFactory.getLogger(ClusterStatus.class);
+  private static final Logger log = LogManager.getLogger(ClusterStatus.class);
   public static final String JAVA_SECURITY_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
   public static final String BROKERS_IDS_PATH = "/brokers/ids";
   public static final int BROKER_METADATA_REQUEST_BACKOFF_MS = 1000;
