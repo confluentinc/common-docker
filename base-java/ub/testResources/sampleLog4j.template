@@ -10,7 +10,7 @@ log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
 log4j.logger.{{ $k }}={{ $v -}}
 {{ end }}
 
-{{- $kr_props := envToProps "LOG4J_" "" nil -}}
+{{- $kr_props := envToProps "LOG4J_" "" nil nil nil -}}
 {{ range $k, $v := $kr_props }}
 {{ $k }}={{ $v }}
 {{ end }}
