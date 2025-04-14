@@ -263,10 +263,10 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
-func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string, excludeProps []string) map[string]string {
+func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludeEnvs []string, excludeProps []string) map[string]string {
 	result := make(map[string]string)
-	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil, excludeProps)
-	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil, excludeProps)
+	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludeEnvs, nil, excludeProps)
+	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludeEnvs, nil, excludeProps)
 	for name, value := range primaryProps {
 		result[name] = value
 	}
