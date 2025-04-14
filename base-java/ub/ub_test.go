@@ -466,7 +466,7 @@ func TestEnvToProps(t *testing.T) {
 		envVars           map[string]string
 		envPrefix         string
 		propPrefix        string
-		exclude           []string
+		excludeEnvs       []string
 		excludePropPrefix []string
 		excludeProps      []string
 		expected          map[string]string
@@ -480,7 +480,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.",
-			exclude:           []string{},
+			excludeEnvs:       []string{},
 			excludePropPrefix: nil,
 			excludeProps:      nil,
 			expected: map[string]string{
@@ -497,7 +497,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.",
-			exclude:           []string{"APP_SECRET"},
+			excludeEnvs:       []string{"APP_SECRET"},
 			excludePropPrefix: nil,
 			excludeProps:      nil,
 			expected: map[string]string{
@@ -514,7 +514,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.meta.",
-			exclude:           []string{},
+			excludeEnvs:       []string{},
 			excludePropPrefix: nil,
 			excludeProps:      nil,
 			expected: map[string]string{
@@ -530,7 +530,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.",
-			exclude:           []string{},
+			excludeEnvs:       []string{},
 			excludePropPrefix: nil,
 			excludeProps:      nil,
 			expected:          map[string]string{},
@@ -544,7 +544,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.",
-			exclude:           []string{},
+			excludeEnvs:       []string{},
 			excludePropPrefix: []string{"app.test"},
 			excludeProps:      nil,
 			expected: map[string]string{
@@ -561,7 +561,7 @@ func TestEnvToProps(t *testing.T) {
 			},
 			envPrefix:         "APP_",
 			propPrefix:        "app.",
-			exclude:           []string{},
+			excludeEnvs:       []string{},
 			excludePropPrefix: nil,
 			excludeProps:      []string{"app.foo.bar"},
 			expected: map[string]string{
@@ -581,7 +581,7 @@ func TestEnvToProps(t *testing.T) {
 					os.Unsetenv(k)
 				}
 			}()
-			result := envToProps(tt.envPrefix, tt.propPrefix, tt.exclude, tt.excludePropPrefix, tt.excludeProps)
+			result := envToProps(tt.envPrefix, tt.propPrefix, tt.excludeEnvs, tt.excludePropPrefix, tt.excludeProps)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("envToProps() = %v, want %v", result, tt.expected)
 			}
@@ -594,8 +594,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 		primaryEnvPrefix   string
 		secondaryEnvPrefix string
 		propPrefix         string
-		excludes           []string
-		excludeProps       []string
+		excludeEnvs        []string
+		excludePropPrefix  []string
 	}
 
 	tests := []struct {
@@ -610,8 +610,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{},
-				excludeProps:       nil,
+				excludeEnvs:        []string{},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"PRIMARY_TEST1":   "value1",
@@ -630,8 +630,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{},
-				excludeProps:       nil,
+				excludeEnvs:        []string{},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"PRIMARY_TEST1":   "value1",
@@ -650,8 +650,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{"PRIMARY_TEST1"},
-				excludeProps:       nil,
+				excludeEnvs:        []string{"PRIMARY_TEST1"},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"PRIMARY_TEST1":   "value1",
@@ -670,8 +670,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{},
-				excludeProps:       nil,
+				excludeEnvs:        []string{},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"PRIMARY_SINGLE_UNDERSCORE":   "dot",
@@ -691,8 +691,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{},
-				excludeProps:       nil,
+				excludeEnvs:        []string{},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"OTHER_VAR1": "value1",
@@ -706,8 +706,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.meta.",
-				excludes:           []string{},
-				excludeProps:       nil,
+				excludeEnvs:        []string{},
+				excludePropPrefix:  nil,
 			},
 			envVars: map[string]string{
 				"PRIMARY_TEST1":   "value1",
@@ -724,8 +724,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
 				propPrefix:         "test.",
-				excludes:           []string{},
-				excludeProps:       []string{"test.test1"},
+				excludeEnvs:        []string{},
+				excludePropPrefix:  []string{"test.test1"},
 			},
 			envVars: map[string]string{
 				"PRIMARY_TEST1":   "value1",
@@ -751,7 +751,7 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				}
 			}()
 
-			got := setPropertiesWithEnvToPropsWithTwoPrefixes(tt.args.primaryEnvPrefix, tt.args.secondaryEnvPrefix, tt.args.propPrefix, tt.args.excludes, tt.args.excludeProps)
+			got := setPropertiesWithEnvToPropsWithTwoPrefixes(tt.args.primaryEnvPrefix, tt.args.secondaryEnvPrefix, tt.args.propPrefix, tt.args.excludeEnvs, tt.args.excludePropPrefix)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setPropertiesWithEnvToPropsWithTwoPrefixes() = %v, want %v", got, tt.want)
 			}
