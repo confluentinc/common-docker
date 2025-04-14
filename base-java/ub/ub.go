@@ -263,10 +263,10 @@ func buildProperties(spec ConfigSpec, environment map[string]string) map[string]
 	return config
 }
 
-func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string) map[string]string {
+func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPrefix, propPrefix string, excludes []string, excludeProps []string) map[string]string {
 	result := make(map[string]string)
-	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil)
-	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil)
+	primaryProps := envToProps(primaryEnvPrefix, propPrefix, excludes, nil, excludeProps)
+	secondaryProps := envToProps(secondaryEnvPrefix, propPrefix, excludes, nil, excludeProps)
 	for name, value := range primaryProps {
 		result[name] = value
 	}
@@ -278,7 +278,7 @@ func setPropertiesWithEnvToPropsWithTwoPrefixes(primaryEnvPrefix, secondaryEnvPr
 	return result
 }
 
-func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excludePropPrefixes []string) map[string]string {
+func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excludePropPrefixes []string, excludeProps []string) map[string]string {
 	env := GetEnvironment()
 	config := make(map[string]string)
 	for envName, envValue := range env {
@@ -289,7 +289,7 @@ func envToProps(envPrefix, propertyNamePrefix string, excludeEnvs []string, excl
 			trimmedEnvName := strings.TrimPrefix(envName, envPrefix)
 			propertyName := propertyNamePrefix + ConvertKey(trimmedEnvName)
 
-			if slices.Contains(excludeEnvs, propertyName) {
+			if slices.Contains(excludeProps, propertyName) {
 				continue
 			}
 			shouldExclude := false
