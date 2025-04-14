@@ -645,7 +645,7 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 			},
 		},
 		{
-			name: "with excludes",
+			name: "with excludeEnvs",
 			args: args{
 				primaryEnvPrefix:   "PRIMARY_",
 				secondaryEnvPrefix: "SECONDARY_",
@@ -763,7 +763,7 @@ func Test_setProperties(t *testing.T) {
 	type args struct {
 		properties map[string][]string
 		required   bool
-		excludes   []string
+		excludeEnvs []string
 	}
 
 	tests := []struct {
@@ -781,7 +781,7 @@ func Test_setProperties(t *testing.T) {
 					"prop3": {"REQUIRED_PROP3"},
 				},
 				required: true,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"REQUIRED_PROP1": "value1",
@@ -803,7 +803,7 @@ func Test_setProperties(t *testing.T) {
 					"prop3": {"REQUIRED_PROP3"},
 				},
 				required: true,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"REQUIRED_PROP1": "value1",
@@ -824,7 +824,7 @@ func Test_setProperties(t *testing.T) {
 					"prop3": {"OPTIONAL_PROP3"},
 				},
 				required: false,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"OPTIONAL_PROP1": "value1",
@@ -846,7 +846,7 @@ func Test_setProperties(t *testing.T) {
 					"prop3": {"OPTIONAL_PROP3"},
 				},
 				required: false,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"OPTIONAL_PROP1": "value1",
@@ -858,7 +858,7 @@ func Test_setProperties(t *testing.T) {
 			},
 		},
 		{
-			name: "with excludes",
+			name: "with excludeEnvs",
 			args: args{
 				properties: map[string][]string{
 					"prop1": {"EXCLUDED_PROP1"},
@@ -866,7 +866,7 @@ func Test_setProperties(t *testing.T) {
 					"prop3": {"EXCLUDED_PROP3"},
 				},
 				required: true,
-				excludes: []string{"EXCLUDED_PROP1", "EXCLUDED_PROP3"},
+				excludeEnvs: []string{"EXCLUDED_PROP1", "EXCLUDED_PROP3"},
 			},
 			envVars: map[string]string{
 				"EXCLUDED_PROP1": "value1",
@@ -887,7 +887,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"PRIMARY_PROP2", "SECONDARY_PROP2"},
 				},
 				required: true,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"PRIMARY_PROP1": "value1",
@@ -907,7 +907,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2.nested": {"NESTED_PROP2"},
 				},
 				required: true,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"NESTED_PROP1": "value1",
@@ -923,7 +923,7 @@ func Test_setProperties(t *testing.T) {
 			args: args{
 				properties: map[string][]string{},
 				required: true,
-				excludes: []string{},
+				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
 				"SOME_PROP": "value",
@@ -943,7 +943,7 @@ func Test_setProperties(t *testing.T) {
 				}
 			}()
 
-			got := setProperties(tt.args.properties, tt.args.required, tt.args.excludes)
+			got := setProperties(tt.args.properties, tt.args.required, tt.args.excludeEnvs)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setProperties() = %v, want %v", got, tt.want)
 			}
