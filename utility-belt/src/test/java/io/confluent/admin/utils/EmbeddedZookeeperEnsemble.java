@@ -15,6 +15,8 @@
  */
 package io.confluent.admin.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.zookeeper.client.FourLetterWordMain;
 import org.apache.zookeeper.common.X509Exception.SSLContextException;
 import org.apache.zookeeper.server.quorum.Election;
@@ -22,8 +24,6 @@ import org.apache.zookeeper.server.quorum.QuorumPeer;
 import org.apache.zookeeper.test.ClientBase;
 import org.apache.zookeeper.test.JMXEnv;
 import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class EmbeddedZookeeperEnsemble {
 
-  private static final Logger log = LoggerFactory.getLogger(EmbeddedZookeeperEnsemble.class);
+  private static final Logger log = LogManager.getLogger(EmbeddedZookeeperEnsemble.class);
   private static int CONNECTION_TIMEOUT = 30000;
   private static String LOCAL_ADDR = "localhost";
   private final Map<Integer, QuorumPeer> quorumPeersById = new ConcurrentHashMap<>();
