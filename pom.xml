@@ -29,6 +29,7 @@
     </modules>
 
     <properties>
+        <java.version>17</java.version>
         <docker.ubi8.os_type>ubi8</docker.ubi8.os_type>
         <docker.ubi9.os_type>ubi9</docker.ubi9.os_type>
         <docker.file>Dockerfile.${docker.ubi9.os_type}</docker.file>
