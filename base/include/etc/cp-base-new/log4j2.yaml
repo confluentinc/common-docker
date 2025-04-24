@@ -12,13 +12,7 @@ Configuration:
     Logger:
       - name: org.apache.kafka
         level: ERROR
-      - name: org.I0Itec.zkclient.ZkClient
-        level: ERROR
       - name: io.confluent.admin.utils
-        level: INFO
-        AppenderRef:
-          - ref: stderr
-      - name: org.apache.zookeeper
         level: INFO
         AppenderRef:
           - ref: stderr
