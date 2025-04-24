@@ -125,26 +125,10 @@ public class KafkaReadyCommand {
               res.getString("bootstrap_servers")
           );
         } else {
-          String zkConnectString = res.getString("zookeeper_connect");
-          boolean zkReady = ClusterStatus.isZookeeperReady(zkConnectString, res.getInt("timeout"));
-          if (!zkReady) {
-            throw new RuntimeException("Could not reach zookeeper " + zkConnectString);
-          }
-          Map<String, String> endpoints = ClusterStatus.getKafkaEndpointFromZookeeper(
-              zkConnectString,
-              res.getInt("timeout")
+          log.error("Bootstrap servers should be provided through config or bootstrap_servers");
+          throw new RuntimeException(
+              "Bootstrap servers should be provided through config or bootstrap_servers"
           );
-
-          String bootstrapBroker = endpoints.get(res.getString("security_protocol"));
-          if (bootstrapBroker == null) {
-            throw new RuntimeException(
-                "No endpoints found for security protocol ["
-                + res.getString("security_protocol")
-                + "]. Endpoints found in ZK [" + endpoints + "]"
-            );
-          }
-          workerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapBroker);
-
         }
         success = ClusterStatus.isKafkaReady(
             workerProps,

@@ -74,7 +74,6 @@ public class EmbeddedKafkaCluster {
   private File jaasFilePath = null;
   private Option<File> brokerTrustStoreFile = Option$.MODULE$.<File>empty();
   private boolean enableSASLSSL = false;
-  private EmbeddedZookeeperEnsemble zookeeper = null;
   private int numBrokers;
   private boolean isRunning = false;
   private KafkaClusterTestKit cluster;
@@ -336,20 +335,12 @@ public class EmbeddedKafkaCluster {
     log.debug("Startup of embedded Kafka broker at {} completed ...", brokerList());
   }
 
-
-  public void setJaasFilePath(File jaasFilePath) {
-    this.jaasFilePath = jaasFilePath;
-  }
-
   public String getBootstrapBrokers(SecurityProtocol securityProtocol) {
     return brokerList();
   }
 
   public boolean isRunning() {
     return isRunning;
-  }
-  public String getZookeeperConnectString() {
-    return this.zookeeper.connectString();
   }
 
   public String brokerList() {
