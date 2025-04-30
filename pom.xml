@@ -37,7 +37,7 @@
         <!-- Versions-->
         <ubi8.image.version>8.10-1179.1741863533</ubi8.image.version>
         <ubi9.micro.image.version>9.5-1744118077</ubi9.micro.image.version>
-        <ubi9.minimal.image.version>9.5-1742914212</ubi9.minimal.image.version>
+        <ubi9.minimal.image.version>9.5-1745855087</ubi9.minimal.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
@@ -52,7 +52,7 @@
         <ubi9.iputils.version>20210202-10.el9_5</ubi9.iputils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.xzlibs.version>5.2.5-8.el9_0</ubi9.xzlibs.version>
-        <ubi9.glibc.version>2.34-125.el9_5.3</ubi9.glibc.version>
+        <ubi9.glibc.version>2.34-125.el9_5.8</ubi9.glibc.version>
         <ubi9.findutils.version>1:4.8.0-7.el9</ubi9.findutils.version>
         <ubi9.crypto.policies.scripts.version>20240828-2.git626aa59.el9_5</ubi9.crypto.policies.scripts.version>
         <!-- Python Module Versions -->
