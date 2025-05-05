@@ -50,8 +50,8 @@
         <ubi8.curl.version>7.61.1-34.el8_10.3</ubi8.curl.version>
         <ubi8.findutils.version>1:4.6.0-21.el8</ubi8.findutils.version>
         <ubi8.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi8.crypto.policies.scripts.version>
-        <!-- ZULU OpenJDK Package Version -->
-        <ubi.temurin.jdk.version>17.0.14.0.0.7-1</ubi.temurin.jdk.version>
+        <!-- Temurin JDK Package Version -->
+        <ubi.temurin.jdk.version>17.0.15.0.0.6-0</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi8.python.pip.version>20.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
