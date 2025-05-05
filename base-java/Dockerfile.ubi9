@@ -62,7 +62,8 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
-    && mkdir /licenses
+    && mkdir /licenses \
+    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
@@ -70,7 +71,6 @@ RUN update-crypto-policies --set FIPS
 COPY license.txt /licenses
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
-
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
