@@ -33,7 +33,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi8.os_type}</docker.tag>
         <io.confluent.common-docker.version>7.9.1-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi8.image.version>8.10-1179.1741863533</ubi8.image.version>
+        <ubi8.image.version>8.10-1255</ubi8.image.version>
         <ubi9.micro.image.version>9.5-1739467664</ubi9.micro.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
@@ -53,7 +53,7 @@
         <ubi8.findutils.version>1:4.6.0-21.el8</ubi8.findutils.version>
         <ubi8.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi8.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.temurin.jdk.version>17.0.14.0.0.7-1</ubi.temurin.jdk.version>
+        <ubi.temurin.jdk.version>17.0.15.0.0.6-0</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi8.python.pip.version>20.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>71.1.0</ubi.python.setuptools.version>
