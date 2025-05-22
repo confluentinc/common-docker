@@ -79,10 +79,10 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluent
 
 RUN printf "[temurin-jdk] \n\
 name=temurin-jdk \n\
-baseurl=https://packages.adoptium.net/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
 enabled=1 \n\
 gpgcheck=1 \n\
-gpgkey=https://packages.adoptium.net/artifactory/api/gpg/key/public \n\
+gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
 # ENV required when manually installing openssl,
