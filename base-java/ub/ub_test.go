@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -8,6 +9,9 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
@@ -947,6 +951,138 @@ func Test_setProperties(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setProperties() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestRunListenersCmd(t *testing.T) {
+	tests := []struct {
+		name                string
+		advertisedListeners string
+		expectedOutput      string
+		expectError         bool
+	}{
+		{
+			name:                "single listener with protocol",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "multiple listeners with protocols",
+			advertisedListeners: "PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9093",
+			expectedOutput:      "localhost:9092,localhost:9093\n",
+			expectError:         false,
+		},
+		{
+			name:                "listener without protocol",
+			advertisedListeners: "localhost:9092",
+			expectedOutput:      "localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "mixed listeners",
+			advertisedListeners: "PLAINTEXT://localhost:9092,localhost:9093,SASL_PLAINTEXT://localhost:9094",
+			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094\n",
+			expectError:         false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a buffer to capture stdout
+			var buf bytes.Buffer
+			oldStdout := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			// Create a new command and run it
+			cmd := &cobra.Command{}
+			err := runListenersCmd(cmd, []string{tt.advertisedListeners})
+
+			// Restore stdout
+			w.Close()
+			os.Stdout = oldStdout
+			buf.ReadFrom(r)
+
+			// Check the output
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedOutput, buf.String())
+			}
+		})
+	}
+}
+
+func TestParseLog4jLoggers(t *testing.T) {
+	defaultLoggers := map[string]string{
+		"root":  "INFO",
+		"kafka": "WARN",
+	}
+
+	tests := []struct {
+		name           string
+		loggersStr     string
+		defaultLoggers map[string]string
+		expected       map[string]string
+	}{
+		{
+			name:           "empty string returns default loggers",
+			loggersStr:     "",
+			defaultLoggers: defaultLoggers,
+			expected:       defaultLoggers,
+		},
+		{
+			name:           "single logger override",
+			loggersStr:     "kafka=DEBUG",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "INFO",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "multiple logger overrides",
+			loggersStr:     "kafka=DEBUG,root=ERROR",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "ERROR",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "new logger addition",
+			loggersStr:     "kafka=DEBUG,new.logger=TRACE",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":       "INFO",
+				"kafka":      "DEBUG",
+				"new.logger": "TRACE",
+			},
+		},
+		{
+			name:           "whitespace handling",
+			loggersStr:     " kafka = DEBUG , root = ERROR ",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "ERROR",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "invalid format preserved in default",
+			loggersStr:     "invalid_format",
+			defaultLoggers: defaultLoggers,
+			expected:       defaultLoggers,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := parseLog4jLoggers(tt.loggersStr, tt.defaultLoggers)
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
