@@ -16,6 +16,9 @@ WORKDIR /build/ub
 COPY --chown=appuser:appuser ub/ ./
 RUN go build -ldflags="-w -s" ./ub.go
 
+# Fix permissions for Go module cache
+RUN mkdir -p /go/pkg/mod/cache/download && chown -R appuser:appuser /go/pkg/mod
+
 USER appuser
 RUN go test ./...
 
@@ -46,12 +49,12 @@ ENV LANG="C.UTF-8"
 ENV USE_LOG4J_2="True"
 
 RUN printf "[temurin-jre] \n\
-name=temurin-jre \n\
-baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
-" > /etc/yum.repos.d/adoptium.repo
+    name=temurin-jre \n\
+    baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+    enabled=1 \n\
+    gpgcheck=1 \n\
+    gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
+    " > /etc/yum.repos.d/adoptium.repo
 
 RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
