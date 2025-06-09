@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -8,6 +9,9 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
@@ -680,9 +684,9 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				"SECONDARY_SINGLE_UNDERSCORE": "secondary_dot",
 			},
 			want: map[string]string{
-				"test.single.underscore":   "dot",
-				"test.double_underscore":   "single_underscore",
-				"test.triple-underscore":   "dash",
+				"test.single.underscore": "dot",
+				"test.double_underscore": "single_underscore",
+				"test.triple-underscore": "dash",
 			},
 		},
 		{
@@ -761,8 +765,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 
 func Test_setProperties(t *testing.T) {
 	type args struct {
-		properties map[string][]string
-		required   bool
+		properties  map[string][]string
+		required    bool
 		excludeEnvs []string
 	}
 
@@ -780,7 +784,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"REQUIRED_PROP2"},
 					"prop3": {"REQUIRED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -802,7 +806,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"REQUIRED_PROP2"},
 					"prop3": {"REQUIRED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -823,7 +827,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"OPTIONAL_PROP2"},
 					"prop3": {"OPTIONAL_PROP3"},
 				},
-				required: false,
+				required:    false,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -845,7 +849,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"OPTIONAL_PROP2"},
 					"prop3": {"OPTIONAL_PROP3"},
 				},
-				required: false,
+				required:    false,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -865,7 +869,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"EXCLUDED_PROP2"},
 					"prop3": {"EXCLUDED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{"EXCLUDED_PROP1", "EXCLUDED_PROP3"},
 			},
 			envVars: map[string]string{
@@ -886,13 +890,13 @@ func Test_setProperties(t *testing.T) {
 					"prop1": {"PRIMARY_PROP1", "SECONDARY_PROP1"},
 					"prop2": {"PRIMARY_PROP2", "SECONDARY_PROP2"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
-				"PRIMARY_PROP1": "value1",
+				"PRIMARY_PROP1":   "value1",
 				"SECONDARY_PROP1": "value2",
-				"PRIMARY_PROP2": "value3",
+				"PRIMARY_PROP2":   "value3",
 			},
 			want: map[string]string{
 				"prop1": "value1",
@@ -906,7 +910,7 @@ func Test_setProperties(t *testing.T) {
 					"prop1.nested": {"NESTED_PROP1"},
 					"prop2.nested": {"NESTED_PROP2"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -921,8 +925,8 @@ func Test_setProperties(t *testing.T) {
 		{
 			name: "empty properties map",
 			args: args{
-				properties: map[string][]string{},
-				required: true,
+				properties:  map[string][]string{},
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
