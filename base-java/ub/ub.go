@@ -572,7 +572,6 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-// parseLog4jLoggers parses log4j loggers from a string in the format "logger1=level1,logger2=level2"
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers

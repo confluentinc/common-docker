@@ -989,22 +989,18 @@ func TestRunListenersCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a buffer to capture stdout
 			var buf bytes.Buffer
 			oldStdout := os.Stdout
 			r, w, _ := os.Pipe()
 			os.Stdout = w
 
-			// Create a new command and run it
 			cmd := &cobra.Command{}
 			err := runListenersCmd(cmd, []string{tt.advertisedListeners})
 
-			// Restore stdout
 			w.Close()
 			os.Stdout = oldStdout
 			buf.ReadFrom(r)
 
-			// Check the output
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
