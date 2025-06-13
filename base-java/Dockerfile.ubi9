@@ -16,6 +16,9 @@ WORKDIR /build/ub
 COPY --chown=appuser:appuser ub/ ./
 RUN go build -ldflags="-w -s" ./ub.go
 
+# Fix permissions for Go module cache
+RUN mkdir -p /go/pkg/mod/cache/download && chown -R appuser:appuser /go/pkg/mod
+
 USER appuser
 RUN go test ./...
 
