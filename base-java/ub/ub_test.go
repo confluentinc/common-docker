@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
@@ -1002,10 +1001,16 @@ func TestRunListenersCmd(t *testing.T) {
 			buf.ReadFrom(r)
 
 			if tt.expectError {
-				assert.Error(t, err)
+				if err == nil {
+					t.Error("expected error but got nil")
+				}
 			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.expectedOutput, buf.String())
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+				if got := buf.String(); got != tt.expectedOutput {
+					t.Errorf("got output %q, want %q", got, tt.expectedOutput)
+				}
 			}
 		})
 	}
@@ -1077,7 +1082,9 @@ func TestParseLog4jLoggers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := parseLog4jLoggers(tt.loggersStr, tt.defaultLoggers)
-			assert.Equal(t, tt.expected, result)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("parseLog4jLoggers() = %v, want %v", result, tt.expected)
+			}
 		})
 	}
 }
