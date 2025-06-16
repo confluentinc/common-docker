@@ -594,14 +594,19 @@ func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[
 
 func runListenersCmd(_ *cobra.Command, args []string) error {
 	advertisedListeners := args[0]
-	listeners := strings.Split(advertisedListeners, ",")
-	for i, listener := range listeners {
+	rawListeners := strings.Split(advertisedListeners, ",")
+	processedListeners := make([]string, len(rawListeners))
+
+	for i, listener := range rawListeners {
 		parts := strings.SplitN(listener, "://", 2)
 		if len(parts) == 2 {
-			listeners[i] = parts[1]
+			processedListeners[i] = parts[1]
+		} else {
+			processedListeners[i] = listener
 		}
 	}
-	fmt.Println(strings.Join(listeners, ","))
+
+	fmt.Println(strings.Join(processedListeners, ","))
 	return nil
 }
 

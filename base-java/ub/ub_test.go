@@ -984,6 +984,42 @@ func TestRunListenersCmd(t *testing.T) {
 			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094\n",
 			expectError:         false,
 		},
+		{
+			name:                "empty advertised listeners",
+			advertisedListeners: "",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "nil command",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "multiple arguments",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "invalid listener format",
+			advertisedListeners: "PLAINTEXT://",
+			expectedOutput:      "",
+			expectError:         false,
+		},
+		{
+			name:                "multiple colons in protocol",
+			advertisedListeners: "PLAINTEXT://://localhost:9092",
+			expectedOutput:      "://localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "trailing comma",
+			advertisedListeners: "PLAINTEXT://localhost:9092,",
+			expectedOutput:      "localhost:9092,\n",
+			expectError:         false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -994,7 +1030,17 @@ func TestRunListenersCmd(t *testing.T) {
 			os.Stdout = w
 
 			cmd := &cobra.Command{}
-			err := runListenersCmd(cmd, []string{tt.advertisedListeners})
+			args := []string{}
+			if tt.advertisedListeners != "" {
+				args = []string{tt.advertisedListeners}
+			}
+			if tt.name == "multiple arguments" {
+				args = []string{tt.advertisedListeners, "extra-arg"}
+			}
+			if tt.name == "nil command" {
+				cmd = nil
+			}
+			err := runListenersCmd(cmd, args)
 
 			w.Close()
 			os.Stdout = oldStdout
