@@ -593,6 +593,10 @@ func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[
 }
 
 func runListenersCmd(_ *cobra.Command, args []string) error {
+	if len(args) == 0 || args[0] == "" {
+		return fmt.Errorf("advertised listeners cannot be empty")
+	}
+
 	advertisedListeners := args[0]
 	rawListeners := strings.Split(advertisedListeners, ",")
 	processedListeners := make([]string, len(rawListeners))
