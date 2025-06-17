@@ -90,6 +90,13 @@ var (
 		Args:  cobra.ExactArgs(2),
 		RunE:  runKafkaReadyCmd,
 	}
+
+	listenersCmd = &cobra.Command{
+		Use:   "listeners <advertised-listeners>",
+		Short: "extracts listeners from advertised listeners",
+		Args:  cobra.ExactArgs(1),
+		RunE:  runListenersCmd,
+	}
 )
 
 // Helper function to create string slices in templates
@@ -165,6 +172,7 @@ func renderTemplate(templateFilePath string) error {
 		"createStringSliceMap":   createStringSliceMap,
 		"setStringSliceMapValue": setStringSliceMapValue,
 		"setPropertiesWithEnvToPropsWithTwoPrefixes": setPropertiesWithEnvToPropsWithTwoPrefixes,
+		"parseLog4jLoggers":                          parseLog4jLoggers,
 	}
 	t, err := template.New(pt.Base(templateFilePath)).Funcs(funcs).ParseFiles(templateFilePath)
 	if err != nil {
@@ -564,6 +572,48 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
+	if loggersStr == "" {
+		return defaultLoggers
+	}
+
+	result := make(map[string]string)
+	for k, v := range defaultLoggers {
+		result[k] = v
+	}
+
+	loggers := strings.Split(loggersStr, ",")
+	for _, logger := range loggers {
+		parts := strings.SplitN(logger, "=", 2)
+		if len(parts) == 2 {
+			result[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		}
+	}
+	return result
+}
+
+func runListenersCmd(_ *cobra.Command, args []string) error {
+	if len(args) == 0 || args[0] == "" {
+		return fmt.Errorf("advertised listeners cannot be empty")
+	}
+
+	advertisedListeners := args[0]
+	rawListeners := strings.Split(advertisedListeners, ",")
+	processedListeners := make([]string, len(rawListeners))
+
+	for i, listener := range rawListeners {
+		parts := strings.SplitN(listener, "://", 2)
+		if len(parts) == 2 {
+			processedListeners[i] = parts[1]
+		} else {
+			processedListeners[i] = listener
+		}
+	}
+
+	fmt.Println(strings.Join(processedListeners, ","))
+	return nil
+}
+
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "ub",
@@ -583,6 +633,7 @@ func main() {
 	rootCmd.AddCommand(waitCmd)
 	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
+	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
