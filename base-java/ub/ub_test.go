@@ -1011,7 +1011,7 @@ func TestRunListenersCmd(t *testing.T) {
 		{
 			name:                "trailing comma",
 			advertisedListeners: "PLAINTEXT://localhost:9092,",
-			expectedOutput:      "localhost:9092,\n",
+			expectedOutput:      "localhost:9092\n",
 			expectError:         false,
 		},
 	}
