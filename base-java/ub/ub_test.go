@@ -1003,15 +1003,15 @@ func TestRunListenersCmd(t *testing.T) {
 			expectError:         true,
 		},
 		{
-			name:                "invalid listener format",
-			advertisedListeners: "PLAINTEXT://",
-			expectedOutput:      "",
-			expectError:         false,
-		},
-		{
 			name:                "multiple colons in protocol",
 			advertisedListeners: "PLAINTEXT://://localhost:9092",
 			expectedOutput:      "://localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "trailing comma",
+			advertisedListeners: "PLAINTEXT://localhost:9092,",
+			expectedOutput:      "localhost:9092,\n",
 			expectError:         false,
 		},
 	}
