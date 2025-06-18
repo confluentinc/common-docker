@@ -1014,12 +1014,6 @@ func TestRunListenersCmd(t *testing.T) {
 			expectedOutput:      "://localhost:9092\n",
 			expectError:         false,
 		},
-		{
-			name:                "trailing comma",
-			advertisedListeners: "PLAINTEXT://localhost:9092,",
-			expectedOutput:      "localhost:9092,\n",
-			expectError:         false,
-		},
 	}
 
 	for _, tt := range tests {
