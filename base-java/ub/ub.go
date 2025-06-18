@@ -592,25 +592,35 @@ func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[
 	return result
 }
 
-func runListenersCmd(_ *cobra.Command, args []string) error {
-	if len(args) == 0 || args[0] == "" {
+func runListenersCmd(cmd *cobra.Command, args []string) error {
+	if cmd == nil {
+		return fmt.Errorf("command cannot be nil")
+	}
+
+	if len(args) != 1 {
+		return fmt.Errorf("exactly one argument required: advertised listeners")
+	}
+
+	if args[0] == "" {
 		return fmt.Errorf("advertised listeners cannot be empty")
 	}
 
 	advertisedListeners := args[0]
 	rawListeners := strings.Split(advertisedListeners, ",")
-	processedListeners := make([]string, len(rawListeners))
+	processedListeners := make([]string, 0, len(rawListeners))
 
-	for i, listener := range rawListeners {
+	for _, listener := range rawListeners {
 		parts := strings.SplitN(listener, "://", 2)
-		if len(parts) == 2 {
-			processedListeners[i] = parts[1]
-		} else {
-			processedListeners[i] = listener
+		if len(parts) == 2 && parts[1] != "" {
+			processedListeners = append(processedListeners, parts[1])
+		} else if listener != "" {
+			processedListeners = append(processedListeners, listener)
 		}
 	}
 
-	fmt.Println(strings.Join(processedListeners, ","))
+	if len(processedListeners) > 0 {
+		fmt.Println(strings.Join(processedListeners, ","))
+	}
 	return nil
 }
 
