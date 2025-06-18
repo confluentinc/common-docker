@@ -16,6 +16,7 @@ WORKDIR /build/ub
 COPY --chown=appuser:appuser ub/ ./
 RUN go build -ldflags="-w -s" ./ub.go
 
+
 USER appuser
 RUN go test ./...
 
