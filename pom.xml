@@ -35,9 +35,9 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.1-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi8.image.version>8.10-1255</ubi8.image.version>
-        <ubi9.micro.image.version>9.5-1746002938</ubi9.micro.image.version>
-        <ubi9.minimal.image.version>9.5-1745855087</ubi9.minimal.image.version>
+        <ubi8.image.version>8.10-1295.1749680713</ubi8.image.version>
+        <ubi9.micro.image.version>9.6-1750858477</ubi9.micro.image.version>
+        <ubi9.minimal.image.version>9.6-1750782676</ubi9.minimal.image.version>
         <!-- OpenSSL version that is FIPS compliant -->
         <fips.openssl.version>3.0.9</fips.openssl.version>
         <!-- Redhat Package Versions -->
@@ -48,8 +48,8 @@
         <ubi9.wget.version>1.21.1-8.el9_4</ubi9.wget.version>
         <ubi9.netcat.version>7.92-3.el9</ubi9.netcat.version>
         <ubi9.procps.version>3.3.17-14.el9</ubi9.procps.version>
-        <ubi9.krb5.workstation.version>1.21.1-6.el9</ubi9.krb5.workstation.version>
-        <ubi9.iputils.version>20210202-11.el9</ubi9.iputils.version>
+        <ubi9.krb5.workstation.version>1.21.1-8.el9_6</ubi9.krb5.workstation.version>
+        <ubi9.iputils.version>20210202-11.el9_6.1</ubi9.iputils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.xzlibs.version>5.2.5-8.el9_0</ubi9.xzlibs.version>
         <ubi9.glibc.version>2.34-168.el9_6.19</ubi9.glibc.version>
