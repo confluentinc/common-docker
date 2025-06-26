@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -8,6 +9,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
@@ -680,9 +683,9 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 				"SECONDARY_SINGLE_UNDERSCORE": "secondary_dot",
 			},
 			want: map[string]string{
-				"test.single.underscore":   "dot",
-				"test.double_underscore":   "single_underscore",
-				"test.triple-underscore":   "dash",
+				"test.single.underscore": "dot",
+				"test.double_underscore": "single_underscore",
+				"test.triple-underscore": "dash",
 			},
 		},
 		{
@@ -761,8 +764,8 @@ func Test_setPropertiesWithEnvToPropsWithTwoPrefixes(t *testing.T) {
 
 func Test_setProperties(t *testing.T) {
 	type args struct {
-		properties map[string][]string
-		required   bool
+		properties  map[string][]string
+		required    bool
 		excludeEnvs []string
 	}
 
@@ -780,7 +783,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"REQUIRED_PROP2"},
 					"prop3": {"REQUIRED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -802,7 +805,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"REQUIRED_PROP2"},
 					"prop3": {"REQUIRED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -823,7 +826,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"OPTIONAL_PROP2"},
 					"prop3": {"OPTIONAL_PROP3"},
 				},
-				required: false,
+				required:    false,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -845,7 +848,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"OPTIONAL_PROP2"},
 					"prop3": {"OPTIONAL_PROP3"},
 				},
-				required: false,
+				required:    false,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -865,7 +868,7 @@ func Test_setProperties(t *testing.T) {
 					"prop2": {"EXCLUDED_PROP2"},
 					"prop3": {"EXCLUDED_PROP3"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{"EXCLUDED_PROP1", "EXCLUDED_PROP3"},
 			},
 			envVars: map[string]string{
@@ -886,13 +889,13 @@ func Test_setProperties(t *testing.T) {
 					"prop1": {"PRIMARY_PROP1", "SECONDARY_PROP1"},
 					"prop2": {"PRIMARY_PROP2", "SECONDARY_PROP2"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
-				"PRIMARY_PROP1": "value1",
+				"PRIMARY_PROP1":   "value1",
 				"SECONDARY_PROP1": "value2",
-				"PRIMARY_PROP2": "value3",
+				"PRIMARY_PROP2":   "value3",
 			},
 			want: map[string]string{
 				"prop1": "value1",
@@ -906,7 +909,7 @@ func Test_setProperties(t *testing.T) {
 					"prop1.nested": {"NESTED_PROP1"},
 					"prop2.nested": {"NESTED_PROP2"},
 				},
-				required: true,
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -921,8 +924,8 @@ func Test_setProperties(t *testing.T) {
 		{
 			name: "empty properties map",
 			args: args{
-				properties: map[string][]string{},
-				required: true,
+				properties:  map[string][]string{},
+				required:    true,
 				excludeEnvs: []string{},
 			},
 			envVars: map[string]string{
@@ -946,6 +949,181 @@ func Test_setProperties(t *testing.T) {
 			got := setProperties(tt.args.properties, tt.args.required, tt.args.excludeEnvs)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("setProperties() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestRunListenersCmd(t *testing.T) {
+	tests := []struct {
+		name                string
+		advertisedListeners string
+		expectedOutput      string
+		expectError         bool
+	}{
+		{
+			name:                "single listener with protocol",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "multiple listeners with protocols",
+			advertisedListeners: "PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9093",
+			expectedOutput:      "localhost:9092,localhost:9093\n",
+			expectError:         false,
+		},
+		{
+			name:                "listener without protocol",
+			advertisedListeners: "localhost:9092",
+			expectedOutput:      "localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "mixed listeners",
+			advertisedListeners: "PLAINTEXT://localhost:9092,localhost:9093,SASL_PLAINTEXT://localhost:9094",
+			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094\n",
+			expectError:         false,
+		},
+		{
+			name:                "empty advertised listeners",
+			advertisedListeners: "",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "nil command",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "multiple arguments",
+			advertisedListeners: "PLAINTEXT://localhost:9092",
+			expectedOutput:      "",
+			expectError:         true,
+		},
+		{
+			name:                "multiple colons in protocol",
+			advertisedListeners: "PLAINTEXT://://localhost:9092",
+			expectedOutput:      "://localhost:9092\n",
+			expectError:         false,
+		},
+		{
+			name:                "trailing comma",
+			advertisedListeners: "PLAINTEXT://localhost:9092,",
+			expectedOutput:      "localhost:9092\n",
+			expectError:         false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			oldStdout := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			cmd := &cobra.Command{}
+			args := []string{}
+			if tt.advertisedListeners != "" {
+				args = []string{tt.advertisedListeners}
+			}
+			if tt.name == "multiple arguments" {
+				args = []string{tt.advertisedListeners, "extra-arg"}
+			}
+			if tt.name == "nil command" {
+				cmd = nil
+			}
+			err := runListenersCmd(cmd, args)
+
+			w.Close()
+			os.Stdout = oldStdout
+			buf.ReadFrom(r)
+
+			if tt.expectError {
+				if err == nil {
+					t.Error("expected error but got nil")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+				if got := buf.String(); got != tt.expectedOutput {
+					t.Errorf("got output %q, want %q", got, tt.expectedOutput)
+				}
+			}
+		})
+	}
+}
+
+func TestParseLog4jLoggers(t *testing.T) {
+	defaultLoggers := map[string]string{
+		"root":  "INFO",
+		"kafka": "WARN",
+	}
+
+	tests := []struct {
+		name           string
+		loggersStr     string
+		defaultLoggers map[string]string
+		expected       map[string]string
+	}{
+		{
+			name:           "empty string returns default loggers",
+			loggersStr:     "",
+			defaultLoggers: defaultLoggers,
+			expected:       defaultLoggers,
+		},
+		{
+			name:           "single logger override",
+			loggersStr:     "kafka=DEBUG",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "INFO",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "multiple logger overrides",
+			loggersStr:     "kafka=DEBUG,root=ERROR",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "ERROR",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "new logger addition",
+			loggersStr:     "kafka=DEBUG,new.logger=TRACE",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":       "INFO",
+				"kafka":      "DEBUG",
+				"new.logger": "TRACE",
+			},
+		},
+		{
+			name:           "whitespace handling",
+			loggersStr:     " kafka = DEBUG , root = ERROR ",
+			defaultLoggers: defaultLoggers,
+			expected: map[string]string{
+				"root":  "ERROR",
+				"kafka": "DEBUG",
+			},
+		},
+		{
+			name:           "invalid format preserved in default",
+			loggersStr:     "invalid_format",
+			defaultLoggers: defaultLoggers,
+			expected:       defaultLoggers,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := parseLog4jLoggers(tt.loggersStr, tt.defaultLoggers)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("parseLog4jLoggers() = %v, want %v", result, tt.expected)
 			}
 		})
 	}
