@@ -612,9 +612,14 @@ func runListenersCmd(args []string) error {
 		if listener == "" {
 			continue
 		}
-		
-		parts := strings.SplitN(listener, "://", 2)
-		if len(parts) == 2 && parts[1] != "" {
+		if strings.Contains(listener, "://") {
+			parts := strings.SplitN(listener, "://", 2)
+			if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+				return fmt.Errorf("malformed listener: %q", listener)
+			}
+			if strings.Contains(parts[1], "://") {
+				return fmt.Errorf("malformed listener: %q", listener)
+			}
 			processedListeners = append(processedListeners, parts[1])
 		} else {
 			processedListeners = append(processedListeners, listener)

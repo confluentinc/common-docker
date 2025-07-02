@@ -954,91 +954,99 @@ func Test_setProperties(t *testing.T) {
 func TestRunListenersCmd(t *testing.T) {
 	tests := []struct {
 		name                string
-		advertisedListeners string
+		advertisedListeners []string
 		expectedOutput      string
 		expectError         bool
 	}{
 		{
 			name:                "single listener with protocol",
-			advertisedListeners: "PLAINTEXT://localhost:9092",
+			advertisedListeners: []string{"PLAINTEXT://localhost:9092"},
 			expectedOutput:      "localhost:9092\n",
 			expectError:         false,
 		},
 		{
 			name:                "multiple listeners with protocols",
-			advertisedListeners: "PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9093",
+			advertisedListeners: []string{"PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9093"},
 			expectedOutput:      "localhost:9092,localhost:9093\n",
 			expectError:         false,
 		},
 		{
 			name:                "listener without protocol",
-			advertisedListeners: "localhost:9092",
+			advertisedListeners: []string{"localhost:9092"},
 			expectedOutput:      "localhost:9092\n",
 			expectError:         false,
 		},
 		{
 			name:                "mixed listeners",
-			advertisedListeners: "PLAINTEXT://localhost:9092,localhost:9093,SASL_PLAINTEXT://localhost:9094",
+			advertisedListeners: []string{"PLAINTEXT://localhost:9092,localhost:9093,SASL_PLAINTEXT://localhost:9094"},
 			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094\n",
 			expectError:         false,
 		},
 		{
 			name:                "empty advertised listeners",
-			advertisedListeners: "",
+			advertisedListeners: []string{""},
 			expectedOutput:      "",
 			expectError:         true,
 		},
 		{
 			name:                "multiple arguments",
-			advertisedListeners: "PLAINTEXT://localhost:9092",
+			advertisedListeners: []string{"PLAINTEXT://localhost:9092", "extra-arg"},
 			expectedOutput:      "",
 			expectError:         true,
 		},
 		{
-			name:                "multiple colons in protocol",
-			advertisedListeners: "PLAINTEXT://://localhost:9092",
-			expectedOutput:      "://localhost:9092\n",
-			expectError:         false,
+			name:                "malformed protocol",
+			advertisedListeners: []string{"PLAINTEXT://://localhost:9092"},
+			expectedOutput:      "",
+			expectError:         true,
 		},
 		{
 			name:                "trailing comma",
-			advertisedListeners: "PLAINTEXT://localhost:9092,",
+			advertisedListeners: []string{"PLAINTEXT://localhost:9092,"},
 			expectedOutput:      "localhost:9092\n",
 			expectError:         false,
+		},
+		{
+			name:                "no arguments",
+			advertisedListeners: []string{},
+			expectedOutput:      "",
+			expectError:         true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var buf bytes.Buffer
 			oldStdout := os.Stdout
-			r, w, _ := os.Pipe()
+			r, w, err := os.Pipe()
+			if err != nil {
+				t.Fatalf("failed to create pipe: %v", err)
+			}
 			os.Stdout = w
-
-			args := []string{}
-			if tt.advertisedListeners != "" {
-				args = []string{tt.advertisedListeners}
-			}
-			if tt.name == "multiple arguments" {
-				args = []string{tt.advertisedListeners, "extra-arg"}
-			}
-
-			err := runListenersCmd(args)
-
+	
+			err = runListenersCmd(tt.advertisedListeners)
+	
+			var buf bytes.Buffer
+			done := make(chan struct{})
+			go func() {
+				buf.ReadFrom(r)
+				close(done)
+			}()
 			w.Close()
+			<-done
 			os.Stdout = oldStdout
-			buf.ReadFrom(r)
-
+	
+			output := buf.String()
+	
 			if tt.expectError {
 				if err == nil {
-					t.Error("expected error but got nil")
+					t.Errorf("expected error but got nil for test case: %s", tt.name)
 				}
 			} else {
 				if err != nil {
-					t.Errorf("unexpected error: %v", err)
+					t.Errorf("unexpected error for test case %s: %v", tt.name, err)
 				}
-				if got := buf.String(); got != tt.expectedOutput {
-					t.Errorf("got output %q, want %q", got, tt.expectedOutput)
+				if output != tt.expectedOutput {
+					t.Errorf("test case %s: got output %q, want %q", tt.name, output, tt.expectedOutput)
 				}
 			}
 		})
