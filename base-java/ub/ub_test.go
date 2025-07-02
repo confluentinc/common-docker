@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -961,25 +960,25 @@ func TestRunListenersCmd(t *testing.T) {
 		{
 			name:                "single listener with protocol",
 			advertisedListeners: []string{"PLAINTEXT://localhost:9092"},
-			expectedOutput:      "localhost:9092\n",
+			expectedOutput:      "localhost:9092",
 			expectError:         false,
 		},
 		{
 			name:                "multiple listeners with protocols",
 			advertisedListeners: []string{"PLAINTEXT://localhost:9092,SASL_PLAINTEXT://localhost:9093"},
-			expectedOutput:      "localhost:9092,localhost:9093\n",
+			expectedOutput:      "localhost:9092,localhost:9093",
 			expectError:         false,
 		},
 		{
 			name:                "listener without protocol",
 			advertisedListeners: []string{"localhost:9092"},
-			expectedOutput:      "localhost:9092\n",
+			expectedOutput:      "localhost:9092",
 			expectError:         false,
 		},
 		{
 			name:                "mixed listeners",
 			advertisedListeners: []string{"PLAINTEXT://localhost:9092,localhost:9093,SASL_PLAINTEXT://localhost:9094"},
-			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094\n",
+			expectedOutput:      "localhost:9092,localhost:9093,localhost:9094",
 			expectError:         false,
 		},
 		{
@@ -1003,7 +1002,7 @@ func TestRunListenersCmd(t *testing.T) {
 		{
 			name:                "trailing comma",
 			advertisedListeners: []string{"PLAINTEXT://localhost:9092,"},
-			expectedOutput:      "localhost:9092\n",
+			expectedOutput:      "localhost:9092",
 			expectError:         false,
 		},
 		{
@@ -1016,27 +1015,10 @@ func TestRunListenersCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			oldStdout := os.Stdout
-			r, w, err := os.Pipe()
-			if err != nil {
-				t.Fatalf("failed to create pipe: %v", err)
-			}
-			os.Stdout = w
-	
-			err = runListenersCmd(tt.advertisedListeners)
-	
-			var buf bytes.Buffer
-			done := make(chan struct{})
-			go func() {
-				buf.ReadFrom(r)
-				close(done)
-			}()
-			w.Close()
-			<-done
-			os.Stdout = oldStdout
-	
-			output := buf.String()
-	
+			// Execute the command and get result directly
+			output, err := runListenersCmd(tt.advertisedListeners)
+
+			// Assert results
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("expected error but got nil for test case: %s", tt.name)

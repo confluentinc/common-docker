@@ -96,7 +96,12 @@ var (
 		Short: "extracts listeners from advertised listeners",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runListenersCmd(args)
+			listeners, err := runListenersCmd(args)
+			if err != nil {
+				return err
+			}
+			fmt.Println(listeners)
+			return nil
 		},
 	}
 )
@@ -594,13 +599,13 @@ func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[
 	return result
 }
 
-func runListenersCmd(args []string) error {
+func runListenersCmd(args []string) (string, error) {
 	if len(args) != 1 {
-		return fmt.Errorf("exactly one argument required: advertised listeners")
+		return "", fmt.Errorf("exactly one argument required: advertised listeners")
 	}
 
 	if args[0] == "" {
-		return fmt.Errorf("advertised listeners cannot be empty")
+		return "", fmt.Errorf("advertised listeners cannot be empty")
 	}
 
 	advertisedListeners := args[0]
@@ -612,13 +617,14 @@ func runListenersCmd(args []string) error {
 		if listener == "" {
 			continue
 		}
+
 		if strings.Contains(listener, "://") {
 			parts := strings.SplitN(listener, "://", 2)
 			if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-				return fmt.Errorf("malformed listener: %q", listener)
+				return "", fmt.Errorf("malformed listener: %q", listener)
 			}
 			if strings.Contains(parts[1], "://") {
-				return fmt.Errorf("malformed listener: %q", listener)
+				return "", fmt.Errorf("malformed listener: %q", listener)
 			}
 			processedListeners = append(processedListeners, parts[1])
 		} else {
@@ -627,9 +633,9 @@ func runListenersCmd(args []string) error {
 	}
 
 	if len(processedListeners) > 0 {
-		fmt.Println(strings.Join(processedListeners, ","))
+		return strings.Join(processedListeners, ","), nil
 	}
-	return nil
+	return "", nil
 }
 
 func main() {
