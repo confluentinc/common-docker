@@ -1107,10 +1107,6 @@ func TestParseLog4jLoggers(t *testing.T) {
 }
 
 func Test_getEnvWithFallbacks(t *testing.T) {
-	os.Unsetenv("TEST_VAR1")
-	os.Unsetenv("TEST_VAR2")
-	os.Unsetenv("TEST_VAR3")
-
 	tests := []struct {
 		name         string
 		defaultValue string
@@ -1156,8 +1152,8 @@ func Test_getEnvWithFallbacks(t *testing.T) {
 		{
 			name:         "UB_CLASSPATH to CUB_CLASSPATH fallback",
 			defaultValue: "/usr/share/java/cp-base-java/*",
-			envVars:      []string{"UB_CLASSPATH", "CUB_CLASSPATH"},
-			envSetup:     map[string]string{"UB_CLASSPATH": "", "CUB_CLASSPATH": "/custom/classpath/*"},
+			envVars:      []string{"TEST_UB_CLASSPATH", "TEST_CUB_CLASSPATH"},
+			envSetup:     map[string]string{"TEST_UB_CLASSPATH": "", "TEST_CUB_CLASSPATH": "/custom/classpath/*"},
 			expected:     "/custom/classpath/*",
 		},
 	}
