@@ -380,8 +380,17 @@ func loadConfigSpec(path string) (ConfigSpec, error) {
 	return spec, nil
 }
 
+func getEnvWithFallbacks(defaultValue string, envVars ...string) string {
+	for _, envVar := range envVars {
+		if val := os.Getenv(envVar); len(val) > 0 {
+			return val
+		}
+	}
+	return defaultValue
+}
+
 func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
-	classPath := getEnvOrDefault("UB_CLASSPATH", "/usr/share/java/cp-base-java/*")
+	classPath := getEnvWithFallbacks("/usr/share/java/cp-base-java/*", "UB_CLASSPATH", "CUB_CLASSPATH")
 
 	opts := []string{}
 	if jvmOpts != "" {
