@@ -1016,7 +1016,7 @@ func TestRunListenersCmd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output, err := runListenersCmd(tt.advertisedListeners)
-			
+
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("expected error but got nil for test case: %s", tt.name)
@@ -1157,21 +1157,22 @@ func Test_getEnvWithFallbacks(t *testing.T) {
 			name:         "UB_CLASSPATH to CUB_CLASSPATH fallback",
 			defaultValue: "/usr/share/java/cp-base-java/*",
 			envVars:      []string{"UB_CLASSPATH", "CUB_CLASSPATH"},
-			envSetup:     map[string]string{"CUB_CLASSPATH": "/custom/classpath/*"},
+			envSetup:     map[string]string{"UB_CLASSPATH": "", "CUB_CLASSPATH": "/custom/classpath/*"},
 			expected:     "/custom/classpath/*",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Unsetenv("TEST_VAR1")
-			os.Unsetenv("TEST_VAR2")
-			os.Unsetenv("TEST_VAR3")
-			os.Unsetenv("UB_CLASSPATH")
-			os.Unsetenv("CUB_CLASSPATH")
 			for key, value := range tt.envSetup {
 				os.Setenv(key, value)
 			}
+
+			defer func() {
+				for key := range tt.envSetup {
+					os.Unsetenv(key)
+				}
+			}()
 
 			result := getEnvWithFallbacks(tt.defaultValue, tt.envVars...)
 			if result != tt.expected {
