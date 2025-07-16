@@ -1016,7 +1016,7 @@ func TestRunListenersCmd(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output, err := runListenersCmd(tt.advertisedListeners)
-			
+
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("expected error but got nil for test case: %s", tt.name)
@@ -1101,6 +1101,82 @@ func TestParseLog4jLoggers(t *testing.T) {
 			result := parseLog4jLoggers(tt.loggersStr, tt.defaultLoggers)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("parseLog4jLoggers() = %v, want %v", result, tt.expected)
+			}
+		})
+	}
+}
+
+func Test_getEnvWithFallbacks(t *testing.T) {
+	os.Unsetenv("TEST_VAR1")
+	os.Unsetenv("TEST_VAR2")
+	os.Unsetenv("TEST_VAR3")
+
+	tests := []struct {
+		name         string
+		defaultValue string
+		envVars      []string
+		envSetup     map[string]string
+		expected     string
+	}{
+		{
+			name:         "returns first env var when set",
+			defaultValue: "default",
+			envVars:      []string{"TEST_VAR1", "TEST_VAR2", "TEST_VAR3"},
+			envSetup:     map[string]string{"TEST_VAR1": "value1", "TEST_VAR2": "value2"},
+			expected:     "value1",
+		},
+		{
+			name:         "returns second env var when first is empty",
+			defaultValue: "default",
+			envVars:      []string{"TEST_VAR1", "TEST_VAR2", "TEST_VAR3"},
+			envSetup:     map[string]string{"TEST_VAR1": "", "TEST_VAR2": "value2"},
+			expected:     "value2",
+		},
+		{
+			name:         "returns third env var when first two are empty",
+			defaultValue: "default",
+			envVars:      []string{"TEST_VAR1", "TEST_VAR2", "TEST_VAR3"},
+			envSetup:     map[string]string{"TEST_VAR1": "", "TEST_VAR2": "", "TEST_VAR3": "value3"},
+			expected:     "value3",
+		},
+		{
+			name:         "returns default when all env vars are empty",
+			defaultValue: "default",
+			envVars:      []string{"TEST_VAR1", "TEST_VAR2", "TEST_VAR3"},
+			envSetup:     map[string]string{"TEST_VAR1": "", "TEST_VAR2": "", "TEST_VAR3": ""},
+			expected:     "default",
+		},
+		{
+			name:         "returns default when no env vars are set",
+			defaultValue: "default",
+			envVars:      []string{"TEST_VAR1", "TEST_VAR2", "TEST_VAR3"},
+			envSetup:     map[string]string{},
+			expected:     "default",
+		},
+		{
+			name:         "UB_CLASSPATH to CUB_CLASSPATH fallback",
+			defaultValue: "/usr/share/java/cp-base-java/*",
+			envVars:      []string{"UB_CLASSPATH", "CUB_CLASSPATH"},
+			envSetup:     map[string]string{"UB_CLASSPATH": "", "CUB_CLASSPATH": "/custom/classpath/*"},
+			expected:     "/custom/classpath/*",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for key, value := range tt.envSetup {
+				os.Setenv(key, value)
+			}
+
+			defer func() {
+				for key := range tt.envSetup {
+					os.Unsetenv(key)
+				}
+			}()
+
+			result := getEnvWithFallbacks(tt.defaultValue, tt.envVars...)
+			if result != tt.expected {
+				t.Errorf("getEnvWithFallbacks() = %q, expected %q", result, tt.expected)
 			}
 		})
 	}
