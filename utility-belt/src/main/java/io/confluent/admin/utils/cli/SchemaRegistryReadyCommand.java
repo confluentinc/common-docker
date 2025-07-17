@@ -44,6 +44,8 @@ public class SchemaRegistryReadyCommand {
   private static final Logger log = LogManager.getLogger(SchemaRegistryReadyCommand.class);
   public static final String SR_READY = "sr-ready";
   private static final String HEALTH_ENDPOINT = "/subjects";
+  private static final int DEFAULT_TIMEOUT_MS = 5000; // 5 seconds
+  private static final int RETRY_SLEEP_DURATION_MS = 1000; // 1 second
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser srReady = ArgumentParsers
@@ -127,14 +129,14 @@ public class SchemaRegistryReadyCommand {
     while (System.currentTimeMillis() - startTime < timeoutMs) {
       try {
         // First check if the port is open
-        if (!isPortOpen(host, port, 5000)) { // 5 second connection timeout
+        if (!isPortOpen(host, port, DEFAULT_TIMEOUT_MS)) { // 5 second connection timeout
           log.debug("Port {} is not open on host {}", port, host);
-          Thread.sleep(1000);
+          Thread.sleep(RETRY_SLEEP_DURATION_MS);
           continue;
         }
         
         // Then check if Schema Registry responds to HTTP requests
-        if (isHttpEndpointReady(host, port, 5000)) { // 5 second HTTP timeout
+        if (isHttpEndpointReady(host, port, DEFAULT_TIMEOUT_MS)) { // 5 second HTTP timeout
           log.info("Schema Registry is ready at {}:{}", host, port);
           return true;
         }
