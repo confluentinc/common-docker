@@ -91,6 +91,13 @@ var (
 		RunE:  runKafkaReadyCmd,
 	}
 
+	srReadyCmd = &cobra.Command{
+		Use:   "sr-ready <host> <port> <timeout-secs>",
+		Short: "checks if Schema Registry is up and running",
+		Args:  cobra.ExactArgs(3),
+		RunE:  runSrReadyCmd,
+	}
+
 	listenersCmd = &cobra.Command{
 		Use:   "listeners <advertised-listeners>",
 		Short: "extracts listeners from advertised listeners",
@@ -437,6 +444,12 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
+func checkSrReady(host string, port string, timeout string) bool {
+	opts := []string{host, port, timeout}
+	jvmOpts := os.Getenv("SCHEMA_REGISTRY_OPTS")
+	return invokeJavaCommand("io.confluent.admin.utils.cli.SchemaRegistryReadyCommand", jvmOpts, opts)
+}
+
 func waitForServer(host string, port int, timeout time.Duration) bool {
 	address := fmt.Sprintf("%s:%d", host, port)
 	startTime := time.Now()
@@ -588,6 +601,15 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func runSrReadyCmd(_ *cobra.Command, args []string) error {
+	success := checkSrReady(args[0], args[1], args[2])
+	if !success {
+		err := fmt.Errorf("sr-ready check failed")
+		return err
+	}
+	return nil
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -666,6 +688,7 @@ func main() {
 	rootCmd.AddCommand(waitCmd)
 	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
+	rootCmd.AddCommand(srReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
