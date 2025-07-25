@@ -36,10 +36,9 @@
         <io.confluent.common-docker.version>8.1.0-0</io.confluent.common-docker.version>
         <!-- Versions-->
         <ubi8.image.version>8.10-1752564239</ubi8.image.version>
-        <ubi9.micro.image.version>9.6-1750858477</ubi9.micro.image.version>
+        <ubi9.micro.image.version>9.6-1752751762</ubi9.micro.image.version>
         <ubi9.minimal.image.version>9.6-1752587672</ubi9.minimal.image.version>
-        <!-- OpenSSL version that is FIPS compliant -->
-        <fips.openssl.version>3.0.9</fips.openssl.version>
+        <ubi9.openssl.version>1:3.2.2-6.el9_5.1</ubi9.openssl.version>
         <!-- Redhat Package Versions -->
         <ubi9.wget.version>1.21.1-8.el9_4</ubi9.wget.version>
         <ubi9.netcat.version>7.92-3.el9</ubi9.netcat.version>
