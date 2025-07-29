@@ -27,6 +27,11 @@ import (
 	"crypto/tls"
 )
 
+const (
+	// defaultHTTPTimeout is the default timeout for HTTP requests
+	defaultHTTPTimeout = 30 * time.Second
+)
+
 type ConfigSpec struct {
 	Prefixes          map[string]bool   `json:"prefixes"`
 	Excludes          []string          `json:"excludes"`
@@ -462,7 +467,7 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 	url := fmt.Sprintf("%s://%s:%d/%s", scheme, host, port, path)
 	
 	httpClient := &http.Client{
-		Timeout: 30 * time.Second, // Default timeout
+		Timeout: defaultHTTPTimeout,
 	}
 	
 	// Handle TLS certificate validation
