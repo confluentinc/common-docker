@@ -102,7 +102,7 @@ var (
 		Use:   "sr-ready <host> <port> <timeout-secs>",
 		Short: "checks if Schema Registry is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
-		RunE:  runSrReadyCmd,
+		RunE:  runSchemaRegistryReadyCmd,
 	}
 
 	listenersCmd = &cobra.Command{
@@ -461,7 +461,6 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 	
 	url := fmt.Sprintf("%s://%s:%d/%s", scheme, host, port, path)
 	
-	// Create HTTP client with timeout
 	httpClient := &http.Client{
 		Timeout: 30 * time.Second, // Default timeout
 	}
@@ -482,7 +481,7 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 	}
 	
 	// Add authentication if provided
-	if username != "" || password != "" {
+	if username != "" && password != "" {
 		req.SetBasicAuth(username, password)
 	}
 	
@@ -518,7 +517,7 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	}
 	
 	// Check if response is successful and contains 'compatibilityLevel'
-	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < 300
 	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
 		return true
 	} else {
@@ -584,7 +583,7 @@ func waitForHttp(URL string, timeout time.Duration) error {
 	if err != nil {
 		return fmt.Errorf("error retrieving url")
 	}
-	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < 300
 	if !statusOK {
 		return fmt.Errorf("unexpected response for %q with code %d", URL, resp.StatusCode)
 	}
@@ -678,7 +677,7 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func runSrReadyCmd(_ *cobra.Command, args []string) error {
+func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
