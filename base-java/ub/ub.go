@@ -522,7 +522,7 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	}
 	
 	// Check if response is successful and contains 'compatibilityLevel'
-	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < 300
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
 		return true
 	} else {
@@ -588,7 +588,7 @@ func waitForHttp(URL string, timeout time.Duration) error {
 	if err != nil {
 		return fmt.Errorf("error retrieving url")
 	}
-	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < 300
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if !statusOK {
 		return fmt.Errorf("unexpected response for %q with code %d", URL, resp.StatusCode)
 	}
