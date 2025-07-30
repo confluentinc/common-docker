@@ -28,7 +28,6 @@ import (
 )
 
 const (
-	// defaultHTTPTimeout is the default timeout for HTTP requests
 	defaultHTTPTimeout = 30 * time.Second
 )
 
@@ -456,8 +455,6 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
-// makeRequest executes a GET request against a HTTP(S) endpoint.
-// It supports TLS, certificate validation, and basic authentication.
 func makeRequest(host string, port int, secure bool, ignoreCert bool, username string, password string, path string) (*http.Response, error) {
 	scheme := "https"
 	if !secure {
@@ -470,27 +467,21 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 		Timeout: defaultHTTPTimeout,
 	}
 	
-	// Handle TLS certificate validation
 	if secure && ignoreCert {
-		// Create a custom transport that skips certificate verification
 		transport := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 		httpClient.Transport = transport
 	}
 	
-	// Create request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 	
-	// Add authentication if provided
 	if username != "" && password != "" {
 		req.SetBasicAuth(username, password)
 	}
-	
-	// Make the request
 	return httpClient.Do(req)
 }
 
@@ -498,7 +489,6 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /config request and contains 'compatibilityLevel' in the response.
 func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) bool {
-	// Check if you can connect to the endpoint
 	status := waitForServer(host, port, timeout)
 	
 	if !status {
@@ -506,7 +496,6 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 		return false
 	}
 
-	// Check if service is responding as expected to basic request
 	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "config")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error making request: %v\n", err)
@@ -514,14 +503,12 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	}
 	defer resp.Body.Close()
 	
-	// Read response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading response body: %v\n", err)
 		return false
 	}
 	
-	// Check if response is successful and contains 'compatibilityLevel'
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
 		return true
