@@ -1182,7 +1182,6 @@ func Test_getEnvWithFallbacks(t *testing.T) {
 }
 
 func Test_checkSchemaRegistryReady(t *testing.T) {
-	// Create a mock server that responds like Schema Registry
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/config" {
 			w.WriteHeader(http.StatusOK)
@@ -1260,7 +1259,6 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 }
 
 func Test_runSchemaRegistryReadyCmd(t *testing.T) {
-	// Create a mock server that responds like Schema Registry
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/config" {
 			w.WriteHeader(http.StatusOK)
@@ -1350,7 +1348,6 @@ func Test_srReady_EnvironmentVariables(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set up environment variables
 			for k, v := range tt.envVars {
 				os.Setenv(k, v)
 			}
@@ -1360,7 +1357,6 @@ func Test_srReady_EnvironmentVariables(t *testing.T) {
 				}
 			}()
 
-			// Create a mock server for this test
 			mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/config" {
 					w.WriteHeader(http.StatusOK)
@@ -1378,7 +1374,6 @@ func Test_srReady_EnvironmentVariables(t *testing.T) {
 			host := serverURL.Hostname()
 			port := serverURL.Port()
 
-			// Update args with actual server details
 			testArgs := []string{host, port, "5"}
 
 			cmd := &cobra.Command{}
