@@ -1211,7 +1211,7 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 		ignoreCert bool
 		username   string
 		password   string
-		want       bool
+		wantErr    bool
 	}{
 		{
 			name:       "successful schema registry check",
@@ -1222,7 +1222,7 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 			ignoreCert: false,
 			username:   "",
 			password:   "",
-			want:       true,
+			wantErr:    false,
 		},
 		{
 			name:       "invalid host",
@@ -1233,7 +1233,7 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 			ignoreCert: false,
 			username:   "",
 			password:   "",
-			want:       false,
+			wantErr:    true,
 		},
 		{
 			name:       "invalid port",
@@ -1244,15 +1244,15 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 			ignoreCert: false,
 			username:   "",
 			password:   "",
-			want:       false,
+			wantErr:    true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := checkSchemaRegistryReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
-			if got != tt.want {
-				t.Errorf("checkSchemaRegistryReady() = %v, want %v", got, tt.want)
+			err := checkSchemaRegistryReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("checkSchemaRegistryReady() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

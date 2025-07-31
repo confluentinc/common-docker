@@ -488,33 +488,29 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 // checkSchemaRegistryReady waits for Schema Registry to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /config request and contains 'compatibilityLevel' in the response.
-func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) bool {
+func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
 	status := waitForServer(host, port, timeout)
 	
 	if !status {
-		fmt.Fprintf(os.Stderr, "%s cannot be reached on port %d.\n", host, port)
-		return false
+		return fmt.Errorf("schema registry cannot be reached on %s:%d", host, port)
 	}
 
 	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "config")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error making request: %v\n", err)
-		return false
+		return fmt.Errorf("error making request to schema registry: %w", err)
 	}
 	defer resp.Body.Close()
 	
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading response body: %v\n", err)
-		return false
+		return fmt.Errorf("error reading response body: %w", err)
 	}
 	
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
 		return true
 	} else {
-		fmt.Fprintf(os.Stderr, "Unexpected response with code: %d and content: %s\n", resp.StatusCode, string(body))
-		return false
+		return fmt.Errorf("unexpected response from kafka rest proxy with code: %d", resp.StatusCode)
 	}
 }
 
@@ -681,9 +677,9 @@ func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
 	}
 	timeout := time.Duration(secs) * time.Second
 
-	success := checkSchemaRegistryReady(args[0], port, timeout, srSecure, srIgnoreCert, srUsername, srPassword)
-	if !success {
-		return fmt.Errorf("sr-ready check failed")
+	err = checkSchemaRegistryReady(args[0], port, timeout, srSecure, srIgnoreCert, srUsername, srPassword)
+	if err != nil {
+		return fmt.Errorf("sr-ready check failed: %w", err)
 	}
 	return nil
 }
