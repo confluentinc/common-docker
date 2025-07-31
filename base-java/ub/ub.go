@@ -508,9 +508,9 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
-		return true
+		return nil
 	} else {
-		return fmt.Errorf("unexpected response from kafka rest proxy with code: %d", resp.StatusCode)
+		return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
 	}
 }
 
