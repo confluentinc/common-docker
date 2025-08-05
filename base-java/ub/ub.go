@@ -51,6 +51,12 @@ var (
 	srUsername   string
 	srPassword   string
 
+	// Control Center flags
+	ccSecure     bool
+	ccIgnoreCert bool
+	ccUsername   string
+	ccPassword   string
+
 	re = regexp.MustCompile("[^_]_[^_]")
 
 	ensureCmd = &cobra.Command{
@@ -107,6 +113,13 @@ var (
 		Short: "checks if Schema Registry is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
 		RunE:  runSchemaRegistryReadyCmd,
+	}
+
+	controlCenterReadyCmd = &cobra.Command{
+		Use:   "control-center-ready <host> <port> <timeout-secs>",
+		Short: "checks if Confluent Control Center is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE:  runControlCenterReadyCmd,
 	}
 
 	listenersCmd = &cobra.Command{
@@ -513,6 +526,34 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
 }
 
+// checkControlCenterReady waits for Confluent Control Center to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a request and contains 'Control Center' in the response.
+func checkControlCenterReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	status := waitForServer(host, port, timeout)
+	
+	if !status {
+		return fmt.Errorf("control center cannot be reached on %s:%d", host, port)
+	}
+
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "")
+	if err != nil {
+		return fmt.Errorf("error making request to control center: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+	
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
+	if statusOK && strings.Contains(string(body), "Control Center") {
+		return nil
+	} 
+	return fmt.Errorf("unexpected response from control center with code: %d", resp.StatusCode)
+}
+
 func waitForServer(host string, port int, timeout time.Duration) bool {
 	address := fmt.Sprintf("%s:%d", host, port)
 	startTime := time.Now()
@@ -683,6 +724,25 @@ func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func runControlCenterReadyCmd(_ *cobra.Command, args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	err = checkControlCenterReady(args[0], port, timeout, ccSecure, ccIgnoreCert, ccUsername, ccPassword)
+	if err != nil {
+		return fmt.Errorf("control-center-ready check failed: %w", err)
+	}
+	return nil
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -759,6 +819,11 @@ func main() {
 	srReadyCmd.PersistentFlags().StringVarP(&srUsername, "username", "", "", "username used to authenticate to the Schema Registry")
 	srReadyCmd.PersistentFlags().StringVarP(&srPassword, "password", "", "", "password used to authenticate to the Schema Registry")
 
+	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccSecure, "secure", "", false, "use TLS to secure the connection")
+	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccUsername, "username", "", "", "username used to authenticate to the Control Center")
+	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccPassword, "password", "", "", "password used to authenticate to the Control Center")
+
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
@@ -767,6 +832,7 @@ func main() {
 	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 	rootCmd.AddCommand(srReadyCmd)
+	rootCmd.AddCommand(controlCenterReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
