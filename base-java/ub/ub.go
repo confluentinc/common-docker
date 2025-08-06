@@ -63,6 +63,12 @@ var (
 	ccUsername   string
 	ccPassword   string
 
+	// Connect flags
+	connectSecure     bool
+	connectIgnoreCert bool
+	connectUsername   string
+	connectPassword   string
+
 	re = regexp.MustCompile("[^_]_[^_]")
 
 	ensureCmd = &cobra.Command{
@@ -138,6 +144,15 @@ var (
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runControlCenterReadyCmd(args)
+		},
+	}
+
+	connectReadyCmd = &cobra.Command{
+		Use:   "connect-ready <host> <port> <timeout-secs>",
+		Short: "checks if Connect is ready to accept connector tasks",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runConnectReadyCmd(args)
 		},
 	}
 
@@ -596,6 +611,34 @@ func checkControlCenterReady(host string, port int, timeout time.Duration, secur
 	return fmt.Errorf("unexpected response from control center with code: %d", resp.StatusCode)
 }
 
+// checkConnectReady waits for Connect to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a request and contains 'version' in the response.
+func checkConnectReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	status := waitForServer(host, port, timeout)
+	
+	if !status {
+		return fmt.Errorf("connect cannot be reached on %s:%d", host, port)
+	}
+
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "")
+	if err != nil {
+		return fmt.Errorf("error making request to connect: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+	
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
+	if statusOK && strings.Contains(string(body), "version") {
+		return nil
+	} 
+	return fmt.Errorf("unexpected response from connect with code: %d", resp.StatusCode)
+}
+
 func waitForServer(host string, port int, timeout time.Duration) bool {
 	address := fmt.Sprintf("%s:%d", host, port)
 	startTime := time.Now()
@@ -802,6 +845,25 @@ func runControlCenterReadyCmd(args []string) error {
 	return nil
 }
 
+func runConnectReadyCmd(args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	err = checkConnectReady(args[0], port, timeout, connectSecure, connectIgnoreCert, connectUsername, connectPassword)
+	if err != nil {
+		return fmt.Errorf("connect-ready check failed: %w", err)
+	}
+	return nil
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -891,6 +953,11 @@ func main() {
 	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccUsername, "username", "", "", "username used to authenticate to the Control Center")
 	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccPassword, "password", "", "", "password used to authenticate to the Control Center")
 
+	connectReadyCmd.PersistentFlags().BoolVarP(&connectSecure, "secure", "", false, "use TLS to secure the connection")
+	connectReadyCmd.PersistentFlags().BoolVarP(&connectIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	connectReadyCmd.PersistentFlags().StringVarP(&connectUsername, "username", "", "", "username used to authenticate to the Connect worker")
+	connectReadyCmd.PersistentFlags().StringVarP(&connectPassword, "password", "", "", "password used to authenticate to the Connect worker")
+
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
@@ -901,6 +968,7 @@ func main() {
 	rootCmd.AddCommand(srReadyCmd)
 	rootCmd.AddCommand(krReadyCmd)
 	rootCmd.AddCommand(controlCenterReadyCmd)
+	rootCmd.AddCommand(connectReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
