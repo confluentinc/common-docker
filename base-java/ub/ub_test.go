@@ -1443,13 +1443,7 @@ func Test_runKafkaRestReadyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := &cobra.Command{}
-			cmd.Flags().Bool("secure", false, "")
-			cmd.Flags().Bool("ignore-cert", false, "")
-			cmd.Flags().String("username", "", "")
-			cmd.Flags().String("password", "", "")
-
-			err := runKafkaRestReadyCmd(cmd, tt.args)
+			err := runKafkaRestReadyCmd(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runKafkaRestReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}

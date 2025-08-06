@@ -119,7 +119,9 @@ var (
 		Use:   "kr-ready <host> <port> <timeout-secs>",
 		Short: "checks if Kafka REST Proxy is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
-		RunE:  runKafkaRestReadyCmd,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runKafkaRestReadyCmd(args)
+		},
 	}
 
 	listenersCmd = &cobra.Command{
@@ -719,7 +721,7 @@ func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func runKafkaRestReadyCmd(_ *cobra.Command, args []string) error {
+func runKafkaRestReadyCmd(args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
@@ -814,7 +816,6 @@ func main() {
 
 	krReadyCmd.PersistentFlags().StringVarP(&bootstrapServers, "bootstrap-servers", "b", "", "comma-separated list of kafka brokers")
 	krReadyCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path to the config file")
-	krReadyCmd.PersistentFlags().StringVarP(&zookeeperConnect, "zookeeper-connect", "z", "", "zookeeper connect string")
 	krReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "security protocol to use when multiple listeners are enabled.")
 	krReadyCmd.PersistentFlags().BoolVarP(&krSecure, "secure", "", false, "use TLS to secure the connection")
 	krReadyCmd.PersistentFlags().BoolVarP(&krIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
