@@ -51,6 +51,12 @@ var (
 	srUsername   string
 	srPassword   string
 
+	// Kafka REST Proxy flags
+	krSecure     bool
+	krIgnoreCert bool
+	krUsername   string
+	krPassword   string
+
 	// Control Center flags
 	ccSecure     bool
 	ccIgnoreCert bool
@@ -112,14 +118,27 @@ var (
 		Use:   "sr-ready <host> <port> <timeout-secs>",
 		Short: "checks if Schema Registry is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
-		RunE:  runSchemaRegistryReadyCmd,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runSchemaRegistryReadyCmd(args)
+		},
+	}
+
+	krReadyCmd = &cobra.Command{
+		Use:   "kr-ready <host> <port> <timeout-secs>",
+		Short: "checks if Kafka REST Proxy is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runKafkaRestReadyCmd(args)
+		},
 	}
 
 	controlCenterReadyCmd = &cobra.Command{
 		Use:   "control-center-ready <host> <port> <timeout-secs>",
 		Short: "checks if Confluent Control Center is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
-		RunE:  runControlCenterReadyCmd,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runControlCenterReadyCmd(args)
+		},
 	}
 
 	listenersCmd = &cobra.Command{
@@ -526,6 +545,29 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
 }
 
+// checkKafkaRestReady waits for Kafka REST Proxy to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a /topics request with a 2xx status code.
+func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	status := waitForServer(host, port, timeout)
+	
+	if !status {
+		return fmt.Errorf("%s cannot be reached on port %d", host, port)
+	}
+
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "topics")
+	if err != nil {
+		return fmt.Errorf("error making request: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
+	if statusOK {
+		return nil
+	}
+	return fmt.Errorf("unexpected response with code: %d", resp.StatusCode)
+}
+
 // checkControlCenterReady waits for Confluent Control Center to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a request and contains 'Control Center' in the response.
@@ -705,7 +747,7 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
+func runSchemaRegistryReadyCmd(args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
@@ -720,6 +762,23 @@ func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
 	err = checkSchemaRegistryReady(args[0], port, timeout, srSecure, srIgnoreCert, srUsername, srPassword)
 	if err != nil {
 		return fmt.Errorf("sr-ready check failed: %w", err)
+	}
+	return nil
+}
+
+func runKafkaRestReadyCmd(args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+	err = checkKafkaRestReady(args[0], port, timeout, krSecure, krIgnoreCert, krUsername, krPassword)
+	if err != nil {
+		return fmt.Errorf("kr-ready check failed")
 	}
 	return nil
 }
@@ -819,6 +878,14 @@ func main() {
 	srReadyCmd.PersistentFlags().StringVarP(&srUsername, "username", "", "", "username used to authenticate to the Schema Registry")
 	srReadyCmd.PersistentFlags().StringVarP(&srPassword, "password", "", "", "password used to authenticate to the Schema Registry")
 
+	krReadyCmd.PersistentFlags().StringVarP(&bootstrapServers, "bootstrap-servers", "b", "", "comma-separated list of kafka brokers")
+	krReadyCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path to the config file")
+	krReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "security protocol to use when multiple listeners are enabled.")
+	krReadyCmd.PersistentFlags().BoolVarP(&krSecure, "secure", "", false, "use TLS to secure the connection")
+	krReadyCmd.PersistentFlags().BoolVarP(&krIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	krReadyCmd.PersistentFlags().StringVarP(&krUsername, "username", "", "", "username used to authenticate to the Kafka REST Proxy")
+	krReadyCmd.PersistentFlags().StringVarP(&krPassword, "password", "", "", "password used to authenticate to the Kafka REST Proxy")
+
 	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccSecure, "secure", "", false, "use TLS to secure the connection")
 	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
 	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccUsername, "username", "", "", "username used to authenticate to the Control Center")
@@ -832,6 +899,7 @@ func main() {
 	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 	rootCmd.AddCommand(srReadyCmd)
+	rootCmd.AddCommand(krReadyCmd)
 	rootCmd.AddCommand(controlCenterReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
