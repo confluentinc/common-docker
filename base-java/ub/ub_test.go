@@ -1305,13 +1305,7 @@ func Test_runSchemaRegistryReadyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := &cobra.Command{}
-			cmd.Flags().Bool("secure", false, "")
-			cmd.Flags().Bool("ignore-cert", false, "")
-			cmd.Flags().String("username", "", "")
-			cmd.Flags().String("password", "", "")
-
-			err := runSchemaRegistryReadyCmd(cmd, tt.args)
+			err := runSchemaRegistryReadyCmd(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runSchemaRegistryReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -112,7 +112,9 @@ var (
 		Use:   "sr-ready <host> <port> <timeout-secs>",
 		Short: "checks if Schema Registry is ready to accept client requests",
 		Args:  cobra.ExactArgs(3),
-		RunE:  runSchemaRegistryReadyCmd,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runSchemaRegistryReadyCmd(args)
+		},
 	}
 
 	krReadyCmd = &cobra.Command{
@@ -702,7 +704,7 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func runSchemaRegistryReadyCmd(_ *cobra.Command, args []string) error {
+func runSchemaRegistryReadyCmd(args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
