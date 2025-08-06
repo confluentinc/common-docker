@@ -24,6 +24,11 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/unix"
+	"crypto/tls"
+)
+
+const (
+	defaultHTTPTimeout = 30 * time.Second
 )
 
 type ConfigSpec struct {
@@ -39,6 +44,18 @@ var (
 	configFile       string
 	zookeeperConnect string
 	security         string
+
+	// Schema Registry flags
+	srSecure     bool
+	srIgnoreCert bool
+	srUsername   string
+	srPassword   string
+
+	// Kafka REST Proxy flags
+	krSecure     bool
+	krIgnoreCert bool
+	krUsername   string
+	krPassword   string
 
 	re = regexp.MustCompile("[^_]_[^_]")
 
@@ -89,6 +106,24 @@ var (
 		Short: "checks if kafka brokers are up and running",
 		Args:  cobra.ExactArgs(2),
 		RunE:  runKafkaReadyCmd,
+	}
+
+	srReadyCmd = &cobra.Command{
+		Use:   "sr-ready <host> <port> <timeout-secs>",
+		Short: "checks if Schema Registry is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runSchemaRegistryReadyCmd(args)
+		},
+	}
+
+	krReadyCmd = &cobra.Command{
+		Use:   "kr-ready <host> <port> <timeout-secs>",
+		Short: "checks if Kafka REST Proxy is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runKafkaRestReadyCmd(args)
+		},
 	}
 
 	listenersCmd = &cobra.Command{
@@ -437,6 +472,87 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
+func makeRequest(host string, port int, secure bool, ignoreCert bool, username string, password string, path string) (*http.Response, error) {
+	scheme := "https"
+	if !secure {
+		scheme = "http"
+	}
+	
+	url := fmt.Sprintf("%s://%s:%d/%s", scheme, host, port, path)
+	
+	httpClient := &http.Client{
+		Timeout: defaultHTTPTimeout,
+	}
+	
+	if secure && ignoreCert {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		httpClient.Transport = transport
+	}
+	
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+	
+	if username != "" && password != "" {
+		req.SetBasicAuth(username, password)
+	}
+	return httpClient.Do(req)
+}
+
+// checkSchemaRegistryReady waits for Schema Registry to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a /config request and contains 'compatibilityLevel' in the response.
+func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	status := waitForServer(host, port, timeout)
+	
+	if !status {
+		return fmt.Errorf("schema registry cannot be reached on %s:%d", host, port)
+	}
+
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "config")
+	if err != nil {
+		return fmt.Errorf("error making request to schema registry: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+	
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
+	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
+		return nil
+	} 
+	return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
+}
+
+// checkKafkaRestReady waits for Kafka REST Proxy to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a /topics request with a 2xx status code.
+func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	status := waitForServer(host, port, timeout)
+	
+	if !status {
+		return fmt.Errorf("%s cannot be reached on port %d", host, port)
+	}
+
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "topics")
+	if err != nil {
+		return fmt.Errorf("error making request: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
+	if statusOK {
+		return nil
+	}
+	return fmt.Errorf("unexpected response with code: %d", resp.StatusCode)
+}
+
 func waitForServer(host string, port int, timeout time.Duration) bool {
 	address := fmt.Sprintf("%s:%d", host, port)
 	startTime := time.Now()
@@ -494,7 +610,7 @@ func waitForHttp(URL string, timeout time.Duration) error {
 	if err != nil {
 		return fmt.Errorf("error retrieving url")
 	}
-	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
+	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
 	if !statusOK {
 		return fmt.Errorf("unexpected response for %q with code %d", URL, resp.StatusCode)
 	}
@@ -588,6 +704,42 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func runSchemaRegistryReadyCmd(args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	err = checkSchemaRegistryReady(args[0], port, timeout, srSecure, srIgnoreCert, srUsername, srPassword)
+	if err != nil {
+		return fmt.Errorf("sr-ready check failed: %w", err)
+	}
+	return nil
+}
+
+func runKafkaRestReadyCmd(args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+	err = checkKafkaRestReady(args[0], port, timeout, krSecure, krIgnoreCert, krUsername, krPassword)
+	if err != nil {
+		return fmt.Errorf("kr-ready check failed")
+	}
+	return nil
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -659,6 +811,19 @@ func main() {
 	kafkaReadyCmd.PersistentFlags().StringVarP(&zookeeperConnect, "zookeeper-connect", "z", "", "zookeeper connect string")
 	kafkaReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "security protocol to use when multiple listeners are enabled.")
 
+	srReadyCmd.PersistentFlags().BoolVarP(&srSecure, "secure", "", false, "use TLS to secure the connection")
+	srReadyCmd.PersistentFlags().BoolVarP(&srIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	srReadyCmd.PersistentFlags().StringVarP(&srUsername, "username", "", "", "username used to authenticate to the Schema Registry")
+	srReadyCmd.PersistentFlags().StringVarP(&srPassword, "password", "", "", "password used to authenticate to the Schema Registry")
+
+	krReadyCmd.PersistentFlags().StringVarP(&bootstrapServers, "bootstrap-servers", "b", "", "comma-separated list of kafka brokers")
+	krReadyCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "path to the config file")
+	krReadyCmd.PersistentFlags().StringVarP(&security, "security", "s", "", "security protocol to use when multiple listeners are enabled.")
+	krReadyCmd.PersistentFlags().BoolVarP(&krSecure, "secure", "", false, "use TLS to secure the connection")
+	krReadyCmd.PersistentFlags().BoolVarP(&krIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	krReadyCmd.PersistentFlags().StringVarP(&krUsername, "username", "", "", "username used to authenticate to the Kafka REST Proxy")
+	krReadyCmd.PersistentFlags().StringVarP(&krPassword, "password", "", "", "password used to authenticate to the Kafka REST Proxy")
+
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
@@ -666,6 +831,8 @@ func main() {
 	rootCmd.AddCommand(waitCmd)
 	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
+	rootCmd.AddCommand(srReadyCmd)
+	rootCmd.AddCommand(krReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)

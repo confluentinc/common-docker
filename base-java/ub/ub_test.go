@@ -4,8 +4,10 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -1172,6 +1174,270 @@ func Test_getEnvWithFallbacks(t *testing.T) {
 			result := getEnvWithFallbacks(tt.defaultValue, tt.envVars...)
 			if result != tt.expected {
 				t.Errorf("getEnvWithFallbacks() = %q, expected %q", result, tt.expected)
+			}
+		})
+	}
+}
+
+func Test_checkSchemaRegistryReady(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/config" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"compatibilityLevel":"BACKWARD"}`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port, err := strconv.Atoi(serverURL.Port())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name       string
+		host       string
+		port       int
+		timeout    time.Duration
+		secure     bool
+		ignoreCert bool
+		username   string
+		password   string
+		wantErr    bool
+	}{
+		{
+			name:       "successful schema registry check",
+			host:       host,
+			port:       port,
+			timeout:    5 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    false,
+		},
+		{
+			name:       "invalid host",
+			host:       "invalid-host",
+			port:       8081,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+		{
+			name:       "invalid port",
+			host:       host,
+			port:       99999,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkSchemaRegistryReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("checkSchemaRegistryReady() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_runSchemaRegistryReadyCmd(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/config" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"compatibilityLevel":"BACKWARD"}`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port := serverURL.Port()
+
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "successful schema registry ready check",
+			args:    []string{host, port, "5"},
+			wantErr: false,
+		},
+		{
+			name:    "invalid port",
+			args:    []string{host, "invalid-port", "5"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid timeout",
+			args:    []string{host, port, "invalid-timeout"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid host",
+			args:    []string{"invalid-host", "8081", "5"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := runSchemaRegistryReadyCmd(tt.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("runSchemaRegistryReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_checkKafkaRestReady(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/topics" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`["topic1","topic2"]`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port, err := strconv.Atoi(serverURL.Port())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name       string
+		host       string
+		port       int
+		timeout    time.Duration
+		secure     bool
+		ignoreCert bool
+		username   string
+		password   string
+		wantErr    bool
+	}{
+		{
+			name:       "successful kafka rest check",
+			host:       host,
+			port:       port,
+			timeout:    5 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    false,
+		},
+		{
+			name:       "invalid host",
+			host:       "invalid-host",
+			port:       8082,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+		{
+			name:       "invalid port",
+			host:       host,
+			port:       99999,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkKafkaRestReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("checkKafkaRestReady() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_runKafkaRestReadyCmd(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/topics" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`["topic1","topic2"]`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port := serverURL.Port()
+
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "successful kafka rest ready check",
+			args:    []string{host, port, "5"},
+			wantErr: false,
+		},
+		{
+			name:    "invalid port",
+			args:    []string{host, "invalid-port", "5"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid timeout",
+			args:    []string{host, port, "invalid-timeout"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid host",
+			args:    []string{"invalid-host", "8082", "5"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := runKafkaRestReadyCmd(tt.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("runKafkaRestReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
