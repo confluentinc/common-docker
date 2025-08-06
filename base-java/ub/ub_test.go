@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/spf13/cobra"
 )
 
 func assertEqual(a string, b string, t *testing.T) {
