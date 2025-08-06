@@ -783,7 +783,7 @@ func runKafkaRestReadyCmd(args []string) error {
 	return nil
 }
 
-func runControlCenterReadyCmd(_ *cobra.Command, args []string) error {
+func runControlCenterReadyCmd(args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)

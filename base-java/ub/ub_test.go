@@ -1603,13 +1603,7 @@ func Test_runControlCenterReadyCmd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cmd := &cobra.Command{}
-			cmd.Flags().Bool("secure", false, "")
-			cmd.Flags().Bool("ignore-cert", false, "")
-			cmd.Flags().String("username", "", "")
-			cmd.Flags().String("password", "", "")
-
-			err := runControlCenterReadyCmd(cmd, tt.args)
+			err := runControlCenterReadyCmd(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runControlCenterReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}
