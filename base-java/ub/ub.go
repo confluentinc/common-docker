@@ -39,6 +39,17 @@ type ConfigSpec struct {
 	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
 }
 
+type RequestConfig struct {
+	Host       string
+	Port       int
+	Endpoint   string
+	Secure     bool
+	IgnoreCert bool
+	Username   string
+	Password   string
+	Timeout    time.Duration
+}
+
 var (
 	bootstrapServers string
 	configFile       string
@@ -520,14 +531,14 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 // checkComponentReady is a generic function that checks if a component is ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a request and contains the expected content in the response.
-func checkComponentReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string, endpoint string, expectedContent string, componentName string) error {
-	status := waitForServer(host, port, timeout)
+func checkComponentReady(componentName string, config RequestConfig, expectedContentInBody string) error {
+	status := waitForServer(config.Host, config.Port, config.Timeout)
 	
 	if !status {
-		return fmt.Errorf("%s cannot be reached on %s:%d", componentName, host, port)
+		return fmt.Errorf("%s cannot be reached on %s:%d", componentName, config.Host, config.Port)
 	}
 
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, endpoint)
+	resp, err := makeRequest(config.Host, config.Port, config.Secure, config.IgnoreCert, config.Username, config.Password, config.Endpoint)
 	if err != nil {
 		return fmt.Errorf("error making request to %s: %w", componentName, err)
 	}
@@ -539,7 +550,7 @@ func checkComponentReady(host string, port int, timeout time.Duration, secure bo
 	}
 	
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK && (expectedContent == "" || strings.Contains(string(body), expectedContent)) {
+	if statusOK && (expectedContentInBody == "" || strings.Contains(string(body), expectedContentInBody)) {
 		return nil
 	} 
 	return fmt.Errorf("unexpected response from %s with code: %d", componentName, resp.StatusCode)
@@ -549,21 +560,51 @@ func checkComponentReady(host string, port int, timeout time.Duration, secure bo
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /config request and contains 'compatibilityLevel' in the response.
 func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "config", "compatibilityLevel", "schema registry")
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "config",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
+	}
+	return checkComponentReady("schema registry", config, "compatibilityLevel")
 }
 
 // checkKafkaRestReady waits for Kafka REST Proxy to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /topics request with a 2xx status code.
 func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "topics", "", "kafka rest proxy")
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "topics",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
+	}
+	return checkComponentReady("kafka rest proxy", config, "")
 }
 
 // checkControlCenterReady waits for Confluent Control Center to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a request and contains 'Control Center' in the response.
 func checkControlCenterReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "", "Control Center", "control center")
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
+	}
+	return checkComponentReady("control center", config, "Control Center")
 }
 
 func waitForServer(host string, port int, timeout time.Duration) bool {
