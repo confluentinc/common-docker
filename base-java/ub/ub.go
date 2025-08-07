@@ -502,19 +502,19 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 	return httpClient.Do(req)
 }
 
-// checkSchemaRegistryReady waits for Schema Registry to be ready.
+// checkComponentReady is a generic function that checks if a component is ready.
 // It first checks if the service is reachable, then verifies it responds correctly
-// to a /config request and contains 'compatibilityLevel' in the response.
-func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+// to a request and contains the expected content in the response.
+func checkComponentReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string, endpoint string, expectedContent string, componentName string) error {
 	status := waitForServer(host, port, timeout)
 	
 	if !status {
-		return fmt.Errorf("schema registry cannot be reached on %s:%d", host, port)
+		return fmt.Errorf("%s cannot be reached on %s:%d", componentName, host, port)
 	}
 
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "config")
+	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, endpoint)
 	if err != nil {
-		return fmt.Errorf("error making request to schema registry: %w", err)
+		return fmt.Errorf("error making request to %s: %w", componentName, err)
 	}
 	defer resp.Body.Close()
 	
@@ -524,33 +524,24 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	}
 	
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
+	if statusOK && (expectedContent == "" || strings.Contains(string(body), expectedContent)) {
 		return nil
 	} 
-	return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
+	return fmt.Errorf("unexpected response from %s with code: %d", componentName, resp.StatusCode)
+}
+
+// checkSchemaRegistryReady waits for Schema Registry to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a /config request and contains 'compatibilityLevel' in the response.
+func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "config", "compatibilityLevel", "schema registry")
 }
 
 // checkKafkaRestReady waits for Kafka REST Proxy to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /topics request with a 2xx status code.
 func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	status := waitForServer(host, port, timeout)
-	
-	if !status {
-		return fmt.Errorf("%s cannot be reached on port %d", host, port)
-	}
-
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "topics")
-	if err != nil {
-		return fmt.Errorf("error making request: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK {
-		return nil
-	}
-	return fmt.Errorf("unexpected response with code: %d", resp.StatusCode)
+	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "topics", "", "kafka rest proxy")
 }
 
 func waitForServer(host string, port int, timeout time.Duration) bool {
