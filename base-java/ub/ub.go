@@ -563,28 +563,7 @@ func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bo
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a request and contains 'Control Center' in the response.
 func checkControlCenterReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	status := waitForServer(host, port, timeout)
-	
-	if !status {
-		return fmt.Errorf("control center cannot be reached on %s:%d", host, port)
-	}
-
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "")
-	if err != nil {
-		return fmt.Errorf("error making request to control center: %w", err)
-	}
-	defer resp.Body.Close()
-	
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
-	}
-	
-	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK && strings.Contains(string(body), "Control Center") {
-		return nil
-	} 
-	return fmt.Errorf("unexpected response from control center with code: %d", resp.StatusCode)
+	return checkComponentReady(host, port, timeout, secure, ignoreCert, username, password, "", "Control Center", "control center")
 }
 
 func waitForServer(host string, port int, timeout time.Duration) bool {
