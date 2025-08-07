@@ -1442,3 +1442,171 @@ func Test_runKafkaRestReadyCmd(t *testing.T) {
 		})
 	}
 }
+
+func Test_checkControlCenterReady(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"version":"7.4.0","name":"Control Center"}`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port, err := strconv.Atoi(serverURL.Port())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name       string
+		host       string
+		port       int
+		timeout    time.Duration
+		secure     bool
+		ignoreCert bool
+		username   string
+		password   string
+		wantErr    bool
+	}{
+		{
+			name:       "successful control center check",
+			host:       host,
+			port:       port,
+			timeout:    5 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    false,
+		},
+		{
+			name:       "invalid host",
+			host:       "invalid-host",
+			port:       9021,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+		{
+			name:       "invalid port",
+			host:       host,
+			port:       99999,
+			timeout:    1 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+		{
+			name:       "response without Control Center text",
+			host:       host,
+			port:       port,
+			timeout:    5 * time.Second,
+			secure:     false,
+			ignoreCert: false,
+			username:   "",
+			password:   "",
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Override the mock server for the "response without Control Center text" test
+			if tt.name == "response without Control Center text" {
+				// Create a new mock server that doesn't return "Control Center"
+				altMockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					if r.URL.Path == "/" {
+						w.WriteHeader(http.StatusOK)
+						w.Write([]byte(`{"version":"7.4.0","name":"Some Other Service"}`))
+					} else {
+						http.NotFound(w, r)
+					}
+				}))
+				defer altMockServer.Close()
+
+				altServerURL, err := url.Parse(altMockServer.URL)
+				if err != nil {
+					t.Fatal(err)
+				}
+				tt.host = altServerURL.Hostname()
+				altPort, err := strconv.Atoi(altServerURL.Port())
+				if err != nil {
+					t.Fatal(err)
+				}
+				tt.port = altPort
+			}
+
+			err := checkControlCenterReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("checkControlCenterReady() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_runControlCenterReadyCmd(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"version":"7.4.0","name":"Control Center"}`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port := serverURL.Port()
+
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "successful control center ready check",
+			args:    []string{host, port, "5"},
+			wantErr: false,
+		},
+		{
+			name:    "invalid port",
+			args:    []string{host, "invalid-port", "5"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid timeout",
+			args:    []string{host, port, "invalid-timeout"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid host",
+			args:    []string{"invalid-host", "9021", "5"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := runControlCenterReadyCmd(tt.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("runControlCenterReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

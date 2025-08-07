@@ -39,6 +39,17 @@ type ConfigSpec struct {
 	ExcludeWithPrefix string            `json:"excludeWithPrefix"`
 }
 
+type RequestConfig struct {
+	Host       string
+	Port       int
+	Endpoint   string
+	Secure     bool
+	IgnoreCert bool
+	Username   string
+	Password   string
+	Timeout    time.Duration
+}
+
 var (
 	bootstrapServers string
 	configFile       string
@@ -56,6 +67,12 @@ var (
 	krIgnoreCert bool
 	krUsername   string
 	krPassword   string
+
+	// Control Center flags
+	ccSecure     bool
+	ccIgnoreCert bool
+	ccUsername   string
+	ccPassword   string
 
 	re = regexp.MustCompile("[^_]_[^_]")
 
@@ -123,6 +140,15 @@ var (
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runKafkaRestReadyCmd(args)
+		},
+	}
+
+	controlCenterReadyCmd = &cobra.Command{
+		Use:   "control-center-ready <host> <port> <timeout-secs>",
+		Short: "checks if Confluent Control Center is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runControlCenterReadyCmd(args)
 		},
 	}
 
@@ -502,19 +528,19 @@ func makeRequest(host string, port int, secure bool, ignoreCert bool, username s
 	return httpClient.Do(req)
 }
 
-// checkSchemaRegistryReady waits for Schema Registry to be ready.
+// checkComponentReady is a generic function that checks if a component is ready.
 // It first checks if the service is reachable, then verifies it responds correctly
-// to a /config request and contains 'compatibilityLevel' in the response.
-func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	status := waitForServer(host, port, timeout)
+// to a request and contains the expected content in the response.
+func checkComponentReady(componentName string, config RequestConfig, expectedContentInBody string) error {
+	status := waitForServer(config.Host, config.Port, config.Timeout)
 	
 	if !status {
-		return fmt.Errorf("schema registry cannot be reached on %s:%d", host, port)
+		return fmt.Errorf("%s cannot be reached on %s:%d", componentName, config.Host, config.Port)
 	}
 
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "config")
+	resp, err := makeRequest(config.Host, config.Port, config.Secure, config.IgnoreCert, config.Username, config.Password, config.Endpoint)
 	if err != nil {
-		return fmt.Errorf("error making request to schema registry: %w", err)
+		return fmt.Errorf("error making request to %s: %w", componentName, err)
 	}
 	defer resp.Body.Close()
 	
@@ -524,33 +550,61 @@ func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secu
 	}
 	
 	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK && strings.Contains(string(body), "compatibilityLevel") {
+	if statusOK && (expectedContentInBody == "" || strings.Contains(string(body), expectedContentInBody)) {
 		return nil
 	} 
-	return fmt.Errorf("unexpected response from schema registry with code: %d", resp.StatusCode)
+	return fmt.Errorf("unexpected response from %s with code: %d", componentName, resp.StatusCode)
+}
+
+// checkSchemaRegistryReady waits for Schema Registry to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a /config request and contains 'compatibilityLevel' in the response.
+func checkSchemaRegistryReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "config",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
+	}
+	return checkComponentReady("schema registry", config, "compatibilityLevel")
 }
 
 // checkKafkaRestReady waits for Kafka REST Proxy to be ready.
 // It first checks if the service is reachable, then verifies it responds correctly
 // to a /topics request with a 2xx status code.
 func checkKafkaRestReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
-	status := waitForServer(host, port, timeout)
-	
-	if !status {
-		return fmt.Errorf("%s cannot be reached on port %d", host, port)
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "topics",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
 	}
+	return checkComponentReady("kafka rest proxy", config, "")
+}
 
-	resp, err := makeRequest(host, port, secure, ignoreCert, username, password, "topics")
-	if err != nil {
-		return fmt.Errorf("error making request: %w", err)
+// checkControlCenterReady waits for Confluent Control Center to be ready.
+// It first checks if the service is reachable, then verifies it responds correctly
+// to a request and contains 'Control Center' in the response.
+func checkControlCenterReady(host string, port int, timeout time.Duration, secure bool, ignoreCert bool, username string, password string) error {
+	config := RequestConfig{
+		Host:       host,
+		Port:       port,
+		Endpoint:   "",
+		Secure:     secure,
+		IgnoreCert: ignoreCert,
+		Username:   username,
+		Password:   password,
+		Timeout:    timeout,
 	}
-	defer resp.Body.Close()
-	
-	statusOK := resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices
-	if statusOK {
-		return nil
-	}
-	return fmt.Errorf("unexpected response with code: %d", resp.StatusCode)
+	return checkComponentReady("control center", config, "Control Center")
 }
 
 func waitForServer(host string, port int, timeout time.Duration) bool {
@@ -740,6 +794,25 @@ func runKafkaRestReadyCmd(args []string) error {
 	return nil
 }
 
+func runControlCenterReadyCmd(args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	err = checkControlCenterReady(args[0], port, timeout, ccSecure, ccIgnoreCert, ccUsername, ccPassword)
+	if err != nil {
+		return fmt.Errorf("control-center-ready check failed: %w", err)
+	}
+	return nil
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -824,6 +897,11 @@ func main() {
 	krReadyCmd.PersistentFlags().StringVarP(&krUsername, "username", "", "", "username used to authenticate to the Kafka REST Proxy")
 	krReadyCmd.PersistentFlags().StringVarP(&krPassword, "password", "", "", "password used to authenticate to the Kafka REST Proxy")
 
+	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccSecure, "secure", "", false, "use TLS to secure the connection")
+	controlCenterReadyCmd.PersistentFlags().BoolVarP(&ccIgnoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccUsername, "username", "", "", "username used to authenticate to the Control Center")
+	controlCenterReadyCmd.PersistentFlags().StringVarP(&ccPassword, "password", "", "", "password used to authenticate to the Control Center")
+
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
@@ -833,6 +911,7 @@ func main() {
 	rootCmd.AddCommand(kafkaReadyCmd)
 	rootCmd.AddCommand(srReadyCmd)
 	rootCmd.AddCommand(krReadyCmd)
+	rootCmd.AddCommand(controlCenterReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
