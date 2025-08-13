@@ -71,17 +71,14 @@ var (
 		"schema-registry": {
 			Endpoint:        "config",
 			ExpectedContent: "compatibilityLevel",
-			ComponentName:   "schema registry",
 		},
 		"kafka-rest": {
 			Endpoint:        "topics",
 			ExpectedContent: "",
-			ComponentName:   "kafka rest proxy",
 		},
 		"control-center": {
 			Endpoint:        "",
 			ExpectedContent: "Control Center",
-			ComponentName:   "control center",
 		},
 	}
 
@@ -718,7 +715,7 @@ func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func runComponentReadyCmd(componentType string, args []string) error {
+func runComponentReadyCmd(componentName string, args []string) error {
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
@@ -730,9 +727,9 @@ func runComponentReadyCmd(componentType string, args []string) error {
 	}
 	timeout := time.Duration(secs) * time.Second
 
-	config, exists := componentConfigs[componentType]
+	config, exists := componentConfigs[componentName]
 	if !exists {
-		return fmt.Errorf("unknown component type: %s", componentType)
+		return fmt.Errorf("unknown component type: %s", componentName)
 	}
 
 	requestConfig := RequestConfig{
@@ -746,9 +743,9 @@ func runComponentReadyCmd(componentType string, args []string) error {
 		Timeout:    timeout,
 	}
 
-	err = checkComponentReady(config.ComponentName, requestConfig, config.ExpectedContent)
+	err = checkComponentReady(componentName, requestConfig, config.ExpectedContent)
 	if err != nil {
-		return fmt.Errorf("%s ready check failed: %w", componentType, err)
+		return fmt.Errorf("%s ready check failed: %w", componentName, err)
 	}
 	return nil
 }
