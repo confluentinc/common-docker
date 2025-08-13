@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -1179,12 +1178,19 @@ func Test_getEnvWithFallbacks(t *testing.T) {
 	}
 }
 
-func Test_checkSchemaRegistryReady(t *testing.T) {
+func Test_runComponentReadyCmd(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/config" {
+		switch r.URL.Path {
+		case "/config":
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"compatibilityLevel":"BACKWARD"}`))
-		} else {
+		case "/topics":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`["topic1","topic2"]`))
+		case "/":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"version":"7.4.0","name":"Control Center"}`))
+		default:
 			http.NotFound(w, r)
 		}
 	}))
@@ -1195,62 +1201,63 @@ func Test_checkSchemaRegistryReady(t *testing.T) {
 		t.Fatal(err)
 	}
 	host := serverURL.Hostname()
-	port, err := strconv.Atoi(serverURL.Port())
-	if err != nil {
-		t.Fatal(err)
-	}
+	port := serverURL.Port()
 
 	tests := []struct {
-		name       string
-		host       string
-		port       int
-		timeout    time.Duration
-		secure     bool
-		ignoreCert bool
-		username   string
-		password   string
-		wantErr    bool
+		name          string
+		componentType string
+		args          []string
+		wantErr       bool
 	}{
 		{
-			name:       "successful schema registry check",
-			host:       host,
-			port:       port,
-			timeout:    5 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    false,
+			name:          "successful schema registry ready check",
+			componentType: "schema-registry",
+			args:          []string{host, port, "5"},
+			wantErr:       false,
 		},
 		{
-			name:       "invalid host",
-			host:       "invalid-host",
-			port:       8081,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
+			name:          "successful kafka rest ready check",
+			componentType: "kafka-rest",
+			args:          []string{host, port, "5"},
+			wantErr:       false,
 		},
 		{
-			name:       "invalid port",
-			host:       host,
-			port:       99999,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
+			name:          "successful control center ready check",
+			componentType: "control-center",
+			args:          []string{host, port, "5"},
+			wantErr:       false,
+		},
+		{
+			name:          "invalid port",
+			componentType: "schema-registry",
+			args:          []string{host, "invalid-port", "5"},
+			wantErr:       true,
+		},
+		{
+			name:          "invalid timeout",
+			componentType: "kafka-rest",
+			args:          []string{host, port, "invalid-timeout"},
+			wantErr:       true,
+		},
+		{
+			name:          "invalid host",
+			componentType: "control-center",
+			args:          []string{"invalid-host", "9021", "5"},
+			wantErr:       true,
+		},
+		{
+			name:          "unknown component type",
+			componentType: "unknown-component",
+			args:          []string{host, port, "5"},
+			wantErr:       true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := checkSchemaRegistryReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
+			err := runComponentReadyCmd(tt.componentType, tt.args)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("checkSchemaRegistryReady() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("runComponentReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -1311,83 +1318,6 @@ func Test_runSchemaRegistryReadyCmd(t *testing.T) {
 	}
 }
 
-func Test_checkKafkaRestReady(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/topics" {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`["topic1","topic2"]`))
-		} else {
-			http.NotFound(w, r)
-		}
-	}))
-	defer mockServer.Close()
-
-	serverURL, err := url.Parse(mockServer.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	host := serverURL.Hostname()
-	port, err := strconv.Atoi(serverURL.Port())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tests := []struct {
-		name       string
-		host       string
-		port       int
-		timeout    time.Duration
-		secure     bool
-		ignoreCert bool
-		username   string
-		password   string
-		wantErr    bool
-	}{
-		{
-			name:       "successful kafka rest check",
-			host:       host,
-			port:       port,
-			timeout:    5 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    false,
-		},
-		{
-			name:       "invalid host",
-			host:       "invalid-host",
-			port:       8082,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
-		},
-		{
-			name:       "invalid port",
-			host:       host,
-			port:       99999,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := checkKafkaRestReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("checkKafkaRestReady() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func Test_runKafkaRestReadyCmd(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/topics" {
@@ -1438,119 +1368,6 @@ func Test_runKafkaRestReadyCmd(t *testing.T) {
 			err := runKafkaRestReadyCmd(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runKafkaRestReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_checkControlCenterReady(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"version":"7.4.0","name":"Control Center"}`))
-		} else {
-			http.NotFound(w, r)
-		}
-	}))
-	defer mockServer.Close()
-
-	serverURL, err := url.Parse(mockServer.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	host := serverURL.Hostname()
-	port, err := strconv.Atoi(serverURL.Port())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tests := []struct {
-		name       string
-		host       string
-		port       int
-		timeout    time.Duration
-		secure     bool
-		ignoreCert bool
-		username   string
-		password   string
-		wantErr    bool
-	}{
-		{
-			name:       "successful control center check",
-			host:       host,
-			port:       port,
-			timeout:    5 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    false,
-		},
-		{
-			name:       "invalid host",
-			host:       "invalid-host",
-			port:       9021,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
-		},
-		{
-			name:       "invalid port",
-			host:       host,
-			port:       99999,
-			timeout:    1 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
-		},
-		{
-			name:       "response without Control Center text",
-			host:       host,
-			port:       port,
-			timeout:    5 * time.Second,
-			secure:     false,
-			ignoreCert: false,
-			username:   "",
-			password:   "",
-			wantErr:    true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Override the mock server for the "response without Control Center text" test
-			if tt.name == "response without Control Center text" {
-				// Create a new mock server that doesn't return "Control Center"
-				altMockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					if r.URL.Path == "/" {
-						w.WriteHeader(http.StatusOK)
-						w.Write([]byte(`{"version":"7.4.0","name":"Some Other Service"}`))
-					} else {
-						http.NotFound(w, r)
-					}
-				}))
-				defer altMockServer.Close()
-
-				altServerURL, err := url.Parse(altMockServer.URL)
-				if err != nil {
-					t.Fatal(err)
-				}
-				tt.host = altServerURL.Hostname()
-				altPort, err := strconv.Atoi(altServerURL.Port())
-				if err != nil {
-					t.Fatal(err)
-				}
-				tt.port = altPort
-			}
-
-			err := checkControlCenterReady(tt.host, tt.port, tt.timeout, tt.secure, tt.ignoreCert, tt.username, tt.password)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("checkControlCenterReady() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
