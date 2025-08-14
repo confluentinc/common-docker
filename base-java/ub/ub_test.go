@@ -1205,49 +1205,49 @@ func Test_runComponentReadyCmd(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		componentType string
+		componentName string
 		args          []string
 		wantErr       bool
 	}{
 		{
 			name:          "successful schema registry ready check",
-			componentType: "schema-registry",
+			componentName: "schema-registry",
 			args:          []string{host, port, "5"},
 			wantErr:       false,
 		},
 		{
 			name:          "successful kafka rest ready check",
-			componentType: "kafka-rest",
+			componentName: "kafka-rest",
 			args:          []string{host, port, "5"},
 			wantErr:       false,
 		},
 		{
 			name:          "successful control center ready check",
-			componentType: "control-center",
+			componentName: "control-center",
 			args:          []string{host, port, "5"},
 			wantErr:       false,
 		},
 		{
 			name:          "invalid port",
-			componentType: "schema-registry",
+			componentName: "schema-registry",
 			args:          []string{host, "invalid-port", "5"},
 			wantErr:       true,
 		},
 		{
 			name:          "invalid timeout",
-			componentType: "kafka-rest",
+			componentName: "kafka-rest",
 			args:          []string{host, port, "invalid-timeout"},
 			wantErr:       true,
 		},
 		{
 			name:          "invalid host",
-			componentType: "control-center",
+			componentName: "control-center",
 			args:          []string{"invalid-host", "9021", "5"},
 			wantErr:       true,
 		},
 		{
 			name:          "unknown component type",
-			componentType: "unknown-component",
+			componentName: "unknown-component",
 			args:          []string{host, port, "5"},
 			wantErr:       true,
 		},

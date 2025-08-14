@@ -53,7 +53,6 @@ type RequestConfig struct {
 type ComponentReadyConfig struct {
 	Endpoint           string
 	ExpectedContent    string
-	ComponentName      string
 }
 
 var (
@@ -74,7 +73,6 @@ var (
 		},
 		"kafka-rest": {
 			Endpoint:        "topics",
-			ExpectedContent: "",
 		},
 		"control-center": {
 			Endpoint:        "",
