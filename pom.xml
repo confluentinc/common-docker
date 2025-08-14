@@ -35,9 +35,9 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.1-0</io.confluent.common-docker.version>
         <!-- Versions-->
-        <ubi8.image.version>8.10-1752564239</ubi8.image.version>
-        <ubi9.micro.image.version>9.6-1752751762</ubi9.micro.image.version>
-        <ubi9.minimal.image.version>9.6-1752587672</ubi9.minimal.image.version>
+        <ubi8.image.version>8.10-1755105495</ubi8.image.version>
+        <ubi9.micro.image.version>9.6-1754345610</ubi9.micro.image.version>
+        <ubi9.minimal.image.version>9.6-1754584681</ubi9.minimal.image.version>
         <ubi9.openssl.version>1:3.2.2-6.el9_5.1</ubi9.openssl.version>
         <!-- Redhat Package Versions -->
         <ubi9.wget.version>1.21.1-8.el9_4</ubi9.wget.version>
@@ -51,7 +51,7 @@
         <ubi9.iputils.version>20210202-11.el9_6.1</ubi9.iputils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.xzlibs.version>5.2.5-8.el9_0</ubi9.xzlibs.version>
-        <ubi9.glibc.version>2.34-168.el9_6.20</ubi9.glibc.version>
+        <ubi9.glibc.version>2.34-168.el9_6.23</ubi9.glibc.version>
         <ubi9.findutils.version>1:4.8.0-7.el9</ubi9.findutils.version>
         <ubi9.crypto.policies.scripts.version>20240828-2.git626aa59.el9_5</ubi9.crypto.policies.scripts.version>
         <!-- Python Module Versions -->
@@ -66,12 +66,12 @@
         <ubi8.iputils.version>20180629-11.el8</ubi8.iputils.version>
         <ubi8.hostname.version>3.20-6.el8</ubi8.hostname.version>
         <ubi8.xzlibs.version>5.2.4-4.el8_6</ubi8.xzlibs.version>
-        <ubi8.glibc.version>2.28-251.el8_10.22</ubi8.glibc.version>
+        <ubi8.glibc.version>2.28-251.el8_10.25</ubi8.glibc.version>
         <ubi8.curl.version>7.61.1-34.el8_10.3</ubi8.curl.version>
         <ubi8.findutils.version>1:4.6.0-21.el8</ubi8.findutils.version>
         <ubi8.crypto.policies.scripts.version>20230731-1.git3177e06.el8</ubi8.crypto.policies.scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi.temurin.jdk.version>21.0.7.0.0.6-0</ubi.temurin.jdk.version>
+        <ubi.temurin.jdk.version>21.0.8.0.0.9-1</ubi.temurin.jdk.version>
         <!-- Python Module Versions -->
         <ubi8.python.pip.version>20.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>78.1.1</ubi.python.setuptools.version>
