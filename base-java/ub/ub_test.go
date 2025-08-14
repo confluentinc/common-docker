@@ -1190,6 +1190,9 @@ func Test_runComponentReadyCmd(t *testing.T) {
 		case "/":
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"version":"7.4.0","name":"Control Center"}`))
+		case "/info":
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"version":"7.4.0","ksqlServiceId":"ksql-service","ksql":"Ksql"}`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -1224,6 +1227,12 @@ func Test_runComponentReadyCmd(t *testing.T) {
 		{
 			name:          "successful control center ready check",
 			componentName: "control-center",
+			args:          []string{host, port, "5"},
+			wantErr:       false,
+		},
+		{
+			name:          "successful ksql server ready check",
+			componentName: "ksql-server",
 			args:          []string{host, port, "5"},
 			wantErr:       false,
 		},
@@ -1423,6 +1432,61 @@ func Test_runControlCenterReadyCmd(t *testing.T) {
 			err := runControlCenterReadyCmd(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runControlCenterReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_runKsqlServerReadyCmd(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/info" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"version":"7.4.0","ksqlServiceId":"ksql-service","ksql":"Ksql"}`))
+		} else {
+			http.NotFound(w, r)
+		}
+	}))
+	defer mockServer.Close()
+
+	serverURL, err := url.Parse(mockServer.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	host := serverURL.Hostname()
+	port := serverURL.Port()
+
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "successful ksql server ready check",
+			args:    []string{host, port, "5"},
+			wantErr: false,
+		},
+		{
+			name:    "invalid port",
+			args:    []string{host, "invalid-port", "5"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid timeout",
+			args:    []string{host, port, "invalid-timeout"},
+			wantErr: true,
+		},
+		{
+			name:    "invalid host",
+			args:    []string{"invalid-host", "8088", "5"},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := runKsqlServerReadyCmd(tt.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("runKsqlServerReadyCmd() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
