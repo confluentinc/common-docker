@@ -75,7 +75,6 @@ var (
 			Endpoint:        "topics",
 		},
 		"control-center": {
-			Endpoint:        "",
 			ExpectedContent: "Control Center",
 		},
 	}
