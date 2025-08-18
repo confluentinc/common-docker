@@ -87,7 +87,7 @@ RUN microdnf --nodocs install yum \
         "nmap-ncat${NETCAT_VERSION}" \
         "python312${PYTHON312_VERSION}"
 
-RUN microdnf --nodocs install -y --setopt=install_weak_deps=False \
+RUN microdnf --nodocs install -y \
         "python3.12-pip${PYTHON_PIP_VERSION}" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
