@@ -77,6 +77,13 @@ var (
 		"control-center": {
 			ExpectedContent: "Control Center",
 		},
+		"ksql-server": {
+			Endpoint:        "info",
+			ExpectedContent: "Ksql",
+		},
+		"connect": {
+			ExpectedContent: "version",
+		},
 	}
 
 	re = regexp.MustCompile("[^_]_[^_]")
@@ -154,6 +161,24 @@ var (
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runControlCenterReadyCmd(args)
+		},
+	}
+
+	ksqlServerReadyCmd = &cobra.Command{
+		Use:   "ksql-server-ready <host> <port> <timeout-secs>",
+		Short: "checks if KSQL Server is ready to accept client requests",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runKsqlServerReadyCmd(args)
+		},
+	}
+
+	connectReadyCmd = &cobra.Command{
+		Use:   "connect-ready <host> <port> <timeout-secs>",
+		Short: "checks if Connect is ready to accept connector tasks",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runConnectReadyCmd(args)
 		},
 	}
 
@@ -759,6 +784,14 @@ func runControlCenterReadyCmd(args []string) error {
 	return runComponentReadyCmd("control-center", args)
 }
 
+func runKsqlServerReadyCmd(args []string) error {
+	return runComponentReadyCmd("ksql-server", args)
+}
+
+func runConnectReadyCmd(args []string) error {
+	return runComponentReadyCmd("connect", args)
+}
+
 func parseLog4jLoggers(loggersStr string, defaultLoggers map[string]string) map[string]string {
 	if loggersStr == "" {
 		return defaultLoggers
@@ -848,6 +881,16 @@ func main() {
 	controlCenterReadyCmd.PersistentFlags().StringVarP(&username, "username", "", "", "username used to authenticate to the Control Center")
 	controlCenterReadyCmd.PersistentFlags().StringVarP(&password, "password", "", "", "password used to authenticate to the Control Center")
 
+	ksqlServerReadyCmd.PersistentFlags().BoolVarP(&secure, "secure", "", false, "use TLS to secure the connection")
+	ksqlServerReadyCmd.PersistentFlags().BoolVarP(&ignoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	ksqlServerReadyCmd.PersistentFlags().StringVarP(&username, "username", "", "", "username used to authenticate to the KSQL Server")
+	ksqlServerReadyCmd.PersistentFlags().StringVarP(&password, "password", "", "", "password used to authenticate to the KSQL Server")
+
+	connectReadyCmd.PersistentFlags().BoolVarP(&secure, "secure", "", false, "use TLS to secure the connection")
+	connectReadyCmd.PersistentFlags().BoolVarP(&ignoreCert, "ignore-cert", "", false, "ignore TLS certificate errors")
+	connectReadyCmd.PersistentFlags().StringVarP(&username, "username", "", "", "username used to authenticate to the Connect")
+	connectReadyCmd.PersistentFlags().StringVarP(&password, "password", "", "", "password used to authenticate to the Connect")
+
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
@@ -858,6 +901,8 @@ func main() {
 	rootCmd.AddCommand(srReadyCmd)
 	rootCmd.AddCommand(krReadyCmd)
 	rootCmd.AddCommand(controlCenterReadyCmd)
+	rootCmd.AddCommand(ksqlServerReadyCmd)
+	rootCmd.AddCommand(connectReadyCmd)
 	rootCmd.AddCommand(listenersCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
