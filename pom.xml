@@ -49,7 +49,7 @@
         <!-- ZULU OpenJDK Package Version -->
         <ubi.zulu.openjdk.version>11.0.28-1</ubi.zulu.openjdk.version>
         <!-- Python Module Versions -->
-        <ubi8.python.pip.version>23.*</ubi8.python.pip.version>
+        <ubi8.python.pip.version>22.*</ubi8.python.pip.version>
         <ubi.python.setuptools.version>78.1.1</ubi.python.setuptools.version>
         <ubi.python.confluent.docker.utils.version>v0.0.162</ubi.python.confluent.docker.utils.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
