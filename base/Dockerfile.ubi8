@@ -85,7 +85,7 @@ RUN microdnf --nodocs install yum \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
-        "python311${PYTHON311_VERSION}"
+        "python3.11${PYTHON311_VERSION}"
 
 RUN yum --nodocs install -y --setopt=install_weak_deps=False \
         "python3.11-pip${PYTHON_PIP_VERSION}" \
