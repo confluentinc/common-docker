@@ -37,7 +37,7 @@
         <!-- Versions-->
         <ubi8.image.version>8.10-1755105495</ubi8.image.version>
         <ubi9.micro.image.version>9.6-1754345610</ubi9.micro.image.version>
-        <ubi9.minimal.image.version>9.6-1754584681</ubi9.minimal.image.version>
+        <ubi9.minimal.image.version>9.6-1755695350</ubi9.minimal.image.version>
         <ubi9.openssl.version>1:3.2.2-6.el9_5.1</ubi9.openssl.version>
         <!-- Redhat Package Versions -->
         <ubi9.wget.version>1.21.1-8.el9_4</ubi9.wget.version>
