@@ -37,8 +37,8 @@
         <ubi8.openssl.version>1:1.1.1k-14.el8_6</ubi8.openssl.version>
         <ubi8.wget.version>1.19.5-12.el8_10</ubi8.wget.version>
         <ubi8.netcat.version>7.92-1.el8</ubi8.netcat.version>
-        <ubi8.python39.version>3.9.20-1.module+el8.10.0+22342+478c159e</ubi8.python39.version>
-        <ubi8.tar.version>1.30-10.el8_10</ubi8.tar.version>
+        <ubi8.python39.version>3.9.20-2.module+el8.10.0+23441+1124c1da</ubi8.python39.version>
+        <ubi8.tar.version>1.30-11.el8_10</ubi8.tar.version>
         <ubi8.procps.version>3.3.15-14.el8</ubi8.procps.version>
         <ubi8.krb5.workstation.version>1.18.2-32.el8_10</ubi8.krb5.workstation.version>
         <ubi8.iputils.version>20180629-11.el8</ubi8.iputils.version>
