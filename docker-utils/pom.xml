@@ -96,6 +96,7 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
