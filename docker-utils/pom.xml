@@ -93,9 +93,7 @@
                 <version>${maven-jar-plugin.version}</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
+                        <id>default-jar</id>
                         <phase>none</phase>
                     </execution>
                 </executions>
