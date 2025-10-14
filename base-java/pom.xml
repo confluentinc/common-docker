@@ -133,6 +133,7 @@
                         <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                         <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                         <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
+                        <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                     </buildArgs>
                 </configuration>
             </plugin>
@@ -154,6 +155,7 @@
                                     <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
+                                    <OPENSSL_VERSION>-${fips.openssl.version}</OPENSSL_VERSION>
                                 </args>
                             </build>
                         </image>
