@@ -46,7 +46,7 @@
         <ubi9.tar.version>1.34-7.el9</ubi9.tar.version>
         <ubi9.wget.version>1.21.1-8.el9_4</ubi9.wget.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
-        <ubi9.krb5.workstation.version>1.21.1-8.el9_6</ubi9.krb5.workstation.version>
+        <ubi9.krb5-workstation.version>1.21.1-8.el9_6</ubi9.krb5-workstation.version>
         <ubi9.iputils.version>20210202-11.el9_6.1</ubi9.iputils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.xz-libs.version>5.2.5-8.el9_0</ubi9.xz-libs.version>
