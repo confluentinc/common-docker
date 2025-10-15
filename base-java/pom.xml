@@ -130,7 +130,7 @@
                         <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
-                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                         <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                         <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                     </buildArgs>
@@ -151,7 +151,7 @@
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
-                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                                 </args>
