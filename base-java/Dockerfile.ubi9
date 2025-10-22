@@ -78,7 +78,7 @@ RUN microdnf --nodocs -y install yum \
     && cd .. \
     && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
     && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
-    && microdnf install -y --setopt=install_weak_deps=False \
+    && microdnf install -y \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
