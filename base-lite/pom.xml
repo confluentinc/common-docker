@@ -85,10 +85,10 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                        <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}</ZULU_OPENJDK_VERSION>
+                        <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
+                        <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
-                        <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
+                        <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                     </buildArgs>
                 </configuration>
             </plugin>
@@ -101,13 +101,13 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi.image.version}</UBI_MINIMAL_VERSION>
-                                    <ZULU_OPENJDK_VERSION>-${ubi.zulu.openjdk.version}
+                                    <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
+                                    <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}
                                     </ZULU_OPENJDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
-                                    <GOLANG_VERSION>${golang.version}</GOLANG_VERSION>
+                                    <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                                 </args>
                             </build>
                         </image>
