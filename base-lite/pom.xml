@@ -86,7 +86,7 @@
                 <configuration>
                     <buildArgs>
                         <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
-                        <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
+                        <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu17-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                     </buildArgs>
@@ -102,7 +102,7 @@
                             <build>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
-                                    <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}
+                                    <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu17-ca-jdk-headless.version}
                                     </ZULU_OPENJDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
