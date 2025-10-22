@@ -50,7 +50,7 @@
         <ubi8-minimal.findutils.version>1:4.6.0-21.el8</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
         <!-- ZULU OpenJDK Package Version -->
-        <ubi8-minimal.zulu17-ca-jdk-headless.version>11.0.28-1</ubi8-minimal.zulu17-ca-jdk-headless.version>
+        <ubi8-minimal.zulu17-ca-jdk-headless.version>17.0.16-1</ubi8-minimal.zulu17-ca-jdk-headless.version>
         <!-- Python Module Versions -->
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
         <python.setuptools.version>78.1.1</python.setuptools.version>
