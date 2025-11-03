@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>8.0.3-0</version>
+        <version>8.1.1-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -145,8 +145,9 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
+                                    <UBI_MINIMAL_VERSION>${ubi9-minimal.temurin-21-jdk.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                                    <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>

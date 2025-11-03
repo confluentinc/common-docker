@@ -55,6 +55,7 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 
 RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
+    && microdnf install -y procps-ng${PROCPS_VERSION} \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
