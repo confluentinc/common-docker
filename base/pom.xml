@@ -135,7 +135,7 @@
                         <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
                         <TAR_VERSION>-${ubi9-minimal.tar.version}</TAR_VERSION>
                         <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
-                        <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.workstation.version}</KRB5_WORKSTATION_VERSION>
+                        <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
                         <IPUTILS_VERSION>-${ubi9-minimal.iputils.version}</IPUTILS_VERSION>
                         <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
                         <XZ_LIBS_VERSION>-${ubi9-minimal.xz-libs.version}</XZ_LIBS_VERSION>
@@ -166,7 +166,7 @@
                                     <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
                                     <TAR_VERSION>-${ubi9-minimal.tar.version}</TAR_VERSION>
                                     <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
-                                    <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.workstation.version}
+                                    <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.version}
                                     </KRB5_WORKSTATION_VERSION>
                                     <IPUTILS_VERSION>-${ubi9-minimal.iputils.version}</IPUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
