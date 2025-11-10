@@ -5,19 +5,17 @@ ARG DOCKER_UPSTREAM_TAG
 ARG GOLANG_VERSION
 ARG UBI_MINIMAL_VERSION
 
+
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
+ENV GO_BIN="/go/bin"
+
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+RUN go install github.com/confluentinc/cp-docker-utils/cmd/ub@master
 
 WORKDIR /build/package_dedupe
 COPY --chown=appuser:appuser package_dedupe/ ./
 RUN go build -ldflags="-w -s" ./package_dedupe.go
 
-WORKDIR /build/ub
-COPY --chown=appuser:appuser ub/ ./
-RUN go build -ldflags="-w -s" ./ub.go
-
-USER appuser
-RUN go test ./...
 
 FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
 ARG PROJECT_VERSION
@@ -70,7 +68,7 @@ RUN update-crypto-policies --set FIPS
 
 COPY license.txt /licenses
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
-COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
+COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
