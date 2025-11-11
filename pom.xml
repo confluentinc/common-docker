@@ -75,6 +75,7 @@
 
         <!-- Python Module Versions -->
         <python.setuptools.version>78.1.1</python.setuptools.version>
+        <git-repo.cp-docker-utils.tag>v1.0.1</git-repo.cp-docker-utils.tag>
         <python.confluent.docker.utils.version>v0.0.162</python.confluent.docker.utils.version>
         <!-- Golang Version -->
         <golang.image.version>1.25.4-trixie</golang.image.version>
