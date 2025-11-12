@@ -6,13 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	pt "path"
 
@@ -63,6 +68,20 @@ var (
 		Short: "creates and renders properties to stdout using the json config spec.",
 		Args:  cobra.ExactArgs(1),
 		RunE:  runRenderPropertiesCmd,
+	}
+
+	waitCmd = &cobra.Command{
+		Use:   "wait <host> <port> <timeout-in-secs>",
+		Short: "waits for a service to start listening on a port",
+		Args:  cobra.ExactArgs(3),
+		RunE:  runWaitCmd,
+	}
+
+	httpReadyCmd = &cobra.Command{
+		Use:   "http-ready <url> <timeout-in-secs>",
+		Short: "waits for an HTTP/HTTPS URL to be retrievable",
+		Args:  cobra.ExactArgs(2),
+		RunE:  runHttpReadyCmd,
 	}
 
 	kafkaReadyCmd = &cobra.Command{
@@ -297,6 +316,70 @@ func checkKafkaReady(minNumBroker string, timeout string, bootstrapServers strin
 	return invokeJavaCommand("io.confluent.admin.utils.cli.KafkaReadyCommand", jvmOpts, opts)
 }
 
+func waitForServer(host string, port int, timeout time.Duration) bool {
+	address := fmt.Sprintf("%s:%d", host, port)
+	startTime := time.Now()
+	connectTimeout := 5 * time.Second
+
+	for {
+		conn, err := net.DialTimeout("tcp", address, connectTimeout)
+		if err == nil {
+			_ = conn.Close()
+			return true
+		}
+		if time.Since(startTime) >= timeout {
+			return false
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func waitForHttp(URL string, timeout time.Duration) error {
+	parsedURL, err := url.Parse(URL)
+	if err != nil {
+		return fmt.Errorf("error in parsing url %q: %w", URL, err)
+	}
+
+	host := parsedURL.Hostname()
+	portStr := parsedURL.Port()
+
+	if len(host) == 0 {
+		host = "localhost"
+	}
+
+	if len(portStr) == 0 {
+		switch parsedURL.Scheme {
+		case "http":
+			portStr = "80"
+		case "https":
+			portStr = "443"
+		default:
+			return fmt.Errorf("no port specified and cannot infer port based on protocol (only http(s) supported)")
+		}
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", portStr, err)
+	}
+
+	if !waitForServer(host, port, timeout) {
+		return fmt.Errorf("service is unreachable on host = %q, port = %q", host, portStr)
+	}
+
+	httpClient := &http.Client{
+		Timeout: timeout * time.Second,
+	}
+	resp, err := httpClient.Get(URL)
+	if err != nil {
+		return fmt.Errorf("error retrieving url")
+	}
+	statusOK := resp.StatusCode >= 200 && resp.StatusCode < 300
+	if !statusOK {
+		return fmt.Errorf("unexpected response for %q with code %d", URL, resp.StatusCode)
+	}
+	return nil
+}
+
 func runEnsureCmd(_ *cobra.Command, args []string) error {
 	success := ensure(args[0])
 	if !success {
@@ -342,6 +425,39 @@ func runRenderPropertiesCmd(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+func runWaitCmd(_ *cobra.Command, args []string) error {
+	port, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing port %q: %w", args[1], err)
+	}
+
+	secs, err := strconv.Atoi(args[2])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[2], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	success := waitForServer(args[0], port, timeout)
+	if !success {
+		return fmt.Errorf("service is unreachable for host %q and port %q", args[0], args[1])
+	}
+	return nil
+}
+
+func runHttpReadyCmd(_ *cobra.Command, args []string) error {
+	secs, err := strconv.Atoi(args[1])
+	if err != nil {
+		return fmt.Errorf("error in parsing timeout seconds %q: %w", args[1], err)
+	}
+	timeout := time.Duration(secs) * time.Second
+
+	success := waitForHttp(args[0], timeout)
+	if success != nil {
+		return fmt.Errorf("error in http-ready check for url %q: %w", args[0], success)
+	}
+	return nil
+}
+
 func runKafkaReadyCmd(_ *cobra.Command, args []string) error {
 	success := checkKafkaReady(args[0], args[1], bootstrapServers, zookeeperConnect, configFile, security)
 	if !success {
@@ -367,6 +483,8 @@ func main() {
 	rootCmd.AddCommand(ensureCmd)
 	rootCmd.AddCommand(renderTemplateCmd)
 	rootCmd.AddCommand(renderPropertiesCmd)
+	rootCmd.AddCommand(waitCmd)
+	rootCmd.AddCommand(httpReadyCmd)
 	rootCmd.AddCommand(kafkaReadyCmd)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
