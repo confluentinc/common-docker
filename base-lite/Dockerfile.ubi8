@@ -62,7 +62,7 @@ RUN microdnf --nodocs install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         "curl${CURL_VERSION}" \
-        "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
+        "zulu17-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     && microdnf clean all \
     && yum clean all \
     && rm -rf /tmp/* \
