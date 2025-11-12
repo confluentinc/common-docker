@@ -138,7 +138,7 @@
                         <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi8-minimal.python39-pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
-                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                     </buildArgs>
                 </configuration>
@@ -168,7 +168,7 @@
                           <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
                           <PYTHON_PIP_VERSION>-${ubi8-minimal.python39-pip.version}</PYTHON_PIP_VERSION>
                           <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
-                          <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                          <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                           <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         </args>
                       </build>

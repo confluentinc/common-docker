@@ -51,7 +51,7 @@
 
         3. GitHub Repository Tags:
            Pattern: git-repo.<confluentinc-repo-name>.version
-           Example: git-repo.confluent-docker-utils.version
+           Example: git-repo.confluent-docker-utils.tag
            Updates: Highest semantic version tag in format v{int}.{int}.{int} from the repository
 
         4. Docker Hub Images:
