@@ -12,19 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 ARG UBI_MINIMAL_VERSION="latest"
-ARG GOLANG_VERSION
-
-FROM golang:${GOLANG_VERSION} AS build-ub
-WORKDIR /build
-RUN useradd --no-log-init --create-home --shell /bin/bash appuser
-COPY --chown=appuser:appuser ub/ ./
-RUN CGO_ENABLED=0 go build -ldflags="-w -s" ./ub.go
-USER appuser
-RUN go test ./...
-
-FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
+FROM registry.access.redhat.com/ubi9/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -43,18 +32,50 @@ LABEL vendor="Confluent"
 LABEL version=$GIT_COMMIT
 LABEL release=$PROJECT_VERSION
 LABEL name=$ARTIFACT_ID
-LABEL summary="Common base image for new Confluent lightweight Docker images."
-LABEL description="Common base image for Confluent lightweight Docker images."
+LABEL summary="Common base image for Confluent's Docker images."
+LABEL description="Common base image for Confluent's Docker images."
 LABEL io.confluent.docker=true
 
 # This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
 # base image that supports it
 ENV LANG="C.UTF-8"
 
+# Set the classpath for JARs required by `cub`
+ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
+ENV USE_LOG4J_2="True"
+
+# These ARGs are left blank indicating to the Dnf package manager to install the latest package
+# version that happens to be availible at this time. For reproducible builds, versions should be specified
+# as '-1.2.3-4.el8' on the command line. Or more preferibly the 'dockerfile-maven-plugin' is used
+# where these arguments are set in base/pom.xml under the <buildArgs> elements based on the commit you're
+# building from.
+
+# Redhat Package Versions
+ARG OPENSSL_VERSION=""
+ARG WGET_VERSION=""
+ARG NETCAT_VERSION=""
+ARG PYTHON39_VERSION=""
+ARG TAR_VERSION=""
+ARG PROCPS_VERSION=""
+ARG KRB5_WORKSTATION_VERSION=""
+ARG IPUTILS_VERSION=""
+ARG HOSTNAME_VERSION=""
+ARG XZ_LIBS_VERSION=""
+ARG GLIBC_VERSION=""
+ARG CURL_VERSION=""
+
 # Temurin JDK version
 ARG TEMURIN_JDK_VERSION=""
 
-ENV UB_CLASSPATH=/usr/share/java/cp-base-lite/*
+# Python Module Versions
+ARG PYTHON_PIP_VERSION=""
+ARG PYTHON_SETUPTOOLS_VERSION=""
+
+# Confluent Docker Utils Version (Namely the tag or branch to grab from git to install)
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
+
+# This can be overriden for an offline/air-gapped builds
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
 RUN printf "[temurin-jdk] \n\
 name=temurin-jdk \n\
@@ -64,12 +85,31 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-RUN microdnf --nodocs install yum \
-    && yum --nodocs update -y \
+RUN microdnf --nodocs -y install yum \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
-        "curl${CURL_VERSION}" \
-        "temurin-17-jre${TEMURIN_JDK_VERSION}" \
-    && microdnf clean all \
+        git \
+        "openssl${OPENSSL_VERSION}" \
+        "wget${WGET_VERSION}" \
+        "nmap-ncat${NETCAT_VERSION}" \
+        "python3${PYTHON39_VERSION}" \
+        "python3-pip${PYTHON_PIP_VERSION}" \
+        "tar${TAR_VERSION}" \
+        "procps-ng${PROCPS_VERSION}" \
+        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
+        "iputils${IPUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "xz-libs${XZ_LIBS_VERSION}" \
+        "glibc${GLIBC_VERSION}" \
+        "glibc-common${GLIBC_VERSION}" \
+        "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "findutils${FINDUTILS_VERSION}" \
+        "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
+        "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
+    && alternatives --install /usr/bin/python python /usr/bin/python3 2000 \
+    && alternatives --set python /usr/bin/python3 \
+    && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
+    && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
@@ -90,11 +130,14 @@ COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/sh
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite
-COPY --from=build-ub /build/ub /usr/bin
+COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
 
 RUN mkdir /licenses
 COPY license.txt /licenses
+
+# Disable setuid/setgid bits
+RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
+RUN find / -perm /6000 -type f -exec chmod g-s {} \; || true
 
 USER appuser
 WORKDIR /home/appuser
