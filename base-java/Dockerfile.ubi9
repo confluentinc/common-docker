@@ -10,12 +10,17 @@ FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 ENV GO_BIN="/go/bin"
 ARG CP_DOCKER_UTILS_VERSION
 
+# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
+# For more details, see https://go.dev/doc/security/fips140
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
-RUN go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/ub@${CP_DOCKER_UTILS_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/ub@${CP_DOCKER_UTILS_VERSION}
 
 WORKDIR /build/package_dedupe
 COPY --chown=appuser:appuser package_dedupe/ ./
-RUN go build -ldflags="-w -s" ./package_dedupe.go
+
+# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
+# For more details, see https://go.dev/doc/security/fips140
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" ./package_dedupe.go
 
 
 FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
