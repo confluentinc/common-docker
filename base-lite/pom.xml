@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.7.7-0</version>
+        <version>7.8.6-0</version>
     </parent>
 
     <packaging>pom</packaging>
@@ -86,7 +86,7 @@
                 <configuration>
                     <buildArgs>
                         <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
-                        <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu17-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
+                        <TEMURIN_JDK_VERSION>-${ubi8-minimal.temurin-17-jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                     </buildArgs>
@@ -102,8 +102,7 @@
                             <build>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi8-minimal.image.version}</UBI_MINIMAL_VERSION>
-                                    <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu17-ca-jdk-headless.version}
-                                    </ZULU_OPENJDK_VERSION>
+                                    <TEMURIN_JDK_VERSION>-${ubi8-minimal.temurin-17-jdk.version}</TEMURIN_JDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
