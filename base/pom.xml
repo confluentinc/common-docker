@@ -145,7 +145,7 @@
                         <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi9-minimal.python3-pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
-                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                     </buildArgs>
                 </configuration>
@@ -179,7 +179,7 @@
                                     <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}
                                     </PYTHON_SETUPTOOLS_VERSION>
                                     <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                                        ${python.confluent.docker.utils.version}
+                                        ${git-repo.confluent-docker-utils.tag}
                                     </PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
