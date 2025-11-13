@@ -12,10 +12,7 @@ ARG CP_DOCKER_UTILS_VERSION
 
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 RUN go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/ub@${CP_DOCKER_UTILS_VERSION}
-
-WORKDIR /build/package_dedupe
-COPY --chown=appuser:appuser package_dedupe/ ./
-RUN go build -ldflags="-w -s" ./package_dedupe.go
+RUN go build -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/package_dedupe@add_pacakge_dedupe
 
 
 FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
@@ -68,7 +65,7 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
 RUN update-crypto-policies --set FIPS
 
 COPY license.txt /licenses
-COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
+COPY --from=build-ub-package-dedupe /go/bin/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
