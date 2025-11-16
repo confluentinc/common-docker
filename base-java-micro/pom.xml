@@ -28,9 +28,9 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base-java</artifactId>
+    <artifactId>cp-base-java-micro</artifactId>
 
-    <description>Base for new Confluent lightweight Docker images</description>
+    <description>Base for new Confluent ultra-lightweight Docker images based on ubi9-micro</description>
     <name>${project.artifactId}</name>
 
     <properties>
@@ -53,7 +53,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Operator dependencies for metrics integration -->
         <dependency>
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-jvm</artifactId>
@@ -126,7 +125,8 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
+                        <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
+                        <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
@@ -146,7 +146,8 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
+                                    <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
+                                    <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                                     <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
