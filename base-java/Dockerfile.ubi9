@@ -1,10 +1,9 @@
 ARG UBI_MICRO_VERSION
+ARG UBI9_VERSION
 ARG TEMURIN_JDK_VERSION
 ARG DOCKER_UPSTREAM_REGISTRY
 ARG DOCKER_UPSTREAM_TAG
 ARG GOLANG_VERSION
-ARG UBI_MINIMAL_VERSION
-
 
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 ENV GO_BIN="/go/bin"
@@ -20,12 +19,41 @@ RUN CGO_ENABLED=0 go install -ldflags="-w -s" github.com/confluentinc/cp-docker-
 # For more details, see https://go.dev/doc/security/fips140
 RUN CGO_ENABLED=0 go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/package_dedupe@${CP_DOCKER_UTILS_VERSION}
 
+FROM registry.access.redhat.com/ubi9:${UBI9_VERSION} AS jdk-builder
+ARG TEMURIN_JDK_VERSION
+ARG PROCPS_VERSION
+ARG CRYPTO_POLICIES_SCRIPTS_VERSION
+ARG FINDUTILS_VERSION
+ARG HOSTNAME_VERSION
 
-FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
+RUN printf "[temurin-jre] \n\
+name=temurin-jre \n\
+baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+
+RUN mkdir -p /microdir
+
+RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
+    && dnf install --installroot=/microdir --releasever=9 --setopt=install_weak_deps=False --nodocs -y \
+       temurin-21-jre${TEMURIN_JDK_VERSION} \
+       procps-ng${PROCPS_VERSION} \
+       crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+       findutils${FINDUTILS_VERSION} \
+       hostname${HOSTNAME_VERSION} \
+       shadow-utils \
+    && dnf --installroot=/microdir clean all \
+    && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
+    && rm /etc/yum.repos.d/adoptium.repo
+
+RUN chroot /microdir useradd --no-log-init --create-home --shell /bin/bash appuser
+
+FROM registry.access.redhat.com/ubi9-micro:${UBI_MICRO_VERSION} AS REFRESH
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 
-# Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
 
 ARG GIT_COMMIT
@@ -39,34 +67,17 @@ LABEL vendor="Confluent"
 LABEL version=$GIT_COMMIT
 LABEL release=$PROJECT_VERSION
 LABEL name=$ARTIFACT_ID
-LABEL summary="Common base image for new Confluent lightweight Docker images."
-LABEL description="Common base image for Confluent lightweight Docker images."
+LABEL summary="Common base image for new Confluent ultra-lightweight Docker images based on ubi9-micro."
+LABEL description="Common base image for Confluent ultra-lightweight Docker images based on ubi9-micro."
 LABEL io.confluent.docker=true
-# This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
-# base image that supports it
+
 ENV LANG="C.UTF-8"
 ENV USE_LOG4J_2="True"
 
-RUN printf "[temurin-jre] \n\
-name=temurin-jre \n\
-baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
-" > /etc/yum.repos.d/adoptium.repo
+COPY --from=jdk-builder /microdir/ /
 
-RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
-    && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
-    && microdnf install -y procps-ng${PROCPS_VERSION} \
-    && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
-    && microdnf install -y findutils${FINDUTILS_VERSION} \
-    && microdnf install -y hostname${HOSTNAME_VERSION} \
-    && microdnf clean all \
-    && useradd --no-log-init --create-home --shell /bin/bash appuser \
-    && mkdir -p /etc/confluent/docker /usr/logs \
-    && chown appuser:appuser -R /etc/confluent/ /usr/logs \
-    && mkdir /licenses \
-    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+RUN mkdir -p /etc/confluent/docker /usr/logs /licenses \
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
