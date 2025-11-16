@@ -22,9 +22,10 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base-java</module>
-        <module>base</module>
-        <module>base-lite</module>
-        <module>jmxterm</module>
+<!--        <module>base-java-micro</module>-->
+<!--        <module>base</module>-->
+<!--        <module>base-lite</module>-->
+<!--        <module>jmxterm</module>-->
         <!-- <module>kerberos</module> -->
     </modules>
 
@@ -67,6 +68,7 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1761032271</ubi8-minimal.image.version>
+        <ubi9.image.version>latest</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1762965531</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1762956380</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
