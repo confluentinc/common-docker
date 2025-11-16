@@ -28,7 +28,7 @@
 
     <packaging>pom</packaging>
 
-    <artifactId>cp-base-java</artifactId>
+    <artifactId>cp-base-java-micro</artifactId>
 
     <description>Base for new Confluent ultra-lightweight Docker images based on ubi9-micro</description>
     <name>${project.artifactId}</name>
