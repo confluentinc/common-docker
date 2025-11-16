@@ -128,6 +128,7 @@
                         <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
                         <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                        <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                         <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
