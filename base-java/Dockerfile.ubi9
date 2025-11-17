@@ -56,10 +56,9 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
 # ENV required when manually installing openssl,
-# Install OpenSSL to /opt/openssl to avoid conflicts with system libraries
-# Update LD_LIBRARY_PATH to include both system and custom OpenSSL paths
-ENV LD_LIBRARY_PATH=/opt/openssl/lib64:/opt/openssl/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
-ENV PATH=/opt/openssl/bin:$PATH
+# for arm64 required binaries are present in /usr/local/lib
+# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
+ENV LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 # Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
 # Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
@@ -72,18 +71,18 @@ RUN microdnf --nodocs -y install yum \
     && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
     && cd openssl${OPENSSL_VERSION} \
     && echo "installing FIPS compliant openssl" \
-    && ./Configure enable-fips --prefix=/opt/openssl --openssldir=/opt/openssl/ssl \
+    && ./Configure enable-fips \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
     && echo "successfully installed FIPS compliant openssl" \
     && cd .. \
     && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
+    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && microdnf install -y \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
         "temurin-21-jre${TEMURIN_JDK_VERSION}" \
-    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
@@ -96,7 +95,7 @@ RUN microdnf --nodocs -y install yum \
 RUN update-crypto-policies --set FIPS
 
 COPY license.txt /licenses
-COPY openssl-fips.cnf  /opt/openssl/ssl/openssl-fips.cnf
+COPY openssl-fips.cnf  /usr/local/ssl/openssl-fips.cnf
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
 
