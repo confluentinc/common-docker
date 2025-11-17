@@ -61,6 +61,10 @@ fips = fips_sect
 [alg_sect]
 default_properties = fips=yes
 
+# FIPS provider configuration - this section is referenced from [provider_sect]
+[fips_sect]
+activate = 1
+
 # If no providers are activated explicitly, the default one is activated implicitly.
 # See man 7 OSSL_PROVIDER-default for more details.
 #

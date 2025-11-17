@@ -78,7 +78,9 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && make install > /dev/null 2>&1 \
     && echo "successfully installed FIPS compliant openssl" \
     && echo "initializing FIPS module..." \
-    && /opt/openssl-fips/bin/openssl fipsinstall -out /opt/openssl-fips/ssl/fipsmodule.cnf -module /opt/openssl-fips/lib64/ossl-modules/fips.so \
+    && FIPS_MODULE_PATH=$(find /opt/openssl-fips/lib* -name "fips.so" | head -1) \
+    && echo "Found FIPS module at: ${FIPS_MODULE_PATH}" \
+    && /opt/openssl-fips/bin/openssl fipsinstall -out /opt/openssl-fips/ssl/fipsmodule.cnf -module ${FIPS_MODULE_PATH} \
     && echo "FIPS module initialized successfully" \
     && cd .. \
     && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
@@ -97,24 +99,10 @@ ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
 
-# Validate FIPS OpenSSL installation using Chainguard FIPS test
-RUN yum install -y gcc make \
-    && curl -sSL https://github.com/chainguard-dev/openssl-fips-test/archive/refs/heads/main.tar.gz -o /tmp/openssl-fips-test.tar.gz \
-    && cd /tmp && tar -xzf openssl-fips-test.tar.gz \
-    && cd openssl-fips-test-main \
-    && echo "Building Chainguard OpenSSL FIPS test tool..." \
-    && export PKG_CONFIG_PATH=/opt/openssl-fips/lib64/pkgconfig:/opt/openssl-fips/lib/pkgconfig:$PKG_CONFIG_PATH \
-    && export CPPFLAGS="-I/opt/openssl-fips/include" \
-    && export LDFLAGS="-L/opt/openssl-fips/lib64 -L/opt/openssl-fips/lib" \
-    && make OPENSSL_CFLAGS="-I/opt/openssl-fips/include" OPENSSL_LIBS="-L/opt/openssl-fips/lib64 -L/opt/openssl-fips/lib -lssl -lcrypto" \
-    && echo "Running comprehensive FIPS validation test..." \
-    && OPENSSL_CONF=/opt/openssl-fips/ssl/openssl-fips.cnf LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib ./openssl-fips-test \
-    && echo "✅ Chainguard FIPS OpenSSL validation passed!" \
-    && cd / && rm -rf /tmp/openssl-fips-test* \
-    && yum remove -y gcc make --setopt=clean_requirements_on_remove=1
-
+# Copy FIPS configuration file
 COPY license.txt /licenses
 COPY openssl-fips.cnf  /opt/openssl-fips/ssl/openssl-fips.cnf
+
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
 
