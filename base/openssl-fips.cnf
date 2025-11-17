@@ -48,7 +48,7 @@ tsa_policy3 = 1.2.3.4.5.7
 # fips provider. It contains a named section e.g. [fips_sect] which is
 # referenced from the [provider_sect] below.
 # Refer to the OpenSSL security policy for more information.
-.include /usr/local/ssl/fipsmodule.cnf
+.include /opt/openssl-fips/ssl/fipsmodule.cnf
 
 [openssl_init]
 providers = provider_sect

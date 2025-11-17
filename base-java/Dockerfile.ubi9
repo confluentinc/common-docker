@@ -55,47 +55,66 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-# ENV required when manually installing openssl,
-# for arm64 required binaries are present in /usr/local/lib
-# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
-ENV LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
-
-# Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
-# Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
-# Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
-# For details on the necessary configuration changes in openssl.cnf, please refer to the documentation at: https://docs.openssl.org/3.0/man7/fips_module/#description
+# Install system packages first to establish baseline
 RUN microdnf --nodocs -y install yum \
     && yum --nodocs -q update -y \
-    && yum --nodocs -q install -y wget tar gzip make perl gcc \
-    && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
-    && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
-    && cd openssl${OPENSSL_VERSION} \
-    && echo "installing FIPS compliant openssl" \
-    && ./Configure enable-fips \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && echo "successfully installed FIPS compliant openssl" \
-    && cd .. \
-    && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
-    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
     && microdnf install -y \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "hostname${HOSTNAME_VERSION}" \
         "temurin-21-jre${TEMURIN_JDK_VERSION}" \
     && yum clean all \
+    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+
+# Install FIPS-compliant OpenSSL to custom prefix to avoid conflicts with system Python
+# This approach maintains FIPS compliance while preserving system stability
+RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
+    && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
+    && cd openssl${OPENSSL_VERSION} \
+    && echo "installing FIPS compliant openssl to /opt/openssl-fips" \
+    && ./Configure enable-fips --prefix=/opt/openssl-fips --openssldir=/opt/openssl-fips/ssl \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
+    && echo "successfully installed FIPS compliant openssl" \
+    && echo "initializing FIPS module..." \
+    && /opt/openssl-fips/bin/openssl fipsinstall -out /opt/openssl-fips/ssl/fipsmodule.cnf -module /opt/openssl-fips/lib64/ossl-modules/fips.so \
+    && echo "FIPS module initialized successfully" \
+    && cd .. \
+    && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
+    && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
+    && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
-    && mkdir /licenses \
-    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+    && mkdir /licenses
+
+# Set environment for FIPS OpenSSL only when needed - don't interfere with system Python
+ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
+ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
 
+# Validate FIPS OpenSSL installation using Chainguard FIPS test
+RUN yum install -y gcc make \
+    && curl -sSL https://github.com/chainguard-dev/openssl-fips-test/archive/refs/heads/main.tar.gz -o /tmp/openssl-fips-test.tar.gz \
+    && cd /tmp && tar -xzf openssl-fips-test.tar.gz \
+    && cd openssl-fips-test-main \
+    && echo "Building Chainguard OpenSSL FIPS test tool..." \
+    && export PKG_CONFIG_PATH=/opt/openssl-fips/lib64/pkgconfig:/opt/openssl-fips/lib/pkgconfig:$PKG_CONFIG_PATH \
+    && export CPPFLAGS="-I/opt/openssl-fips/include" \
+    && export LDFLAGS="-L/opt/openssl-fips/lib64 -L/opt/openssl-fips/lib" \
+    && make OPENSSL_CFLAGS="-I/opt/openssl-fips/include" OPENSSL_LIBS="-L/opt/openssl-fips/lib64 -L/opt/openssl-fips/lib -lssl -lcrypto" \
+    && echo "Running comprehensive FIPS validation test..." \
+    && OPENSSL_CONF=/opt/openssl-fips/ssl/openssl-fips.cnf LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib ./openssl-fips-test \
+    && echo "✅ Chainguard FIPS OpenSSL validation passed!" \
+    && cd / && rm -rf /tmp/openssl-fips-test* \
+    && yum remove -y gcc make --setopt=clean_requirements_on_remove=1
+
 COPY license.txt /licenses
-COPY openssl-fips.cnf  /usr/local/ssl/openssl-fips.cnf
+COPY openssl-fips.cnf  /opt/openssl-fips/ssl/openssl-fips.cnf
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
 
