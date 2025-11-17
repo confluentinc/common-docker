@@ -95,6 +95,7 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
 # Set environment for FIPS OpenSSL only when needed - don't interfere with system Python
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
 ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
+ENV OPENSSL_CONF=/opt/openssl-fips/ssl/openssl-fips.cnf
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
