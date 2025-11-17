@@ -55,6 +55,12 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
+# ENV required when manually installing openssl,
+# Install OpenSSL to /opt/openssl to avoid conflicts with system libraries
+# Update LD_LIBRARY_PATH to include both system and custom OpenSSL paths
+ENV LD_LIBRARY_PATH=/opt/openssl/lib64:/opt/openssl/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+ENV PATH=/opt/openssl/bin:$PATH
+
 # Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
 # Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
 # Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
@@ -85,10 +91,6 @@ RUN microdnf --nodocs -y install yum \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
-
-# Set OpenSSL environment variables after all package installations to avoid affecting package managers
-ENV LD_LIBRARY_PATH=/opt/openssl/lib64:/opt/openssl/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
-ENV PATH=/opt/openssl/bin:$PATH
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
