@@ -11,12 +11,8 @@ ARG CP_DOCKER_UTILS_VERSION
 
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 
-# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
-# For more details, see https://go.dev/doc/security/fips140
 RUN CGO_ENABLED=0 go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/ub@${CP_DOCKER_UTILS_VERSION}
 
-# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
-# For more details, see https://go.dev/doc/security/fips140
 RUN CGO_ENABLED=0 go install -ldflags="-w -s" github.com/confluentinc/cp-docker-utils/cmd/package_dedupe@${CP_DOCKER_UTILS_VERSION}
 
 FROM registry.access.redhat.com/ubi9:${UBI9_VERSION} AS jdk-builder
@@ -79,7 +75,6 @@ COPY --from=jdk-builder /microdir/ /
 RUN mkdir -p /etc/confluent/docker /usr/logs /licenses \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
-# enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
 
 COPY license.txt /licenses
@@ -89,14 +84,11 @@ COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
+COPY --chown=appuser:appuser include/etc/cp-base-java-micro /etc/cp-base-java-micro
 
-# Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
 RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
 
-# Disable setuid/setgid bits
-RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
-RUN find / -perm /6000 -type f -exec chmod g-s {} \; || true
+RUN find / -perm /6000 -type f -exec chmod a-s {} \; 2>/dev/null || true
 
 USER appuser
 WORKDIR /home/appuser
