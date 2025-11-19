@@ -5,9 +5,9 @@ ARG DOCKER_UPSTREAM_TAG
 ARG GOLANG_VERSION
 ARG UBI_MINIMAL_VERSION
 ARG OPENSSL_VERSION
-ARG CRYPTO_POLICIES_SCRIPTS_VERSION=""
-ARG FINDUTILS_VERSION=""
-ARG HOSTNAME_VERSION=""
+ARG CRYPTO_POLICIES_SCRIPTS_VERSION
+ARG FINDUTILS_VERSION
+ARG HOSTNAME_VERSION
 
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
@@ -27,6 +27,10 @@ FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
 ARG OPENSSL_VERSION
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
+ARG CRYPTO_POLICIES_SCRIPTS_VERSION
+ARG FINDUTILS_VERSION
+ARG HOSTNAME_VERSION
+ARG TEMURIN_JDK_VERSION
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
@@ -58,19 +62,22 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-# ENV required when manually installing openssl,
-# for arm64 required binaries are present in /usr/local/lib
-# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
-# Also include the FIPS OpenSSL installation path for library discovery
-ENV LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+# Install system packages first to establish baseline
+RUN microdnf --nodocs -y install yum \
+    && yum --nodocs -q update -y \
+    && microdnf install -y \
+        "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
+        "findutils${FINDUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "temurin-21-jre${TEMURIN_JDK_VERSION}" \
+    && yum clean all \
+    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
 
 # Install a FIPS-enabled version of OpenSSL. Only specific versions of OpenSSL support FIPS. Verify the supported versions at https://openssl-library.org/source/.
 # Consult the security policy document for the specific OpenSSL version to ensure proper installation in a FIPS-compliant manner.
 # Security document can also be found at https://openssl-library.org/source/ corresponding to every supported version of OpenSSL.
 # For details on the necessary configuration changes in openssl.cnf, please refer to the documentation at: https://docs.openssl.org/3.0/man7/fips_module/#description
-RUN microdnf --nodocs -y install yum \
-    && yum --nodocs -q update -y \
-    && yum --nodocs -q install -y wget tar gzip make perl gcc \
+RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
     && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
     && cd openssl${OPENSSL_VERSION} \
@@ -87,18 +94,19 @@ RUN microdnf --nodocs -y install yum \
     && cd .. \
     && rm -rf openssl${OPENSSL_VERSION} openssl${OPENSSL_VERSION}.tar.gz \
     && yum remove -y wget tar make perl gcc glibc-gconv-extra --setopt=clean_requirements_on_remove=1 \
-    && microdnf install -y \
-        "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
-        "findutils${FINDUTILS_VERSION}" \
-        "hostname${HOSTNAME_VERSION}" \
-        "temurin-21-jre${TEMURIN_JDK_VERSION}" \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
-    && mkdir /licenses \
-    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+    && mkdir /licenses
+
+# ENV required when manually installing openssl,
+# for arm64 required binaries are present in /usr/local/lib
+# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
+# Also include the FIPS OpenSSL installation path for library discovery
+# Set AFTER system package installation to avoid interfering with build-time Python
+ENV LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 # Set environment for FIPS OpenSSL - ensure it's available in PATH and properly configured
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips

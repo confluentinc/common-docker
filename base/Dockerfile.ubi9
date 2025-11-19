@@ -63,6 +63,8 @@ ARG HOSTNAME_VERSION=""
 ARG XZ_LIBS_VERSION=""
 ARG GLIBC_VERSION=""
 ARG CURL_VERSION=""
+ARG FINDUTILS_VERSION=""
+ARG CRYPTO_POLICIES_SCRIPTS_VERSION=""
 
 # Temurin JDK version
 ARG TEMURIN_JDK_VERSION=""
@@ -85,12 +87,6 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-
-# ENV required when manually installing openssl,
-# for arm64 required binaries are present in /usr/local/lib
-# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
-# Also include the FIPS OpenSSL installation path for library discovery
-ENV LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 # Install system packages first to establish baseline and avoid Python conflicts
 RUN microdnf --nodocs -y install yum \
@@ -146,6 +142,13 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
+
+# ENV required when manually installing openssl,
+# for arm64 required binaries are present in /usr/local/lib
+# for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
+# Also include the FIPS OpenSSL installation path for library discovery
+# Set AFTER system package installation to avoid interfering with build-time Python
+ENV LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 # Set environment for FIPS OpenSSL - ensure it's available in PATH and properly configured
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
