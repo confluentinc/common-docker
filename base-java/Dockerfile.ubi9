@@ -101,20 +101,21 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses
 
+# Enable FIPS in docker image BEFORE setting FIPS OpenSSL environment variables
+# This avoids library conflicts with system Python during crypto-policies update
+RUN update-crypto-policies --set FIPS
+
 # ENV required when manually installing openssl,
 # for arm64 required binaries are present in /usr/local/lib
 # for amd64 required binaries are present in /usr/local/lib64, hence setting LD_LIBRARY_PATH accordingly
 # Also include the FIPS OpenSSL installation path for library discovery
-# Set AFTER system package installation to avoid interfering with build-time Python
+# Set AFTER crypto-policies update to avoid interfering with system Python
 ENV LD_LIBRARY_PATH=/opt/openssl-fips/lib64:/opt/openssl-fips/lib:/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 # Set environment for FIPS OpenSSL - ensure it's available in PATH and properly configured
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
 ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
 ENV OPENSSL_CONF=/opt/openssl-fips/ssl/openssl-fips.cnf
-
-# enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
-RUN update-crypto-policies --set FIPS
 
 # Copy FIPS configuration file
 COPY license.txt /licenses
