@@ -112,7 +112,6 @@ RUN microdnf --nodocs -y install \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-    && microdnf remove -y git \
     && microdnf clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
