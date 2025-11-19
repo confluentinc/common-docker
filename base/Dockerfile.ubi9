@@ -126,9 +126,6 @@ RUN update-crypto-policies --set FIPS
 RUN mkdir -p /usr/local/ssl
 COPY openssl-fips.cnf /usr/local/ssl/openssl-fips.cnf
 
-# 4. Force OpenSSL to use OUR config
-ENV OPENSSL_CONF=/usr/local/ssl/openssl-fips.cnf
-
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
 # is not advisable in terms of security posture. If set to false (which triggers a shell exit(1) if the check fails from the left

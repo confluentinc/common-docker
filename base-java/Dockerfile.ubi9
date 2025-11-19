@@ -96,10 +96,6 @@ RUN echo "Enabling system-wide FIPS cryptographic policies..." \
 RUN mkdir -p /usr/local/ssl
 COPY openssl-fips.cnf /usr/local/ssl/openssl-fips.cnf
 
-# Set OpenSSL to use our custom FIPS configuration
-# This ensures OpenSSL operates in strict FIPS mode regardless of kernel settings
-ENV OPENSSL_CONF=/usr/local/ssl/openssl-fips.cnf
-
 COPY license.txt /licenses
 COPY --from=build-ub-package-dedupe /build/package_dedupe/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /build/ub/ub /usr/bin/ub
