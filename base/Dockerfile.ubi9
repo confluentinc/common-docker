@@ -87,6 +87,10 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 
 
 # Install system packages first to establish baseline and avoid Python conflicts
+# IMPORTANT: Installing system packages (especially Python) before OpenSSL prevents:
+#   - Python SSL module conflicts that can break package management
+#   - Dependency resolution issues with system libraries
+#   - Runtime errors in Python-based tools (like confluent-docker-utils)
 RUN microdnf --nodocs -y install yum \
     && yum --nodocs -q update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
@@ -116,6 +120,12 @@ RUN microdnf --nodocs -y install yum \
 
 # Install FIPS-compliant OpenSSL to custom prefix to avoid conflicts with system Python
 # This approach maintains FIPS compliance while preserving system stability
+# CRITICAL: Installing to /opt/openssl-fips instead of /usr/local prevents:
+#   - System Python from using incompatible OpenSSL libraries
+#   - LD_LIBRARY_PATH conflicts that break system tools
+#   - Issues with Python package installations (pip, setuptools)
+# Only specific OpenSSL versions support FIPS - verify at https://openssl-library.org/source/
+# Security policy document: https://docs.openssl.org/3.0/man7/fips_module/
 RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
     && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
@@ -126,6 +136,8 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && make install > /dev/null 2>&1 \
     && echo "successfully installed FIPS compliant openssl" \
     && echo "initializing FIPS module..." \
+    # FIPS module must be explicitly initialized after installation
+    # This generates the fipsmodule.cnf required for FIPS provider activation
     && FIPS_MODULE_PATH=$(find /opt/openssl-fips/lib* -name "fips.so" | head -1) \
     && echo "Found FIPS module at: ${FIPS_MODULE_PATH}" \
     && /opt/openssl-fips/bin/openssl fipsinstall -out /opt/openssl-fips/ssl/fipsmodule.cnf -module ${FIPS_MODULE_PATH} \
@@ -140,6 +152,9 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 # Set environment for FIPS OpenSSL only when needed - don't interfere with system Python
+# NOTE: We only add the FIPS OpenSSL bin directory to PATH, not the lib directories
+# This ensures applications requiring FIPS compliance can access the FIPS-enabled OpenSSL
+# while system tools continue using the default OpenSSL without library path conflicts
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
 ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
 

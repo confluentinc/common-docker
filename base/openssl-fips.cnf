@@ -48,6 +48,7 @@ tsa_policy3 = 1.2.3.4.5.7
 # fips provider. It contains a named section e.g. [fips_sect] which is
 # referenced from the [provider_sect] below.
 # Refer to the OpenSSL security policy for more information.
+# NOTE: Path updated to /opt/openssl-fips/ssl/ to match custom OpenSSL installation prefix
 .include /opt/openssl-fips/ssl/fipsmodule.cnf
 
 [openssl_init]

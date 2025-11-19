@@ -56,6 +56,8 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
 # Install system packages first to establish baseline
+# IMPORTANT: Installing system packages (including Java) before OpenSSL prevents conflicts
+# where OpenSSL installation could interfere with system Python dependencies
 RUN microdnf --nodocs -y install yum \
     && yum --nodocs -q update -y \
     && microdnf install -y \
@@ -68,6 +70,11 @@ RUN microdnf --nodocs -y install yum \
 
 # Install FIPS-compliant OpenSSL to custom prefix to avoid conflicts with system Python
 # This approach maintains FIPS compliance while preserving system stability
+# CRITICAL: Installing to /opt/openssl-fips instead of /usr/local prevents:
+#   - System Python from being broken by incompatible OpenSSL libraries
+#   - LD_LIBRARY_PATH conflicts between system and FIPS OpenSSL
+#   - Package manager dependency resolution issues
+# For FIPS support, see: https://openssl-library.org/source/ and https://docs.openssl.org/3.0/man7/fips_module/
 RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && wget -q https://github.com/openssl/openssl/releases/download/openssl${OPENSSL_VERSION}/openssl${OPENSSL_VERSION}.tar.gz \
     && tar -xzf openssl${OPENSSL_VERSION}.tar.gz \
@@ -78,6 +85,7 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && make install > /dev/null 2>&1 \
     && echo "successfully installed FIPS compliant openssl" \
     && echo "initializing FIPS module..." \
+    # FIPS module must be explicitly initialized after installation for proper operation
     && FIPS_MODULE_PATH=$(find /opt/openssl-fips/lib* -name "fips.so" | head -1) \
     && echo "Found FIPS module at: ${FIPS_MODULE_PATH}" \
     && /opt/openssl-fips/bin/openssl fipsinstall -out /opt/openssl-fips/ssl/fipsmodule.cnf -module ${FIPS_MODULE_PATH} \
@@ -93,6 +101,9 @@ RUN yum --nodocs -q install -y wget tar gzip make perl gcc \
     && mkdir /licenses
 
 # Set environment for FIPS OpenSSL only when needed - don't interfere with system Python
+# NOTE: We only add the FIPS OpenSSL bin directory to PATH, not the lib directories
+# This ensures applications that need FIPS OpenSSL can access it explicitly without
+# breaking system tools that depend on the default OpenSSL
 ENV FIPS_OPENSSL_PATH=/opt/openssl-fips
 ENV PATH=$FIPS_OPENSSL_PATH/bin:$PATH
 
