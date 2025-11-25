@@ -66,7 +66,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1763613452</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1764046129</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1762965531</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1763362218</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
@@ -108,7 +108,7 @@
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.162</git-repo.confluent-docker-utils.tag>
-        <git-repo.cp-docker-utils.tag>v1.0.2</git-repo.cp-docker-utils.tag>
+        <git-repo.cp-docker-utils.tag>v1.0.3</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.25.4-trixie</golang.image.version>
