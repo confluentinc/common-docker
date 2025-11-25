@@ -21,7 +21,6 @@ import (
 
 	pt "path"
 
-	"crypto/tls"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
