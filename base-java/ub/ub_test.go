@@ -1552,3 +1552,59 @@ func Test_runConnectReadyCmd(t *testing.T) {
 		})
 	}
 }
+
+func Test_buildJavaCommandArgs(t *testing.T) {
+	tests := []struct {
+		name      string
+		jvmOpts   string
+		classPath string
+		className string
+		args      []string
+		want      []string
+	}{
+		{
+			name:      "empty jvmOpts",
+			jvmOpts:   "",
+			classPath: "/path/to/classpath",
+			className: "com.example.Main",
+			args:      []string{"arg1", "arg2"},
+			want:      []string{"-cp", "/path/to/classpath", "com.example.Main", "arg1", "arg2"},
+		},
+		{
+			name:      "single jvm option",
+			jvmOpts:   "-Xmx512M",
+			classPath: "/path/to/classpath",
+			className: "com.example.Main",
+			args:      []string{"arg1"},
+			want:      []string{"-Xmx512M", "-cp", "/path/to/classpath", "com.example.Main", "arg1"},
+		},
+		{
+			name:      "multiple jvm options",
+			jvmOpts:   "-Xmx512M -Dproperty=value",
+			classPath: "/path/to/classpath",
+			className: "com.example.Main",
+			args:      []string{"arg1", "arg2"},
+			want:      []string{"-Xmx512M", "-Dproperty=value", "-cp", "/path/to/classpath", "com.example.Main", "arg1", "arg2"},
+		},
+		{
+			name:      "multiple jvm options with complex property value",
+			jvmOpts:   "-Xmx1G -Durl.list=https://example.com/path -Xms256M",
+			classPath: "/path/to/classpath",
+			className: "com.example.Main",
+			args:      []string{},
+			want:      []string{"-Xmx1G", "-Durl.list=https://example.com/path", "-Xms256M", "-cp", "/path/to/classpath", "com.example.Main"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := buildJavaCommandArgs(tt.jvmOpts, tt.classPath, tt.className, tt.args)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("buildJavaCommandArgs() mismatch")
+				t.Errorf("  got:  %v", got)
+				t.Errorf("  want: %v", tt.want)
+			}
+		})
+	}
+}

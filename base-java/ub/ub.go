@@ -21,6 +21,7 @@ import (
 
 	pt "path"
 
+
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sys/unix"
@@ -480,15 +481,21 @@ func getEnvWithFallbacks(defaultValue string, envVars ...string) string {
 	return defaultValue
 }
 
-func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
-	classPath := getEnvWithFallbacks("/usr/share/java/cp-base-java/*", "UB_CLASSPATH", "CUB_CLASSPATH")
-
+func buildJavaCommandArgs(jvmOpts string, classPath string, className string, args []string) []string {
 	opts := []string{}
 	if jvmOpts != "" {
-		opts = append(opts, jvmOpts)
+		opts = append(opts, strings.Fields(jvmOpts)...)
 	}
 	opts = append(opts, "-cp", classPath, className)
-	cmd := exec.Command("java", append(opts[:], args...)...)
+	opts = append(opts, args...)
+	return opts
+}
+
+func invokeJavaCommand(className string, jvmOpts string, args []string) bool {
+	classPath := getEnvWithFallbacks("/usr/share/java/cp-base-java/*", "UB_CLASSPATH", "CUB_CLASSPATH")
+	cmdArgs := buildJavaCommandArgs(jvmOpts, classPath, className, args)
+
+	cmd := exec.Command("java", cmdArgs...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
