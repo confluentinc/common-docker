@@ -35,7 +35,7 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.0.3-0</io.confluent.common-docker.version>
         <!-- Image Versions-->
-        <ubi8-minimal.image.version>8.10-1763613452</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1764046129</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1762965531</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1763362218</ubi9-minimal.image.version>
         <!-- Redhat ubi9 minimal Package Versions -->
