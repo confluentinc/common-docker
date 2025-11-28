@@ -15,6 +15,7 @@
 
 ARG UBI_MINIMAL_VERSION="latest"
 ARG GOLANG_VERSION
+ARG CURL_VERSION
 
 FROM golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
@@ -28,6 +29,7 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
+ARG CURL_VERSION
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
