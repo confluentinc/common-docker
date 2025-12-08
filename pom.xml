@@ -66,7 +66,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1764046129</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1765178706</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1762965531</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1764794109</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
@@ -97,7 +97,7 @@
         <ubi8-minimal.iputils.version>20180629-11.el8</ubi8-minimal.iputils.version>
         <ubi8-minimal.hostname.version>3.20-6.el8</ubi8-minimal.hostname.version>
         <ubi8-minimal.xz-libs.version>5.2.4-4.el8_6</ubi8-minimal.xz-libs.version>
-        <ubi8-minimal.glibc.version>2.28-251.el8_10.25</ubi8-minimal.glibc.version>
+        <ubi8-minimal.glibc.version>2.28-251.el8_10.27</ubi8-minimal.glibc.version>
         <ubi8-minimal.curl.version>7.61.1-34.el8_10.8</ubi8-minimal.curl.version>
         <ubi8-minimal.findutils.version>4.6.0-23.el8_10</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
