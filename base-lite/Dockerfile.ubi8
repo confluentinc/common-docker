@@ -20,7 +20,7 @@ FROM golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser ub/ ./
-RUN go build -ldflags="-w -s" ./ub.go
+RUN  CGO_ENABLED=0 go build -ldflags="-w -s" ./ub.go
 USER appuser
 RUN go test ./...
 
