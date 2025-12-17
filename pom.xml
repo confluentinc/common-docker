@@ -64,11 +64,11 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1755105495</ubi8-minimal.image.version>
-        <ubi9-micro.image.version>9.6-1754345610</ubi9-micro.image.version>
+        <ubi8-minimal.image.version>8.10-1765178706</ubi8-minimal.image.version>
+        <ubi9-micro.image.version>9.7-1762965531</ubi9-micro.image.version>
 
         <!-- OS Package Versions -->
-        <ubi8-minimal.openssl.version>1:1.1.1k-14.el8_6</ubi8-minimal.openssl.version>
+        <ubi8-minimal.openssl.version>1.1.1k-14.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-1.el8</ubi8-minimal.nmap-ncat.version>
         <ubi8-minimal.python39.version>3.9.20-2.module+el8.10.0+23441+1124c1da</ubi8-minimal.python39.version>
@@ -78,12 +78,12 @@
         <ubi8-minimal.iputils.version>20180629-11.el8</ubi8-minimal.iputils.version>
         <ubi8-minimal.hostname.version>3.20-6.el8</ubi8-minimal.hostname.version>
         <ubi8-minimal.xz-libs.version>5.2.4-4.el8_6</ubi8-minimal.xz-libs.version>
-        <ubi8-minimal.glibc.version>2.28-251.el8_10.25</ubi8-minimal.glibc.version>
-        <ubi8-minimal.curl.version>7.61.1-34.el8_10.3</ubi8-minimal.curl.version>
-        <ubi8-minimal.findutils.version>1:4.6.0-21.el8</ubi8-minimal.findutils.version>
+        <ubi8-minimal.glibc.version>2.28-251.el8_10.27</ubi8-minimal.glibc.version>
+        <ubi8-minimal.curl.version>7.61.1-34.el8_10.8</ubi8-minimal.curl.version>
+        <ubi8-minimal.findutils.version>4.6.0-23.el8_10</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
-        <ubi8-minimal.temurin-17-jdk.version>17.0.16.0.0.8-0</ubi8-minimal.temurin-17-jdk.version>
-        <ubi8-minimal.python39-pip.version>20.*</ubi8-minimal.python39-pip.version>
+        <ubi8-minimal.temurin-17-jdk.version>17.0.17.0.0.10-0</ubi8-minimal.temurin-17-jdk.version>
+        <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
 
         <!-- Python Package Versions -->
         <python.setuptools.version>78.1.1</python.setuptools.version>
@@ -92,7 +92,7 @@
         <git-repo.confluent-docker-utils.tag>v0.0.162</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.24.2-bullseye</golang.image.version>
+        <golang.image.version>1.25.5-trixie</golang.image.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
