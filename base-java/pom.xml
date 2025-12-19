@@ -133,7 +133,6 @@
                         <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                         <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
                         <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
-                        <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
                     </buildArgs>
                 </configuration>
             </plugin>
@@ -155,7 +154,6 @@
                                     <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
-                                    <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
                                 </args>
                             </build>
                         </image>
