@@ -105,7 +105,6 @@
         <ubi8-minimal.curl.version>7.61.1-34.el8_10.9</ubi8-minimal.curl.version>
         <ubi8-minimal.findutils.version>4.6.0-24.el8_10</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
-        <ubi8-minimal.temurin-17-jdk.version>17.0.17.0.0.10-0</ubi8-minimal.temurin-17-jdk.version>
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
 
         <!-- Python Package Versions -->

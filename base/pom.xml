@@ -130,6 +130,7 @@
 
                         <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                         <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
+                        <OPENSSL_LIBS_VERSION>-${ubi9-minimal.openssl-libs.version}</OPENSSL_LIBS_VERSION>
                         <WGET_VERSION>-${ubi9-minimal.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi9-minimal.nmap-ncat.version}</NETCAT_VERSION>
                         <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
@@ -161,6 +162,7 @@
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
+                                    <OPENSSL_LIBS_VERSION>-${ubi9-minimal.openssl-libs.version}</OPENSSL_LIBS_VERSION>
                                     <WGET_VERSION>-${ubi9-minimal.wget.version}</WGET_VERSION>
                                     <NETCAT_VERSION>-${ubi9-minimal.nmap-ncat.version}</NETCAT_VERSION>
                                     <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
