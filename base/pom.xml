@@ -142,7 +142,7 @@
                         <XZ_LIBS_VERSION>-${ubi9-minimal.xz-libs.version}</XZ_LIBS_VERSION>
                         <GLIBC_VERSION>-${ubi9-minimal.glibc.version}</GLIBC_VERSION>
                         <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
-                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi8-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                         <PYTHON_PIP_VERSION>-${ubi9-minimal.python3-pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
