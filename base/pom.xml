@@ -127,24 +127,26 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
-                        <OPENSSL_VERSION>-${ubi9.openssl.version}</OPENSSL_VERSION>
-                        <OPENSSL_LIBS_VERSION>-${ubi9.openssl.libs.version}</OPENSSL_LIBS_VERSION>
-                        <WGET_VERSION>-${ubi9.wget.version}</WGET_VERSION>
-                        <NETCAT_VERSION>-${ubi9.netcat.version}</NETCAT_VERSION>
-                        <PYTHON39_VERSION>-${ubi9.python39.version}</PYTHON39_VERSION>
-                        <TAR_VERSION>-${ubi9.tar.version}</TAR_VERSION>
-                        <PROCPS_VERSION>-${ubi9.procps.version}</PROCPS_VERSION>
-                        <KRB5_WORKSTATION_VERSION>-${ubi9.krb5.workstation.version}</KRB5_WORKSTATION_VERSION>
-                        <IPUTILS_VERSION>-${ubi9.iputils.version}</IPUTILS_VERSION>
-                        <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
-                        <XZ_LIBS_VERSION>-${ubi9.xzlibs.version}</XZ_LIBS_VERSION>
-                        <GLIBC_VERSION>-${ubi9.glibc.version}</GLIBC_VERSION>
-                        <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
-                        <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
-                        <PYTHON_PIP_VERSION>-${ubi9.python.pip.version}</PYTHON_PIP_VERSION>
-                        <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
-                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${ubi.python.confluent.docker.utils.version}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
+
+                        <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
+                        <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
+                        <OPENSSL_LIBS_VERSION>-${ubi9-minimal.openssl-libs.version}</OPENSSL_LIBS_VERSION>
+                        <WGET_VERSION>-${ubi9-minimal.wget.version}</WGET_VERSION>
+                        <NETCAT_VERSION>-${ubi9-minimal.nmap-ncat.version}</NETCAT_VERSION>
+                        <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
+                        <TAR_VERSION>-${ubi9-minimal.tar.version}</TAR_VERSION>
+                        <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
+                        <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
+                        <IPUTILS_VERSION>-${ubi9-minimal.iputils.version}</IPUTILS_VERSION>
+                        <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
+                        <XZ_LIBS_VERSION>-${ubi9-minimal.xz-libs.version}</XZ_LIBS_VERSION>
+                        <GLIBC_VERSION>-${ubi9-minimal.glibc.version}</GLIBC_VERSION>
+                        <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
+                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                        <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                        <PYTHON_PIP_VERSION>-${ubi9-minimal.python3-pip.version}</PYTHON_PIP_VERSION>
+                        <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
+                        <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                     </buildArgs>
                 </configuration>
@@ -158,28 +160,28 @@
                         <image>
                             <build>
                                 <args>
-                                    <UBI_MINIMAL_VERSION>${ubi9.minimal.image.version}</UBI_MINIMAL_VERSION>
-                                    <OPENSSL_VERSION>-${ubi9.openssl.version}</OPENSSL_VERSION>
-                                    <OPENSSL_LIBS_VERSION>-${ubi9.openssl.libs.version}</OPENSSL_LIBS_VERSION>
-                                    <WGET_VERSION>-${ubi9.wget.version}</WGET_VERSION>
-                                    <NETCAT_VERSION>-${ubi9.netcat.version}</NETCAT_VERSION>
-                                    <PYTHON39_VERSION>-${ubi9.python39.version}</PYTHON39_VERSION>
-                                    <TAR_VERSION>-${ubi9.tar.version}</TAR_VERSION>
-                                    <PROCPS_VERSION>-${ubi9.procps.version}</PROCPS_VERSION>
-                                    <KRB5_WORKSTATION_VERSION>-${ubi9.krb5.workstation.version}
+                                    <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
+                                    <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
+                                    <OPENSSL_LIBS_VERSION>-${ubi9-minimal.openssl-libs.version}</OPENSSL_LIBS_VERSION>
+                                    <WGET_VERSION>-${ubi9-minimal.wget.version}</WGET_VERSION>
+                                    <NETCAT_VERSION>-${ubi9-minimal.nmap-ncat.version}</NETCAT_VERSION>
+                                    <PYTHON39_VERSION>-${ubi9-minimal.python3.version}</PYTHON39_VERSION>
+                                    <TAR_VERSION>-${ubi9-minimal.tar.version}</TAR_VERSION>
+                                    <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
+                                    <KRB5_WORKSTATION_VERSION>-${ubi9-minimal.krb5-workstation.version}
                                     </KRB5_WORKSTATION_VERSION>
-                                    <IPUTILS_VERSION>-${ubi9.iputils.version}</IPUTILS_VERSION>
-                                    <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
-                                    <XZ_LIBS_VERSION>-${ubi9.xzlibs.version}</XZ_LIBS_VERSION>
-                                    <GLIBC_VERSION>-${ubi9.glibc.version}</GLIBC_VERSION>
-                                    <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
-                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto.policies.scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
-                                    <TEMURIN_JDK_VERSION>-${ubi.temurin.jdk.version}</TEMURIN_JDK_VERSION>
-                                    <PYTHON_PIP_VERSION>-${ubi9.python.pip.version}</PYTHON_PIP_VERSION>
-                                    <PYTHON_SETUPTOOLS_VERSION>==${ubi.python.setuptools.version}
+                                    <IPUTILS_VERSION>-${ubi9-minimal.iputils.version}</IPUTILS_VERSION>
+                                    <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
+                                    <XZ_LIBS_VERSION>-${ubi9-minimal.xz-libs.version}</XZ_LIBS_VERSION>
+                                    <GLIBC_VERSION>-${ubi9-minimal.glibc.version}</GLIBC_VERSION>
+                                    <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
+                                    <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
+                                    <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                                    <PYTHON_PIP_VERSION>-${ubi9-minimal.python3-pip.version}</PYTHON_PIP_VERSION>
+                                    <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}
                                     </PYTHON_SETUPTOOLS_VERSION>
                                     <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
-                                        ${ubi.python.confluent.docker.utils.version}
+                                        ${git-repo.confluent-docker-utils.tag}
                                     </PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
