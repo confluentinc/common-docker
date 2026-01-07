@@ -125,6 +125,8 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <configuration>
                     <buildArgs>
+                        <APP_UID>${app.uid}</APP_UID>
+                        <APP_GID>${app.gid}</APP_GID>
                         <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
                         <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                         <TEMURIN_JDK_VERSION>-${ubi9.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
@@ -148,6 +150,8 @@
                         <image>
                             <build>
                                 <args>
+                                    <APP_UID>${app.uid}</APP_UID>
+                                    <APP_GID>${app.gid}</APP_GID>
                                     <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
                                     <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>

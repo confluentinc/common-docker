@@ -122,6 +122,14 @@
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.25.5-trixie</golang.image.version>
 
+        <!-- Application User Configuration
+             User and group IDs for the non-root user (appuser) configured in Docker images.
+             These values ensure consistent UID/GID across all container images and multi-stage builds,
+             preventing permission issues when copying files between stages or mounting volumes.
+             Can be overridden at build time via: -Dapp.uid=<value> -Dapp.gid=<value> -->
+        <app.uid>1000</app.uid>
+        <app.gid>1000</app.gid>
+
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
