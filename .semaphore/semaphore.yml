@@ -73,7 +73,7 @@ global_job_config:
       - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
       - export LATEST_TAG=$BRANCH_TAG-latest
       - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
-      - export DOCKER_REPOS="confluentinc/cp-base-java confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
+      - export DOCKER_REPOS="confluentinc/cp-base-java confluentinc/cp-base-java-micro confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
       - export COMMUNITY_DOCKER_REPOS=""
       - |
         if [[ $SKIP_COMMUNITY == "True" ]]; then
