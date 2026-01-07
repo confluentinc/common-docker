@@ -77,6 +77,7 @@
         <ubi9.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9.crypto-policies-scripts.version>
         <ubi9.findutils.version>4.8.0-7.el9</ubi9.findutils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
+        <ubi9.shadow-utils.version>4.9-15.el9</ubi9.shadow-utils.version>
 
         <ubi9-minimal.openssl.version>3.5.1-4.el9_7</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>

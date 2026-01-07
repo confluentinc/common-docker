@@ -18,7 +18,7 @@ class BaseJavaMicroImageTest(unittest.TestCase):
         ub_cmd = "bash -c 'ub -h'"
         self.assertTrue(b"utility commands" in utils.run_docker_command(image=self.image, command=ub_cmd))
 
-    def test_package_dedupe_exits(self):
+    def test_package_dedupe_exists(self):
         self.assertTrue(utils.path_exists_in_image(self.image, "/usr/bin/package_dedupe"))
 
     def test_package_dedupe_runnable(self):
