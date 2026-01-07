@@ -86,6 +86,7 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
 RUN microdnf --nodocs -y install yum \
+    && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
         "openssl${OPENSSL_VERSION}" \
