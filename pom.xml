@@ -135,6 +135,6 @@
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
         false to enforce the check. Users may override this behavior on the maven CLI by adding this option:
         `-Ddocker.skip-security-update-check=true` -->
-        <docker.skip-security-update-check>true</docker.skip-security-update-check>
+        <docker.skip-security-update-check>false</docker.skip-security-update-check>
     </properties>
 </project>
