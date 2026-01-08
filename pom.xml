@@ -86,7 +86,7 @@
         <ubi9-minimal.temurin-21-jdk.version>21.0.9.0.0.10-0</ubi9-minimal.temurin-21-jdk.version>
         <ubi9-minimal.python3-pip.version>21.3.1-1.el9</ubi9-minimal.python3-pip.version>
 
-        <ubi8-minimal.openssl.version>1.1.1k-14.el8_6</ubi8-minimal.openssl.version>
+        <ubi8-minimal.openssl.version>1.1.1k-14.el8_10</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
         <ubi8-minimal.python39.version>3.9.25-2.module+el8.10.0+23718+1842ae33</ubi8-minimal.python39.version>
