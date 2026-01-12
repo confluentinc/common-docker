@@ -71,7 +71,7 @@
         <ubi9-minimal.image.version>9.7-1764794109</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
 
-        <ubi9-minimal.openssl.version>3.5.1-4.el9_7</ubi9-minimal.openssl.version>
+        <ubi9-minimal.openssl.version>3.5.1-5.el9_7</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>
         <ubi9-minimal.nmap-ncat.version>7.92-3.el9</ubi9-minimal.nmap-ncat.version>
         <ubi9-minimal.python3.version>3.9.25-2.el9_7</ubi9-minimal.python3.version>
@@ -109,7 +109,7 @@
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.163</git-repo.confluent-docker-utils.tag>
-        <git-repo.cp-docker-utils.tag>v1.0.5</git-repo.cp-docker-utils.tag>
+        <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.25.5-trixie</golang.image.version>
