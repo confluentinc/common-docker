@@ -64,7 +64,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1766090732</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1768178537</ubi8-minimal.image.version>
 
         <!-- OS Package Versions -->
         <ubi8-minimal.openssl.version>1.1.1k-14.el8_10</ubi8-minimal.openssl.version>
