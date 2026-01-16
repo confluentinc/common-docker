@@ -120,7 +120,7 @@
         <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.25.5-trixie</golang.image.version>
+        <golang.image.version>1.25.6-trixie</golang.image.version>
 
         <!-- Application User Configuration
              User and group IDs for the non-root user (appuser) configured in Docker images.
