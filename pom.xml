@@ -111,7 +111,7 @@
         <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.25.5-trixie</golang.image.version>
+        <golang.image.version>1.25.6-trixie</golang.image.version>
 
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
