@@ -66,14 +66,14 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1766090732</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1768785502</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1766049073</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.7-1764794109</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.7-1768783948</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
 
-        <ubi9-minimal.openssl.version>3.5.1-4.el9_7</ubi9-minimal.openssl.version>
+        <ubi9-minimal.openssl.version>3.5.1-5.el9_7</ubi9-minimal.openssl.version>
         <!-- OpenSSL-libs version (must match openssl version exactly for FIPS compliance) -->
-        <ubi9-minimal.openssl-libs.version>3.5.1-4.el9_7</ubi9-minimal.openssl-libs.version>
+        <ubi9-minimal.openssl-libs.version>3.5.1-5.el9_7</ubi9-minimal.openssl-libs.version>
         <!-- OpenSSL version that is FIPS compliant (for source compilation in base image) -->
         <fips.openssl.version>3.1.2</fips.openssl.version>
         <!-- Redhat Package Versions -->
@@ -111,10 +111,10 @@
         <python.setuptools.version>80.9.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.163</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.164</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.25.5-trixie</golang.image.version>
+        <golang.image.version>1.25.6-trixie</golang.image.version>
 
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
