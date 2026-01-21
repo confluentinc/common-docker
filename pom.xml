@@ -13,7 +13,7 @@
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>8.0.3-cp2</version>
+    <version>8.0.3-37</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -33,7 +33,7 @@
         <docker.ubi9.os_type>ubi9</docker.ubi9.os_type>
         <docker.file>Dockerfile.${docker.ubi9.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
-        <io.confluent.common-docker.version>8.0.3-cp2</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>8.0.3-37</io.confluent.common-docker.version>
         <!-- Image Versions-->
         <ubi8-minimal.image.version>8.10-1768785502</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1766049073</ubi9-micro.image.version>
