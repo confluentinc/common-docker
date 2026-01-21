@@ -22,9 +22,9 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base-java</module>
-        <module>base</module>
-        <module>base-lite</module>
-        <module>jmxterm</module>
+<!--        <module>base</module>-->
+<!--        <module>base-lite</module>-->
+<!--        <module>jmxterm</module>-->
         <!-- <module>kerberos</module> -->
     </modules>
 
