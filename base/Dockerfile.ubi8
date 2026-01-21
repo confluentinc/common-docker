@@ -108,6 +108,7 @@ RUN microdnf --nodocs install yum \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-17-jdk${TEMURIN_JDK_VERSION}" "temurin-17-jre${TEMURIN_JDK_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
+    && python3 -m pip install --upgrade pip \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && yum remove -y git \
