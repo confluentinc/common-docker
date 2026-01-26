@@ -100,6 +100,11 @@
                     <images>
                         <image>
                             <build>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platform}</platform>
+                                    </platforms>
+                                </buildx>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>

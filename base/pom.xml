@@ -158,6 +158,11 @@
                     <images>
                         <image>
                             <build>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platform}</platform>
+                                    </platforms>
+                                </buildx>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
