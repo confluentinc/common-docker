@@ -35,6 +35,8 @@
         <docker.file>Dockerfile.${docker.ubi9.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.3.0-0</io.confluent.common-docker.version>
+        <!-- Default empty - set via CLI for cross-platform builds: -Ddocker.platform=linux/s390x -->
+        <docker.platform></docker.platform>
 
         <!-- ============================================================ -->
         <!-- AUTOMATED VERSION UPDATE PROPERTY NAMING CONVENTIONS         -->

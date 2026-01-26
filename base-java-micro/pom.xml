@@ -149,6 +149,11 @@
                     <images>
                         <image>
                             <build>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platform}</platform>
+                                    </platforms>
+                                </buildx>
                                 <args>
                                     <APP_UID>${app.uid}</APP_UID>
                                     <APP_GID>${app.gid}</APP_GID>
