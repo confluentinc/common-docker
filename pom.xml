@@ -177,23 +177,6 @@
                             <groupId>io.fabric8</groupId>
                             <artifactId>docker-maven-plugin</artifactId>
                             <version>0.43.4</version>
-                            <configuration>
-                                <images>
-                                    <image>
-                                        <name>${docker.registry}confluentinc/${project.artifactId}:${docker.tag}</name>
-                                        <build>
-                                            <dockerFile>${docker.file}</dockerFile>
-                                            <contextDir>${project.basedir}</contextDir>
-                                            <buildx>
-                                                <platforms>
-                                                    <platform>${docker.platform}</platform>
-                                                </platforms>
-                                            </buildx>
-                                        </build>
-                                    </image>
-                                </images>
-                                <skipPush>true</skipPush>
-                            </configuration>
                             <executions>
                                 <execution>
                                     <id>build-image</id>
