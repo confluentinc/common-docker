@@ -47,4 +47,33 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.43.4</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>${docker.registry}confluentinc/${project.artifactId}:${docker.tag}</name>
+                            <build>
+                                <dockerFile>${docker.file}</dockerFile>
+                                <contextDir>${project.basedir}</contextDir>
+                                <buildx>
+                                    <platforms>
+                                        <platform>${docker.platform}</platform>
+                                    </platforms>
+                                </buildx>
+                                <args>
+                                    <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                                    <DOCKER_TAG>${docker.upstream-tag}</DOCKER_TAG>
+                                </args>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
