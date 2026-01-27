@@ -154,12 +154,14 @@
                                     </platforms>
                                 </buildx>
                                 <args>
+                                    <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                    <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                    <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                    <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                                     <PROCPS_VERSION>-${ubi9-minimal.procps-ng.version}</PROCPS_VERSION>
-                                    <SKIP_SECURITY_UPDATE_CHECK>
-                                        ${docker.skip-security-update-check}
-                                    </SKIP_SECURITY_UPDATE_CHECK>
+                                    <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                                     <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>

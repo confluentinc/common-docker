@@ -66,6 +66,10 @@
                                     </platforms>
                                 </buildx>
                                 <args>
+                                    <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                    <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                    <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                    <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
                                     <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
                                     <DOCKER_TAG>${docker.upstream-tag}</DOCKER_TAG>
                                 </args>
