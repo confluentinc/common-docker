@@ -141,28 +141,71 @@
     </properties>
 
     <profiles>
-        <!-- Override docker profile to use fabric8 plugin with buildx/platform support -->
+        <!-- Profile for cross-platform builds using fabric8 with buildx (e.g., s390x) -->
+        <!-- Activates when docker.platform is set to a non-empty value like linux/s390x -->
         <profile>
-            <id>docker</id>
+            <id>buildx</id>
             <activation>
                 <property>
-                    <name>env.DOCKER_HOST</name>
+                    <name>docker.platform</name>
                 </property>
             </activation>
             <build>
-                <plugins>
-                    <!-- Disable inherited spotify plugin -->
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>dockerfile-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>package</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <!-- Disable spotify plugin for cross-platform builds -->
+                        <plugin>
+                            <groupId>com.spotify</groupId>
+                            <artifactId>dockerfile-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>default</id>
+                                    <phase>none</phase>
+                                </execution>
+                                <execution>
+                                    <id>package</id>
+                                    <phase>none</phase>
+                                </execution>
+                                <execution>
+                                    <id>tag</id>
+                                    <phase>none</phase>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <!-- Configure fabric8 plugin with executions for buildx builds -->
+                        <plugin>
+                            <groupId>io.fabric8</groupId>
+                            <artifactId>docker-maven-plugin</artifactId>
+                            <version>0.43.4</version>
+                            <configuration>
+                                <images>
+                                    <image>
+                                        <name>${docker.registry}confluentinc/${project.artifactId}:${docker.tag}</name>
+                                        <build>
+                                            <dockerFile>${docker.file}</dockerFile>
+                                            <contextDir>${project.basedir}</contextDir>
+                                            <buildx>
+                                                <platforms>
+                                                    <platform>${docker.platform}</platform>
+                                                </platforms>
+                                            </buildx>
+                                        </build>
+                                    </image>
+                                </images>
+                                <skipPush>true</skipPush>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>build</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>

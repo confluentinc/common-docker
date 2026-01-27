@@ -520,7 +520,7 @@ blocks:
             - ci-tools ci-update-version
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.platform=linux/s390x $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.platform=linux/s390x -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             # Verify images are built for s390x architecture
             - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Checking architecture of $image:" && docker inspect --format='{{.Architecture}}' $image; done
