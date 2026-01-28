@@ -86,6 +86,7 @@ RUN microdnf --nodocs install yum \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
         "tar${TAR_VERSION}" \
+        "findutils" \
         "procps-ng${PROCPS_VERSION}" \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
         "iputils${IPUTILS_VERSION}" \
@@ -110,8 +111,8 @@ RUN microdnf --nodocs install yum \
     && wget -q https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
-    && ./configure --prefix=/usr/local --enable-optimizations --with-ensurepip=yes --without-readline --disable-tkinter \
-    && make -j$(nproc) \
+    && ./configure --prefix=/usr/local --enable-optimizations --with-ensurepip=yes --without-readline \
+    && make -j$(nproc) || make -j1 \
     && make altinstall \
     && ln -sf /usr/local/bin/python3.14 /usr/local/bin/python3 \
     && ln -sf /usr/local/bin/python3.14 /usr/local/bin/python \
