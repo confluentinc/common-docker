@@ -103,17 +103,14 @@ RUN microdnf --nodocs install yum \
         expat-devel \
         gdbm-devel \
         libffi-devel \
-        libnsl2-devel \
         ncurses-devel \
-        readline-devel \
         sqlite-devel \
-        tk-devel \
         zlib-devel \
     && cd /tmp \
     && wget -q https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
-    && ./configure --prefix=/usr/local --enable-optimizations --with-ensurepip=yes \
+    && ./configure --prefix=/usr/local --enable-optimizations --with-ensurepip=yes --without-readline --disable-tkinter \
     && make -j$(nproc) \
     && make altinstall \
     && ln -sf /usr/local/bin/python3.14 /usr/local/bin/python3 \
@@ -124,7 +121,7 @@ RUN microdnf --nodocs install yum \
     && /usr/local/bin/python3.14 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && cd / \
     && rm -rf /tmp/Python-${PYTHON314_VERSION}* \
-    && yum remove -y gcc make bzip2-devel expat-devel gdbm-devel libffi-devel libnsl2-devel ncurses-devel readline-devel sqlite-devel tk-devel zlib-devel \
+    && yum remove -y gcc make bzip2-devel expat-devel gdbm-devel libffi-devel ncurses-devel sqlite-devel zlib-devel \
     && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
