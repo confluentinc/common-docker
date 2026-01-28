@@ -126,7 +126,7 @@
                         <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                         <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                        <PYTHON39_VERSION>-${ubi8-minimal.python39.version}</PYTHON39_VERSION>
+                        <PYTHON314_VERSION>${ubi8-minimal.python314.version}</PYTHON314_VERSION>
                         <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                         <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                         <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
@@ -136,7 +136,7 @@
                         <GLIBC_VERSION>-${ubi8-minimal.glibc.version}</GLIBC_VERSION>
                         <CURL_VERSION>-${ubi8-minimal.curl.version}</CURL_VERSION>
                         <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
-                        <PYTHON_PIP_VERSION>-${ubi8-minimal.python39-pip.version}</PYTHON_PIP_VERSION>
+                        <PYTHON_PIP_VERSION>${ubi8-minimal.python314-pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
@@ -156,7 +156,7 @@
                           <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                           <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                           <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                          <PYTHON39_VERSION>-${ubi8-minimal.python39.version}</PYTHON39_VERSION>
+                          <PYTHON314_VERSION>${ubi8-minimal.python314.version}</PYTHON314_VERSION>
                           <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                           <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                           <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
@@ -166,7 +166,7 @@
                           <GLIBC_VERSION>-${ubi8-minimal.glibc.version}</GLIBC_VERSION>
                           <CURL_VERSION>-${ubi8-minimal.curl.version}</CURL_VERSION>
                           <ZULU_OPENJDK_VERSION>-${ubi8-minimal.zulu11-ca-jdk-headless.version}</ZULU_OPENJDK_VERSION>
-                          <PYTHON_PIP_VERSION>-${ubi8-minimal.python39-pip.version}</PYTHON_PIP_VERSION>
+                          <PYTHON_PIP_VERSION>${ubi8-minimal.python314-pip.version}</PYTHON_PIP_VERSION>
                           <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                           <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                           <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
