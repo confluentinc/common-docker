@@ -132,17 +132,17 @@ blocks:
             - ci-tools ci-update-version
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
-            # Build artifacts only with maven (skip docker image build)
+            # Build artifacts with Maven (skip Docker image build, use docker CLI instead)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 -Ddockerfile.skip=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
-            # Build Docker images (ARG defaults are in Dockerfiles)
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
+            # Build Docker images directly
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - >-
               for dev_image in $AMD_DOCKER_DEV_FULL_IMAGES;
               do
@@ -323,17 +323,17 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
-            # Build artifacts only with maven (skip docker image build)
+            # Build artifacts with Maven (skip Docker image build, use docker CLI instead)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 -Ddockerfile.skip=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
-            # Build Docker images (ARG defaults are in Dockerfiles)
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
-            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
+            # Build Docker images directly
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - for image in $ARM_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
         always:
@@ -528,17 +528,17 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
-            # Build artifacts only with maven (skip docker image build)
+            # Build artifacts with Maven (skip Docker image build, use docker buildx instead)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddockerfile.skip=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
-            # Build Docker images with buildx for s390x (ARG defaults are in Dockerfiles)
-            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
-            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
-            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
-            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
-            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
+            # Build Docker images with buildx for s390x platform
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             # Verify images are built for s390x architecture
             - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Checking architecture of $image:" && docker inspect --format='{{.Architecture}}' $image; done
             - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
