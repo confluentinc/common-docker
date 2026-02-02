@@ -20,7 +20,7 @@ ARG CURL_VERSION
 FROM golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
-COPY --chown=appuser:appuser ub/ ./
+COPY --chown=appuser:appuser base-lite/ub/ ./
 RUN CGO_ENABLED=0 go build -ldflags="-w -s" ./ub.go
 USER appuser
 RUN go test ./...
@@ -91,12 +91,12 @@ RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite
+COPY --chown=appuser:appuser base-lite/include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser base-lite/include/etc/cp-base-lite /etc/cp-base-lite
 COPY --from=build-ub /build/ub /usr/bin
 
 RUN mkdir /licenses
-COPY license.txt /licenses
+COPY base-lite/license.txt /licenses
 
 USER appuser
 WORKDIR /home/appuser
