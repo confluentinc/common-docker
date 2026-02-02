@@ -123,11 +123,11 @@ RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
+COPY --chown=appuser:appuser base/include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser base/include/etc/cp-base-new /etc/cp-base-new
 
 RUN mkdir /licenses
-COPY license.txt /licenses
+COPY base/license.txt /licenses
 
 # Disable setuid/setgid bits
 RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
