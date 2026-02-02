@@ -106,6 +106,7 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export S390X_ARCH=.s390x
 blocks:
   - name: Validation
     dependencies: []
@@ -131,10 +132,17 @@ blocks:
             - ci-tools ci-update-version
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            # Build artifacts only with maven (skip docker image build)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
+            # Build Docker images (ARG defaults are in Dockerfiles)
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - >-
               for dev_image in $AMD_DOCKER_DEV_FULL_IMAGES;
               do
@@ -315,10 +323,17 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
+            # Build artifacts only with maven (skip docker image build)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
+            # Build Docker images (ARG defaults are in Dockerfiles)
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - for image in $ARM_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
         always:
@@ -491,9 +506,217 @@ blocks:
             - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$ARM_ARCH
             - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
             - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+  - name: Build & Test S390X
+    dependencies: ["Validation"]
+    run:
+      # don't run the tests on non-functional changes...
+      when: "change_in('/', {exclude: ['/.deployed-versions/', '.github/', 'service.yml', 'README.md'], default_branch: 'master'})"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Build & Test ubi9
+          commands:
+            # Setup QEMU for s390x emulation
+            - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            - docker buildx create --name s390x-builder --use || docker buildx use s390x-builder
+            - docker buildx inspect --bootstrap
+            - export OS_TAG="-ubi9"
+            - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
+            - export S390X_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$S390X_ARCH }$S390X_ARCH
+            - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+            - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - ci-tools ci-update-version
+            # Build artifacts only with maven (skip docker image build)
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH 
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+            - . cache-maven store
+            # Build Docker images with buildx for s390x (ARG defaults are in Dockerfiles)
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} -f base/Dockerfile.ubi9 base/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java -f base-java/Dockerfile.ubi9 base-java/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-java-micro -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg GIT_COMMIT=${GIT_COMMIT} --build-arg BUILD_NUMBER=${BUILD_NUMBER} --build-arg ARTIFACT_ID=cp-base-lite -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
+            # Verify images are built for s390x architecture
+            - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Checking architecture of $image:" && docker inspect --format='{{.Architecture}}' $image; done
+            - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
+      epilogue:
+        always:
+          commands:
+            - . publish-test-results
+            - artifact push workflow target/test-results
+            - artifact push workflow target --destination target-S390X
+  - name: Deploy S390X confluentinc/cp-base-java
+    dependencies: ["Build & Test S390X"]
+    run:
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Deploy S390X confluentinc/cp-base-java ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java
+          commands:
+            - export OS_TAG="-ubi9"
+            - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-java
+            - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$S390X_ARCH
+            - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+            - docker pull $DEV_IMAGE_FULL
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+  - name: Deploy S390X confluentinc/cp-base-java-micro
+    dependencies: ["Build & Test S390X"]
+    run:
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Deploy S390X confluentinc/cp-base-java-micro ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java-micro
+          commands:
+            - export OS_TAG="-ubi9"
+            - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-java-micro
+            - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$S390X_ARCH
+            - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+            - docker pull $DEV_IMAGE_FULL
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+  - name: Deploy S390X confluentinc/cp-base-new
+    dependencies: ["Build & Test S390X"]
+    run:
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Deploy S390X confluentinc/cp-base-new ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-new
+          commands:
+            - export OS_TAG="-ubi9"
+            - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-new
+            - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$S390X_ARCH
+            - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+            - docker pull $DEV_IMAGE_FULL
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+  - name: Deploy S390X confluentinc/cp-base-lite
+    dependencies: ["Build & Test S390X"]
+    run:
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Deploy S390X confluentinc/cp-base-lite ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-lite
+          commands:
+            - export OS_TAG="-ubi9"
+            - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-base-lite
+            - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$S390X_ARCH
+            - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+            - docker pull $DEV_IMAGE_FULL
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+  - name: Deploy S390X confluentinc/cp-jmxterm
+    dependencies: ["Build & Test S390X"]
+    run:
+      when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      jobs:
+        - name: Deploy S390X confluentinc/cp-jmxterm ubi9
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-jmxterm
+          commands:
+            - export OS_TAG="-ubi9"
+            - export PROD_IMAGE_NAME=${DOCKER_PROD_REGISTRY}confluentinc/cp-jmxterm
+            - export GIT_COMMIT_TAG=$GIT_COMMIT$OS_TAG$S390X_ARCH
+            - export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - export DEV_IMAGE_FULL=${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+            - docker pull $DEV_IMAGE_FULL
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - docker push $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - docker push $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - sign-images $PROD_IMAGE_NAME:$GIT_COMMIT_TAG
+            - sign-images $PROD_IMAGE_NAME:$BRANCH_BUILD_TAG
+            - export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - docker push $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - sign-images $PROD_IMAGE_NAME:$PACKAGE_TAG
+            - export LATEST_PUSH_TAG=$LATEST_TAG$OS_TAG$S390X_ARCH
+            - docker tag $DEV_IMAGE_FULL $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
+            - docker push $PROD_IMAGE_NAME:$LATEST_PUSH_TAG
   - name: Create Manifest and Maven Deploy
     dependencies: ["Deploy AMD confluentinc/cp-base-java", "Deploy AMD confluentinc/cp-base-java-micro", "Deploy AMD confluentinc/cp-base-new", "Deploy AMD confluentinc/cp-base-lite", "Deploy AMD confluentinc/cp-jmxterm",
-      "Deploy ARM confluentinc/cp-base-java", "Deploy ARM confluentinc/cp-base-java-micro", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-base-lite", "Deploy ARM confluentinc/cp-jmxterm"]
+      "Deploy ARM confluentinc/cp-base-java", "Deploy ARM confluentinc/cp-base-java-micro", "Deploy ARM confluentinc/cp-base-new", "Deploy ARM confluentinc/cp-base-lite", "Deploy ARM confluentinc/cp-jmxterm",
+      "Deploy S390X confluentinc/cp-base-java", "Deploy S390X confluentinc/cp-base-java-micro", "Deploy S390X confluentinc/cp-base-new", "Deploy S390X confluentinc/cp-base-lite", "Deploy S390X confluentinc/cp-jmxterm"]
     run:
       when: "branch = 'master' or branch =~ '^[0-9]+\\.[0-9]+\\.x$' or branch =~ '^[0-9]+\\.[0-9]+\\.[0-9]+(-cp[0-9]+)?(-rc[0-9]+)?$'"
     task:
@@ -513,20 +736,20 @@ blocks:
               do
                 export OS_TAG="-ubi9"
                 export GIT_TAG=$GIT_COMMIT$OS_TAG
-                docker manifest create $image:$GIT_TAG $image:$GIT_TAG$AMD_ARCH $image:$GIT_TAG$ARM_ARCH
+                docker manifest create $image:$GIT_TAG $image:$GIT_TAG$AMD_ARCH $image:$GIT_TAG$ARM_ARCH $image:$GIT_TAG$S390X_ARCH
                 docker manifest push $image:$GIT_TAG
                 docker pull $image:$GIT_TAG
                 sign-images $image:$GIT_TAG
                 export BRANCH_BUILD_TAG=$BRANCH_TAG-$BUILD_NUMBER$OS_TAG
-                docker manifest create $image:$BRANCH_BUILD_TAG $image:$BRANCH_BUILD_TAG$AMD_ARCH $image:$BRANCH_BUILD_TAG$ARM_ARCH
+                docker manifest create $image:$BRANCH_BUILD_TAG $image:$BRANCH_BUILD_TAG$AMD_ARCH $image:$BRANCH_BUILD_TAG$ARM_ARCH $image:$BRANCH_BUILD_TAG$S390X_ARCH
                 docker manifest push $image:$BRANCH_BUILD_TAG
                 docker pull $image:$BRANCH_BUILD_TAG
                 sign-images $image:$BRANCH_BUILD_TAG
                 export PACKAGE_TAG=$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG
-                docker manifest create $image:$PACKAGE_TAG $image:$PACKAGE_TAG$AMD_ARCH $image:$PACKAGE_TAG$ARM_ARCH
+                docker manifest create $image:$PACKAGE_TAG $image:$PACKAGE_TAG$AMD_ARCH $image:$PACKAGE_TAG$ARM_ARCH $image:$PACKAGE_TAG$S390X_ARCH
                 docker manifest push $image:$PACKAGE_TAG
                 export LATEST_MANIFEST_TAG=$LATEST_TAG$OS_TAG
-                docker manifest create $image:$LATEST_MANIFEST_TAG $image:$LATEST_MANIFEST_TAG$AMD_ARCH $image:$LATEST_MANIFEST_TAG$ARM_ARCH
+                docker manifest create $image:$LATEST_MANIFEST_TAG $image:$LATEST_MANIFEST_TAG$AMD_ARCH $image:$LATEST_MANIFEST_TAG$ARM_ARCH $image:$LATEST_MANIFEST_TAG$S390X_ARCH
                 docker manifest push $image:$LATEST_MANIFEST_TAG
               done
 after_pipeline:
@@ -546,4 +769,5 @@ after_pipeline:
           - checkout
           - artifact pull workflow target-AMD
           - artifact pull workflow target-ARM
+          - artifact pull workflow target-S390X
           - emit-sonarqube-data --run_only_sonar_scan
