@@ -89,11 +89,14 @@ RUN microdnf --nodocs -y install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
+        gcc \
+        make \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
         "python3${PYTHON39_VERSION}" \
         "python3-pip${PYTHON_PIP_VERSION}" \
+        "python3-devel" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
@@ -106,13 +109,20 @@ RUN microdnf --nodocs -y install yum \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
+        "libffi-devel" \
+        "openssl-devel" \
+        "libsodium-devel" \
     && alternatives --install /usr/bin/python python /usr/bin/python3 2000 \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
+    # Install Rust for building bcrypt/cryptography on s390x (removed after pip install)
+    && wget -qO - https://sh.rustup.rs | sh -s -- -y --profile minimal \
+    && . $HOME/.cargo/env \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-    && yum remove -y git \
+    && rustup self uninstall -y \
+    && yum remove -y git gcc make python3-devel libffi-devel openssl-devel libsodium-devel \
     && yum clean all \
-    && rm -rf /tmp/* \
+    && rm -rf /tmp/* /root/.cargo /root/.rustup \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
