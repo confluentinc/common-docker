@@ -46,6 +46,8 @@ LABEL io.confluent.docker=true
 # base image that supports it
 ENV LANG="C.UTF-8"
 ENV USE_LOG4J_2="True"
+# Set classpath for ub utility commands (kafka-ready, etc.) to find utility-belt JARs
+ENV UB_CLASSPATH=/usr/share/java/cp-base-java/*
 
 RUN printf "[temurin-jre] \n\
 name=temurin-jre \n\
