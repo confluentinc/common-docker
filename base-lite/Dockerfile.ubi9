@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 #
 # Copyright 2017 Confluent Inc.
 #
@@ -13,12 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Helpers for cross-compilation using clang
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.5.0 AS xx
+
 ARG UBI_MINIMAL_VERSION="latest"
 ARG GOLANG_VERSION
 ARG CURL_VERSION
 
-FROM golang:${GOLANG_VERSION} AS build-ub
+FROM --platform=$BUILDPLATFORM golang:${GOLANG_VERSION} AS build-ub
+COPY --from=xx / /
+RUN apt-get update && apt-get install -y clang lld
 WORKDIR /build
+ARG TARGETPLATFORM
+RUN xx-apt-get install -y libc6-dev gcc g++
+# This wraps the go compiler to enable cross-compilation by default
+RUN xx-go --wrap
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser ub/ ./
 RUN CGO_ENABLED=0 go build -ldflags="-w -s" ./ub.go
