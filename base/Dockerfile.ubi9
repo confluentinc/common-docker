@@ -118,6 +118,7 @@ RUN microdnf --nodocs -y install yum \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && if [ "$(uname -m)" = "s390x" ]; then \
         . /root/.cargo/env; \
+        echo 'int main() { return 0; }' > /tmp/test.c && gcc /tmp/test.c -o /tmp/test && /tmp/test && echo "GCC test passed" && rm -f /tmp/test /tmp/test.c; \
         python3 -m pip install maturin setuptools-rust wheel; \
         env PATH="/root/.cargo/bin:/usr/bin:/usr/local/bin:/bin" \
             CC=/usr/bin/gcc \
