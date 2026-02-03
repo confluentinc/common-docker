@@ -234,11 +234,11 @@ blocks:
                 --build-arg UBI_MINIMAL_VERSION=${UBI9_MINIMAL_VERSION} \
                 --build-arg PYTHON_CONFLUENT_DOCKER_UTILS_VERSION=${CONFLUENT_DOCKER_UTILS_VERSION} \
                 base/
-            # Build cp-base-java
+            # Build cp-base-java (uses s390x-specific Dockerfile with cross-compilation)
             - |
               docker buildx build --platform linux/s390x --load \
                 -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
-                -f base-java/Dockerfile.ubi9 \
+                -f base-java/Dockerfile.ubi9.s390x \
                 --build-arg ARTIFACT_ID=cp-base-java \
                 --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
                 --build-arg GIT_COMMIT=${GIT_COMMIT} \
@@ -247,11 +247,11 @@ blocks:
                 --build-arg GOLANG_VERSION=${GOLANG_VERSION} \
                 --build-arg CP_DOCKER_UTILS_VERSION=${CP_DOCKER_UTILS_VERSION} \
                 base-java/
-            # Build cp-base-java-micro
+            # Build cp-base-java-micro (uses s390x-specific Dockerfile with cross-compilation)
             - |
               docker buildx build --platform linux/s390x --load \
                 -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
-                -f base-java-micro/Dockerfile.ubi9 \
+                -f base-java-micro/Dockerfile.ubi9.s390x \
                 --build-arg ARTIFACT_ID=cp-base-java-micro \
                 --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
                 --build-arg GIT_COMMIT=${GIT_COMMIT} \
@@ -261,11 +261,11 @@ blocks:
                 --build-arg GOLANG_VERSION=${GOLANG_VERSION} \
                 --build-arg CP_DOCKER_UTILS_VERSION=${CP_DOCKER_UTILS_VERSION} \
                 base-java-micro/
-            # Build cp-base-lite (uses cross-compilation instead of QEMU emulation for Go binary)
+            # Build cp-base-lite (uses s390x-specific Dockerfile with cross-compilation)
             - |
               docker buildx build --platform linux/s390x --load \
                 -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
-                -f base-lite/Dockerfile.ubi9 \
+                -f base-lite/Dockerfile.ubi9.s390x \
                 --build-arg ARTIFACT_ID=cp-base-lite \
                 --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
                 --build-arg GIT_COMMIT=${GIT_COMMIT} \
