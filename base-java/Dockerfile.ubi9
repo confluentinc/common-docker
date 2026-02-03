@@ -71,14 +71,14 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS
 
-COPY base-java/license.txt /licenses
+COPY license.txt /licenses
 COPY --from=build-ub-package-dedupe /go/bin/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
-COPY --chown=appuser:appuser base-java/include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser base-java/include/etc/cp-base-java /etc/cp-base-java
+COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 
 # Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
 RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new

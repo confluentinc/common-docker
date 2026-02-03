@@ -87,15 +87,15 @@ RUN update-crypto-policies --set FIPS && \
     mkdir -p /etc/confluent/docker /usr/logs /licenses && \
     chown ${APP_UID}:${APP_GID} -R /etc/confluent/ /usr/logs
 
-COPY base-java-micro/license.txt /licenses
+COPY license.txt /licenses
 
 COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/package_dedupe /usr/bin/package_dedupe
 COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/ub /usr/bin/ub
 
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
-COPY --chown=${APP_UID}:${APP_GID} base-java-micro/include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=${APP_UID}:${APP_GID} base-java-micro/include/etc/cp-base-java-micro /etc/cp-base-java-micro
+COPY --chown=${APP_UID}:${APP_GID} include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=${APP_UID}:${APP_GID} include/etc/cp-base-java-micro /etc/cp-base-java-micro
 
 # Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
 RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
