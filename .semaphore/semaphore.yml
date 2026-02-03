@@ -99,6 +99,7 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export S390X_ARCH=.s390x
 blocks:
   - name: Validation
     dependencies: []
