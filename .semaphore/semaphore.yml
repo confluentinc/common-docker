@@ -130,10 +130,17 @@ blocks:
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             # Create package structure that Dockerfiles expect
-            - for module in base base-java base-java-micro base-lite jmxterm; do mkdir -p $module/target/cp-$module-8.3.0-0-package/share/{doc,java/cp-$module}; done
+            - mkdir -p base/target/cp-base-new-8.3.0-0-package/share/{doc,java/cp-base-new}
+            - mkdir -p base-java/target/cp-base-java-8.3.0-0-package/share/{doc,java/cp-base-java}
+            - mkdir -p base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/{doc,java/cp-base-java-micro}
+            - mkdir -p base-lite/target/cp-base-lite-8.3.0-0-package/share/{doc,java/cp-base-lite}
+            - mkdir -p jmxterm/target/cp-jmxterm-8.3.0-0-package/share/{doc,java/cp-jmxterm}
             # Copy built artifacts to package structure
-            - cp docker-utils/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
             - cp utility-belt/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/target/cp-base-java-8.3.0-0-package/share/java/cp-base-java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/java/cp-base-java-micro/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/target/cp-base-lite-8.3.0-0-package/share/java/cp-base-lite/ 2>/dev/null || true
+            - cp docker-utils/target/*.jar jmxterm/target/cp-jmxterm-8.3.0-0-package/share/java/cp-jmxterm/ 2>/dev/null || true
             # Build Docker images directly
             - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base/Dockerfile.ubi9 base/
             - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-java/Dockerfile.ubi9 base-java/
@@ -175,10 +182,17 @@ blocks:
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             # Create package structure that Dockerfiles expect
-            - for module in base base-java base-java-micro base-lite jmxterm; do mkdir -p $module/target/cp-$module-8.3.0-0-package/share/{doc,java/cp-$module}; done
+            - mkdir -p base/target/cp-base-new-8.3.0-0-package/share/{doc,java/cp-base-new}
+            - mkdir -p base-java/target/cp-base-java-8.3.0-0-package/share/{doc,java/cp-base-java}
+            - mkdir -p base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/{doc,java/cp-base-java-micro}
+            - mkdir -p base-lite/target/cp-base-lite-8.3.0-0-package/share/{doc,java/cp-base-lite}
+            - mkdir -p jmxterm/target/cp-jmxterm-8.3.0-0-package/share/{doc,java/cp-jmxterm}
             # Copy built artifacts to package structure
-            - cp docker-utils/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
             - cp utility-belt/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/target/cp-base-java-8.3.0-0-package/share/java/cp-base-java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/java/cp-base-java-micro/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/target/cp-base-lite-8.3.0-0-package/share/java/cp-base-lite/ 2>/dev/null || true
+            - cp docker-utils/target/*.jar jmxterm/target/cp-jmxterm-8.3.0-0-package/share/java/cp-jmxterm/ 2>/dev/null || true
             # Build Docker images directly
             - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base/Dockerfile.ubi9 base/
             - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-java/Dockerfile.ubi9 base-java/
@@ -219,10 +233,17 @@ blocks:
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             # Create package structure that Dockerfiles expect
-            - for module in base base-java base-java-micro base-lite jmxterm; do mkdir -p $module/target/cp-$module-8.3.0-0-package/share/{doc,java/cp-$module}; done
+            - mkdir -p base/target/cp-base-new-8.3.0-0-package/share/{doc,java/cp-base-new}
+            - mkdir -p base-java/target/cp-base-java-8.3.0-0-package/share/{doc,java/cp-base-java}
+            - mkdir -p base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/{doc,java/cp-base-java-micro}
+            - mkdir -p base-lite/target/cp-base-lite-8.3.0-0-package/share/{doc,java/cp-base-lite}
+            - mkdir -p jmxterm/target/cp-jmxterm-8.3.0-0-package/share/{doc,java/cp-jmxterm}
             # Copy built artifacts to package structure
-            - cp docker-utils/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
             - cp utility-belt/target/*.jar base/target/cp-base-new-8.3.0-0-package/share/java/cp-base-new/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/target/cp-base-java-8.3.0-0-package/share/java/cp-base-java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/target/cp-base-java-micro-8.3.0-0-package/share/java/cp-base-java-micro/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/target/cp-base-lite-8.3.0-0-package/share/java/cp-base-lite/ 2>/dev/null || true
+            - cp docker-utils/target/*.jar jmxterm/target/cp-jmxterm-8.3.0-0-package/share/java/cp-jmxterm/ 2>/dev/null || true
             # Build Docker images with buildx for s390x platform
             - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base/Dockerfile.ubi9 base/
             - docker buildx build --platform linux/s390x --load -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-java/Dockerfile.ubi9 base-java/
