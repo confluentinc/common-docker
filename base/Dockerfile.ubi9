@@ -106,11 +106,18 @@ RUN microdnf --nodocs -y install yum \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
+        gcc \
+        make \
+        python3-devel \
+        openssl-devel \
+        libffi-devel \
+        cargo \
+        rust \
     && alternatives --install /usr/bin/python python /usr/bin/python3 2000 \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-    && yum remove -y git \
+    && yum remove -y git gcc make python3-devel openssl-devel libffi-devel cargo rust \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
