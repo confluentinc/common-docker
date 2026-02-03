@@ -99,6 +99,7 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export S390X_ARCH=.s390x
 blocks:
   - name: Validation
     dependencies: []
@@ -123,10 +124,32 @@ blocks:
             - ci-tools ci-update-version
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
-              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+            # Build artifacts with Maven (skip Docker image build, use docker CLI instead)
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
+            # Stage artifacts for Docker builds in a clean, version-independent way
+            - mkdir -p base/build-artifacts/{doc,java}
+            - mkdir -p base-java/build-artifacts/{doc,java}
+            - mkdir -p base-java-micro/build-artifacts/{doc,java}
+            - mkdir -p base-lite/build-artifacts/{doc,java}
+            # Create placeholder doc files so Docker COPY doesn't fail on empty directories
+            - touch base/build-artifacts/doc/.placeholder
+            - touch base-java/build-artifacts/doc/.placeholder
+            - touch base-java-micro/build-artifacts/doc/.placeholder
+            - touch base-lite/build-artifacts/doc/.placeholder
+            # Copy built jars to staging directory
+            - cp utility-belt/target/*.jar base/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/build-artifacts/java/ 2>/dev/null || true
+            # Build Docker images directly
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${AMD_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - >-
               for dev_image in $AMD_DOCKER_DEV_FULL_IMAGES;
               do
@@ -156,10 +179,32 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
-              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH 
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+            # Build artifacts with Maven (skip Docker image build, use docker CLI instead)
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
+            # Stage artifacts for Docker builds in a clean, version-independent way
+            - mkdir -p base/build-artifacts/{doc,java}
+            - mkdir -p base-java/build-artifacts/{doc,java}
+            - mkdir -p base-java-micro/build-artifacts/{doc,java}
+            - mkdir -p base-lite/build-artifacts/{doc,java}
+            # Create placeholder doc files so Docker COPY doesn't fail on empty directories
+            - touch base/build-artifacts/doc/.placeholder
+            - touch base-java/build-artifacts/doc/.placeholder
+            - touch base-java-micro/build-artifacts/doc/.placeholder
+            - touch base-lite/build-artifacts/doc/.placeholder
+            # Copy built jars to staging directory
+            - cp utility-belt/target/*.jar base/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/build-artifacts/java/ 2>/dev/null || true
+            # Build Docker images directly
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker build -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${ARM_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
             - for image in $ARM_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
       epilogue:
         always:
@@ -167,6 +212,64 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-ARM
+  - name: Build & Test S390X
+    dependencies: ["Validation"]
+    run:
+      when: "pull_request =~ '.*'"
+    task:
+      agent:
+        machine:
+          type: s1-prod-ubuntu24-04-amd64-1
+      execution_time_limit:
+        hours: 2
+      jobs:
+        - name: Build & Test ubi9
+          commands:
+            # Setup QEMU for s390x emulation
+            - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            - docker buildx create --name s390x-builder --use || docker buildx use s390x-builder
+            - docker buildx inspect --bootstrap
+            - export OS_TAG="-ubi9"
+            - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
+            - export S390X_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$S390X_ARCH }$S390X_ARCH
+            - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+            - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - ci-tools ci-update-version
+            # Build artifacts with Maven (skip Docker image build, use docker buildx instead)
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+            - . cache-maven store
+            # Stage artifacts for Docker builds in a clean, version-independent way
+            - mkdir -p base/build-artifacts/{doc,java}
+            - mkdir -p base-java/build-artifacts/{doc,java}
+            - mkdir -p base-java-micro/build-artifacts/{doc,java}
+            - mkdir -p base-lite/build-artifacts/{doc,java}
+            # Create placeholder doc files so Docker COPY doesn't fail on empty directories
+            - touch base/build-artifacts/doc/.placeholder
+            - touch base-java/build-artifacts/doc/.placeholder
+            - touch base-java-micro/build-artifacts/doc/.placeholder
+            - touch base-lite/build-artifacts/doc/.placeholder
+            # Copy built jars to staging directory
+            - cp utility-belt/target/*.jar base/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/build-artifacts/java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/build-artifacts/java/ 2>/dev/null || true
+            # Build Docker images with buildx for s390x platform (with layer caching)
+            - docker buildx build --platform linux/s390x --load --cache-from type=registry,ref=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:buildcache-s390x --cache-to type=inline -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base/Dockerfile.ubi9 base/
+            - docker buildx build --platform linux/s390x --load --cache-from type=registry,ref=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:buildcache-s390x --cache-to type=inline -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-java/Dockerfile.ubi9 base-java/
+            - docker buildx build --platform linux/s390x --load --cache-from type=registry,ref=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:buildcache-s390x --cache-to type=inline -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-java-micro/Dockerfile.ubi9 base-java-micro/
+            - docker buildx build --platform linux/s390x --load --cache-from type=registry,ref=${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:buildcache-s390x --cache-to type=inline -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f base-lite/Dockerfile.ubi9 base-lite/
+            - docker buildx build --platform linux/s390x --load --cache-from type=registry,ref=${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:buildcache-s390x --cache-to type=inline -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} -f jmxterm/Dockerfile.ubi9 jmxterm/
+            # Verify images are built for s390x architecture
+            - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Checking architecture of $image:" && docker inspect --format='{{.Architecture}}' $image; done
+            - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
+      epilogue:
+        always:
+          commands:
+            - . publish-test-results
+            - artifact push workflow target/test-results
+            - artifact push workflow target --destination target-S390X
 after_pipeline:
   task:
     agent:
@@ -184,4 +287,5 @@ after_pipeline:
           - checkout
           - artifact pull workflow target-AMD
           - artifact pull workflow target-ARM
+          - artifact pull workflow target-S390X
           - emit-sonarqube-data --run_only_sonar_scan
