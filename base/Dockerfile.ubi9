@@ -108,7 +108,7 @@ RUN microdnf --nodocs -y install yum \
         "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
     && ARCH=$(uname -m) \
     && if [ "$ARCH" = "s390x" ]; then \
-        yum --nodocs install -y --setopt=install_weak_deps=False gcc gcc-c++ make python3-devel openssl-devel libffi-devel curl; \
+        yum --nodocs install -y --setopt=install_weak_deps=False gcc gcc-c++ make python3-devel openssl-devel libffi-devel curl binutils; \
         update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 100; \
         update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 100; \
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal; \
@@ -130,7 +130,7 @@ RUN microdnf --nodocs -y install yum \
        fi \
     && if [ "$ARCH" = "s390x" ]; then \
         rm -rf /root/.cargo /root/.rustup; \
-        yum remove -y gcc gcc-c++ make python3-devel openssl-devel libffi-devel curl; \
+        yum remove -y gcc gcc-c++ make python3-devel openssl-devel libffi-devel curl binutils; \
         update-alternatives --remove cc /usr/bin/gcc; \
         update-alternatives --remove c++ /usr/bin/g++; \
        fi \
