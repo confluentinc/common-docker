@@ -88,8 +88,8 @@ RUN microdnf --nodocs -y install yum \
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
-COPY --chown=appuser:appuser build-artifacts/doc/* /usr/share/doc/${ARTIFACT_ID}/
-COPY --chown=appuser:appuser build-artifacts/java/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite

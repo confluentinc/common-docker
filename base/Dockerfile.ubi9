@@ -12,22 +12,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Default versions from pom.xml - can be overridden at build time
-ARG UBI_MINIMAL_VERSION="9.7-1768783948"
+ARG UBI_MINIMAL_VERSION="latest"
 FROM registry.access.redhat.com/ubi9/ubi-minimal:${UBI_MINIMAL_VERSION}
 
-# Build args with defaults
-ARG PROJECT_VERSION="8.3.0-0"
-ARG ARTIFACT_ID="cp-base-new"
-ARG GIT_COMMIT="unknown"
-ARG BUILD_NUMBER=-1
-# TARGETARCH is automatically set by Docker buildx (amd64, arm64, s390x)
-ARG TARGETARCH
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
 
-# Labels
+# Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
+
+ARG GIT_COMMIT
 LABEL io.confluent.docker.git.id=$GIT_COMMIT
+
+ARG BUILD_NUMBER=-1
 LABEL io.confluent.docker.build.number=$BUILD_NUMBER
+
 LABEL maintainer="tools@confluent.io"
 LABEL vendor="Confluent"
 LABEL version=$GIT_COMMIT
@@ -45,10 +44,37 @@ ENV LANG="C.UTF-8"
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 ENV USE_LOG4J_2="True"
 
-# Confluent Docker Utils Version - default from pom.xml
-ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="v0.0.164"
+# These ARGs are left blank indicating to the Dnf package manager to install the latest package
+# version that happens to be availible at this time. For reproducible builds, versions should be specified
+# as '-1.2.3-4.el8' on the command line. Or more preferibly the 'dockerfile-maven-plugin' is used
+# where these arguments are set in base/pom.xml under the <buildArgs> elements based on the commit you're
+# building from.
 
-# This can be overriden for offline/air-gapped builds
+# Redhat Package Versions
+ARG OPENSSL_VERSION=""
+ARG WGET_VERSION=""
+ARG NETCAT_VERSION=""
+ARG PYTHON39_VERSION=""
+ARG TAR_VERSION=""
+ARG PROCPS_VERSION=""
+ARG KRB5_WORKSTATION_VERSION=""
+ARG IPUTILS_VERSION=""
+ARG HOSTNAME_VERSION=""
+ARG XZ_LIBS_VERSION=""
+ARG GLIBC_VERSION=""
+ARG CURL_VERSION=""
+
+# Temurin JDK version
+ARG TEMURIN_JDK_VERSION=""
+
+# Python Module Versions
+ARG PYTHON_PIP_VERSION=""
+ARG PYTHON_SETUPTOOLS_VERSION=""
+
+# Confluent Docker Utils Version (Namely the tag or branch to grab from git to install)
+ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
+
+# This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
 RUN printf "[temurin-jdk] \n\
@@ -59,57 +85,38 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-# Install base packages
 RUN microdnf --nodocs -y install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
-        openssl \
-        wget \
-        nmap-ncat \
-        python3 \
-        python3-pip \
-        tar \
-        procps-ng \
-        krb5-workstation \
-        iputils \
-        hostname \
-        xz-libs \
-        glibc \
-        glibc-common \
-        glibc-minimal-langpack \
-        findutils \
-        crypto-policies-scripts \
-        temurin-21-jdk \
+        "openssl${OPENSSL_VERSION}" \
+        "wget${WGET_VERSION}" \
+        "nmap-ncat${NETCAT_VERSION}" \
+        "python3${PYTHON39_VERSION}" \
+        "python3-pip${PYTHON_PIP_VERSION}" \
+        "tar${TAR_VERSION}" \
+        "procps-ng${PROCPS_VERSION}" \
+        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
+        "iputils${IPUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "xz-libs${XZ_LIBS_VERSION}" \
+        "glibc${GLIBC_VERSION}" \
+        "glibc-common${GLIBC_VERSION}" \
+        "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "findutils${FINDUTILS_VERSION}" \
+        "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
+        "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
     && alternatives --install /usr/bin/python python /usr/bin/python3 2000 \
-    && alternatives --set python /usr/bin/python3
-
-# For s390x: Install build tools needed to compile Python packages from source
-# (bcrypt, cryptography, pynacl don't have pre-built wheels for s390x)
-# For amd64/arm64: Skip this step as pre-built wheels are available
-RUN if [ "$TARGETARCH" = "s390x" ]; then \
-        yum --nodocs install -y --setopt=install_weak_deps=False \
-            gcc make python3-devel libffi-devel openssl-devel \
-        && wget -qO - https://sh.rustup.rs | sh -s -- -y --profile minimal \
-        && . $HOME/.cargo/env \
-        && python3 -m pip install --upgrade setuptools \
-        && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-        && rustup self uninstall -y \
-        && yum remove -y gcc make python3-devel libffi-devel openssl-devel \
-        && rm -rf /root/.cargo /root/.rustup; \
-    else \
-        python3 -m pip install --upgrade setuptools \
-        && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}"; \
-    fi
-
-# Cleanup
-RUN yum remove -y git \
+    && alternatives --set python /usr/bin/python3 \
+    && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
+    && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
+    && yum remove -y git \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
-    && rm /etc/yum.repos.d/adoptium.repo
+    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
 
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
@@ -120,8 +127,8 @@ RUN yum remove -y git \
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
-COPY --chown=appuser:appuser build-artifacts/doc/* /usr/share/doc/${ARTIFACT_ID}/
-COPY --chown=appuser:appuser build-artifacts/java/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-new /etc/cp-base-new
