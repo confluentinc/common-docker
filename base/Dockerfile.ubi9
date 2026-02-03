@@ -120,6 +120,7 @@ RUN microdnf --nodocs -y install yum \
         . /root/.cargo/env; \
         export PATH="/root/.cargo/bin:$PATH"; \
         export CC=gcc CXX=g++ CARGO_TARGET_S390X_UNKNOWN_LINUX_GNU_LINKER=gcc; \
+        python3 -m pip install maturin setuptools-rust wheel; \
         python3 -m pip install --no-build-isolation --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}"; \
        else \
         python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}"; \
