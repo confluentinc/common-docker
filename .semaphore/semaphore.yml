@@ -185,8 +185,7 @@ blocks:
           commands:
             # Setup QEMU for s390x emulation
             - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-            - docker buildx create --name s390x-builder || true
-            - docker buildx use s390x-builder
+            - docker buildx create --name s390x-builder --use || docker buildx use s390x-builder
             - docker buildx inspect --bootstrap
             - export OS_TAG="-ubi9"
             - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
@@ -194,15 +193,94 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
-            # Configure buildx for Maven to use
-            - export DOCKER_BUILDKIT=1
-            - export DOCKER_CLI_EXPERIMENTAL=enabled
-            # Let Maven build Docker images for S390X (it handles all build args automatically)
-            # Note: fabric8 docker-maven-plugin may not fully support buildx, so images might be AMD64
+            # Build artifacts with Maven (skip Docker image build, use docker buildx instead)
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
-              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.skip-build=true -Ddocker.skip-test=true $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
+            # Extract essential version properties from pom.xml for docker build args
+            - export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            - export UBI9_MINIMAL_VERSION=$(mvn help:evaluate -Dexpression=ubi9-minimal.image.version -q -DforceStdout)
+            - export UBI9_MICRO_VERSION=$(mvn help:evaluate -Dexpression=ubi9-micro.image.version -q -DforceStdout)
+            - export UBI9_VERSION=$(mvn help:evaluate -Dexpression=ubi9.image.version -q -DforceStdout)
+            - export GOLANG_VERSION=$(mvn help:evaluate -Dexpression=golang.image.version -q -DforceStdout)
+            - export CP_DOCKER_UTILS_VERSION=$(mvn help:evaluate -Dexpression=git-repo.cp-docker-utils.tag -q -DforceStdout)
+            - export CONFLUENT_DOCKER_UTILS_VERSION=$(mvn help:evaluate -Dexpression=git-repo.confluent-docker-utils.tag -q -DforceStdout)
+            # Manually create package directories (Maven skip-build doesn't create them)
+            - mkdir -p base/target/cp-base-new-${PROJECT_VERSION}-package/share/{doc,java/cp-base-new}
+            - mkdir -p base-java/target/cp-base-java-${PROJECT_VERSION}-package/share/{doc,java/cp-base-java}
+            - mkdir -p base-java-micro/target/cp-base-java-micro-${PROJECT_VERSION}-package/share/{doc,java/cp-base-java-micro}
+            - mkdir -p base-lite/target/cp-base-lite-${PROJECT_VERSION}-package/share/{doc,java/cp-base-lite}
+            # Create README files in doc directories (Docker COPY wildcards require at least one file)
+            - echo "Confluent Platform Base Image" > base/target/cp-base-new-${PROJECT_VERSION}-package/share/doc/README.txt
+            - echo "Confluent Platform Base Java Image" > base-java/target/cp-base-java-${PROJECT_VERSION}-package/share/doc/README.txt
+            - echo "Confluent Platform Base Java Micro Image" > base-java-micro/target/cp-base-java-micro-${PROJECT_VERSION}-package/share/doc/README.txt
+            - echo "Confluent Platform Base Lite Image" > base-lite/target/cp-base-lite-${PROJECT_VERSION}-package/share/doc/README.txt
+            # Copy built JARs to package structure
+            - cp utility-belt/target/*.jar base/target/cp-base-new-${PROJECT_VERSION}-package/share/java/cp-base-new/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java/target/cp-base-java-${PROJECT_VERSION}-package/share/java/cp-base-java/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-java-micro/target/cp-base-java-micro-${PROJECT_VERSION}-package/share/java/cp-base-java-micro/ 2>/dev/null || true
+            - cp utility-belt/target/*.jar base-lite/target/cp-base-lite-${PROJECT_VERSION}-package/share/java/cp-base-lite/ 2>/dev/null || true
+            # Build Docker images with docker buildx for s390x platform with all required build args
+            # Build cp-base-new (base image for others)
+            - |
+              docker buildx build --platform linux/s390x --load \
+                -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                -f base/Dockerfile.ubi9 \
+                --build-arg ARTIFACT_ID=cp-base-new \
+                --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
+                --build-arg GIT_COMMIT=${GIT_COMMIT} \
+                --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                --build-arg UBI_MINIMAL_VERSION=${UBI9_MINIMAL_VERSION} \
+                --build-arg PYTHON_CONFLUENT_DOCKER_UTILS_VERSION=${CONFLUENT_DOCKER_UTILS_VERSION} \
+                base/
+            # Build cp-base-java
+            - |
+              docker buildx build --platform linux/s390x --load \
+                -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                -f base-java/Dockerfile.ubi9 \
+                --build-arg ARTIFACT_ID=cp-base-java \
+                --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
+                --build-arg GIT_COMMIT=${GIT_COMMIT} \
+                --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                --build-arg UBI_MINIMAL_VERSION=${UBI9_MINIMAL_VERSION} \
+                --build-arg GOLANG_VERSION=${GOLANG_VERSION} \
+                --build-arg CP_DOCKER_UTILS_VERSION=${CP_DOCKER_UTILS_VERSION} \
+                base-java/
+            # Build cp-base-java-micro
+            - |
+              docker buildx build --platform linux/s390x --load \
+                -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-java-micro:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                -f base-java-micro/Dockerfile.ubi9 \
+                --build-arg ARTIFACT_ID=cp-base-java-micro \
+                --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
+                --build-arg GIT_COMMIT=${GIT_COMMIT} \
+                --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                --build-arg UBI_MICRO_VERSION=${UBI9_MICRO_VERSION} \
+                --build-arg UBI9_VERSION=${UBI9_VERSION} \
+                --build-arg GOLANG_VERSION=${GOLANG_VERSION} \
+                --build-arg CP_DOCKER_UTILS_VERSION=${CP_DOCKER_UTILS_VERSION} \
+                base-java-micro/
+            # Build cp-base-lite
+            - |
+              docker buildx build --platform linux/s390x --load \
+                -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-lite:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                -f base-lite/Dockerfile.ubi9 \
+                --build-arg ARTIFACT_ID=cp-base-lite \
+                --build-arg PROJECT_VERSION=${PROJECT_VERSION} \
+                --build-arg GIT_COMMIT=${GIT_COMMIT} \
+                --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                --build-arg UBI_MINIMAL_VERSION=${UBI9_MINIMAL_VERSION} \
+                --build-arg GOLANG_VERSION=${GOLANG_VERSION} \
+                base-lite/
+            # Build cp-jmxterm (depends on cp-base-new)
+            - |
+              docker buildx build --platform linux/s390x --load \
+                -t ${DOCKER_DEV_REGISTRY}confluentinc/cp-jmxterm:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                -f jmxterm/Dockerfile.ubi9 \
+                --build-arg DOCKER_REGISTRY=${DOCKER_DEV_REGISTRY} \
+                --build-arg DOCKER_TAG=${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH} \
+                jmxterm/
             # Verify images are built for s390x architecture
             - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Checking architecture of $image:" && docker inspect --format='{{.Architecture}}' $image; done
             - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
