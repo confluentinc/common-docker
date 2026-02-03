@@ -216,12 +216,12 @@ blocks:
     dependencies: ["Validation"]
     run:
       when: "pull_request =~ '.*'"
+    execution_time_limit:
+      hours: 2
     task:
       agent:
         machine:
           type: s1-prod-ubuntu24-04-amd64-1
-      execution_time_limit:
-        hours: 2
       jobs:
         - name: Build & Test ubi9
           commands:
