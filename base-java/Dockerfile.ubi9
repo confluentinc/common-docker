@@ -1,10 +1,21 @@
+# syntax=docker/dockerfile:1
+
 ARG GOLANG_VERSION
 ARG UBI_MINIMAL_VERSION
 
+# Helpers for cross-compilation using clang
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.5.0 AS xx
 
-FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
+FROM --platform=$BUILDPLATFORM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
+COPY --from=xx / /
+RUN apt-get update && apt-get install -y clang lld
 ENV GO_BIN="/go/bin"
 ARG CP_DOCKER_UTILS_VERSION
+ARG TARGETPLATFORM
+
+RUN xx-apt-get install -y libc6-dev gcc g++
+# This wraps the go compiler to enable cross-compilation by default
+RUN xx-go --wrap
 
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 
