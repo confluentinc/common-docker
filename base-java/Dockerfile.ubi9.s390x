@@ -1,0 +1,107 @@
+# syntax=docker/dockerfile:1
+
+ARG GOLANG_VERSION
+ARG UBI_MINIMAL_VERSION
+
+# Helpers for cross-compilation using clang
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.5.0 AS xx
+
+FROM --platform=$BUILDPLATFORM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
+COPY --from=xx / /
+RUN apt-get update && apt-get install -y clang lld git
+WORKDIR /build
+ARG CP_DOCKER_UTILS_VERSION
+ARG TARGETPLATFORM
+
+RUN xx-apt-get install -y libc6-dev gcc g++
+# This wraps the go compiler to enable cross-compilation by default
+RUN xx-go --wrap
+
+RUN useradd --no-log-init --create-home --shell /bin/bash appuser
+
+# Clone and build cp-docker-utils binaries with cross-compilation
+RUN git clone --depth 1 --branch ${CP_DOCKER_UTILS_VERSION} https://github.com/confluentinc/cp-docker-utils.git
+
+# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
+# For more details, see https://go.dev/doc/security/fips140
+WORKDIR /build/cp-docker-utils/cmd/ub
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /usr/local/bin/ub
+
+# CGO_ENABLED=0 flag should be removed for FedRAMP compliance builds.
+# For more details, see https://go.dev/doc/security/fips140
+WORKDIR /build/cp-docker-utils/cmd/package_dedupe
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /usr/local/bin/package_dedupe
+
+
+FROM registry.access.redhat.com/ubi9-minimal:${UBI_MINIMAL_VERSION} AS REFRESH
+ARG PROJECT_VERSION
+ARG ARTIFACT_ID
+ARG TEMURIN_JDK_VERSION
+ARG CRYPTO_POLICIES_SCRIPTS_VERSION
+ARG FINDUTILS_VERSION
+ARG HOSTNAME_VERSION
+
+# Remember where we came from
+LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
+
+ARG GIT_COMMIT
+LABEL io.confluent.docker.git.id=$GIT_COMMIT
+
+ARG BUILD_NUMBER=-1
+LABEL io.confluent.docker.build.number=$BUILD_NUMBER
+
+LABEL maintainer="tools@confluent.io"
+LABEL vendor="Confluent"
+LABEL version=$GIT_COMMIT
+LABEL release=$PROJECT_VERSION
+LABEL name=$ARTIFACT_ID
+LABEL summary="Common base image for new Confluent lightweight Docker images."
+LABEL description="Common base image for Confluent lightweight Docker images."
+LABEL io.confluent.docker=true
+# This affects how strings in Java class files are interpreted.  We want UTF-8 and this is the only locale in the
+# base image that supports it
+ENV LANG="C.UTF-8"
+ENV USE_LOG4J_2="True"
+
+RUN printf "[temurin-jre] \n\
+name=temurin-jre \n\
+baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
+enabled=1 \n\
+gpgcheck=1 \n\
+gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
+" > /etc/yum.repos.d/adoptium.repo
+
+RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
+    && microdnf install -y temurin-21-jre${TEMURIN_JDK_VERSION} \
+    && microdnf install -y procps-ng${PROCPS_VERSION} \
+    && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+    && microdnf install -y findutils${FINDUTILS_VERSION} \
+    && microdnf install -y hostname${HOSTNAME_VERSION} \
+    && microdnf clean all \
+    && useradd --no-log-init --create-home --shell /bin/bash appuser \
+    && mkdir -p /etc/confluent/docker /usr/logs \
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs \
+    && mkdir /licenses \
+    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+
+# enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
+RUN update-crypto-policies --set FIPS
+
+COPY license.txt /licenses
+COPY --from=build-ub-package-dedupe /usr/local/bin/package_dedupe /usr/bin/package_dedupe
+COPY --from=build-ub-package-dedupe /usr/local/bin/ub /usr/bin/ub
+
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
+
+# Some components have hardcoded paths to /usr/share/java/cp-base-new, so to keep backward compatibility a symlink is created
+RUN ln -s /usr/share/java/${ARTIFACT_ID} /usr/share/java/cp-base-new
+
+# Disable setuid/setgid bits
+RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
+RUN find / -perm /6000 -type f -exec chmod g-s {} \; || true
+
+USER appuser
+WORKDIR /home/appuser
