@@ -234,6 +234,8 @@ blocks:
                 --build-arg UBI_MINIMAL_VERSION=${UBI9_MINIMAL_VERSION} \
                 --build-arg PYTHON_CONFLUENT_DOCKER_UTILS_VERSION=${CONFLUENT_DOCKER_UTILS_VERSION} \
                 base/
+            # Push cp-base-new immediately (jmxterm depends on it being in registry)
+            - docker push ${DOCKER_DEV_REGISTRY}confluentinc/cp-base-new:${DOCKER_DEV_TAG}${OS_TAG}${S390X_ARCH}
             # Build cp-base-java (uses s390x-specific Dockerfile with cross-compilation)
             - |
               docker buildx build --platform linux/s390x --load \
