@@ -67,12 +67,12 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1770021813</ubi8-minimal.image.version>
-        <ubi9.image.version>9.7-1769417801</ubi9.image.version>
+        <ubi8-minimal.image.version>8.10-1768971094</ubi8-minimal.image.version>
+        <ubi9.image.version>9.7-1768785530</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1766049073</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.7-1769056855</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.7-1768783948</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
-        <ubi9.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9.temurin-21-jdk.version>
+        <ubi9.temurin-21-jdk.version>21.0.9.0.0.10-0</ubi9.temurin-21-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
         <ubi9.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9.crypto-policies-scripts.version>
         <ubi9.findutils.version>4.8.0-7.el9</ubi9.findutils.version>
@@ -92,7 +92,7 @@
         <ubi9-minimal.glibc.version>2.34-231.el9_7.2</ubi9-minimal.glibc.version>
         <ubi9-minimal.findutils.version>4.8.0-7.el9</ubi9-minimal.findutils.version>
         <ubi9-minimal.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9-minimal.crypto-policies-scripts.version>
-        <ubi9-minimal.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9-minimal.temurin-21-jdk.version>
+        <ubi9-minimal.temurin-21-jdk.version>21.0.9.0.0.10-0</ubi9-minimal.temurin-21-jdk.version>
         <ubi9-minimal.python3-pip.version>21.3.1-1.el9</ubi9-minimal.python3-pip.version>
 
         <ubi8-minimal.openssl.version>1.1.1k-14.el8_10</ubi8-minimal.openssl.version>
@@ -109,14 +109,14 @@
         <ubi8-minimal.curl.version>7.61.1-34.el8_10.9</ubi8-minimal.curl.version>
         <ubi8-minimal.findutils.version>4.6.0-24.el8_10</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
-        <ubi8-minimal.temurin-17-jdk.version>17.0.18.0.0.8-0</ubi8-minimal.temurin-17-jdk.version>
+        <ubi8-minimal.temurin-17-jdk.version>17.0.17.0.0.10-0</ubi8-minimal.temurin-17-jdk.version>
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
 
         <!-- Python Package Versions -->
         <python.setuptools.version>80.9.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.165</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.164</git-repo.confluent-docker-utils.tag>
         <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
