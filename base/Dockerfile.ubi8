@@ -53,7 +53,7 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 ARG OPENSSL_VERSION=""
 ARG WGET_VERSION=""
 ARG NETCAT_VERSION=""
-ARG PYTHON39_VERSION=""
+ARG PYTHON314_VERSION=""
 ARG TAR_VERSION=""
 ARG PROCPS_VERSION=""
 ARG KRB5_WORKSTATION_VERSION=""
@@ -91,8 +91,8 @@ RUN microdnf --nodocs install yum \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
-        "python39${PYTHON39_VERSION}" \
-        "python39-pip${PYTHON_PIP_VERSION}" \
+        "python3.14${PYTHON314_VERSION}" \
+        "python3.14-pip${PYTHON_PIP_VERSION}" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
