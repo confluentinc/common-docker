@@ -93,7 +93,10 @@ RUN microdnf --nodocs install yum \
         gcc \
         gcc-c++ \
         make \
+        perl-IPC-Cmd \
         openssl-devel \
+        openssl-libs \
+        ca-certificates \
         bzip2-devel \
         libffi-devel \
         zlib-devel \
@@ -117,11 +120,14 @@ RUN microdnf --nodocs install yum \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
         "temurin-17-jdk${TEMURIN_JDK_VERSION}" "temurin-17-jre${TEMURIN_JDK_VERSION}"
 
-# Install Python 3.14 from source
+# Install Python 3.14 from source with SSL support
 RUN curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
-    && ./configure --enable-optimizations --with-ensurepip=install \
+    && ./configure --enable-optimizations \
+                   --with-ensurepip=install \
+                   --with-openssl=/usr \
+                   --with-openssl-rpath=auto \
     && make -j$(nproc) \
     && make altinstall \
     && cd .. \
@@ -129,7 +135,8 @@ RUN curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTH
     && ln -sf /usr/local/bin/python3.14 /usr/bin/python3 \
     && ln -sf /usr/local/bin/python3.14 /usr/bin/python \
     && ln -sf /usr/local/bin/pip3.14 /usr/bin/pip3 \
-    && ln -sf /usr/local/bin/pip3.14 /usr/bin/pip
+    && ln -sf /usr/local/bin/pip3.14 /usr/bin/pip \
+    && python3 -c "import ssl; print('SSL module loaded successfully')"
 
 # Install Python packages and cleanup
 RUN python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
