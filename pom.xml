@@ -71,7 +71,7 @@
         <ubi8-minimal.openssl.version>1.1.1k-14.el8_10</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
-        <ubi8-minimal.python314.version>3.14.0-1.module+el8.11.0+24000+00000000</ubi8-minimal.python314.version>
+        <python314.version>3.14.3</python314.version>
         <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
         <ubi8-minimal.procps-ng.version>3.3.15-14.el8</ubi8-minimal.procps-ng.version>
         <ubi8-minimal.krb5-workstation.version>1.18.2-32.el8_10</ubi8-minimal.krb5-workstation.version>
@@ -83,7 +83,6 @@
         <ubi8-minimal.findutils.version>4.6.0-24.el8_10</ubi8-minimal.findutils.version>
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
         <ubi8-minimal.temurin-17-jdk.version>17.0.18.0.0.8-0</ubi8-minimal.temurin-17-jdk.version>
-        <ubi8-minimal.python314-pip.version>24.0-1.module+el8.11.0+24000+00000000</ubi8-minimal.python314-pip.version>
 
         <!-- Python Package Versions -->
         <python.setuptools.version>80.9.0</python.setuptools.version>

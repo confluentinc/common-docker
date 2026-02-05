@@ -126,7 +126,7 @@
                         <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                         <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                        <PYTHON314_VERSION>-${ubi8-minimal.python314.version}</PYTHON314_VERSION>
+                        <PYTHON314_VERSION>${python314.version}</PYTHON314_VERSION>
                         <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                         <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                         <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
@@ -138,7 +138,6 @@
                         <TEMURIN_JDK_VERSION>-${ubi8-minimal.temurin-17-jdk.version}</TEMURIN_JDK_VERSION>
                         <FINDUTILS_VERSION>-${ubi8-minimal.findutils.version}</FINDUTILS_VERSION>
                         <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi8-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
-                        <PYTHON_PIP_VERSION>-${ubi8-minimal.python314-pip.version}</PYTHON_PIP_VERSION>
                         <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                         <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
@@ -158,7 +157,7 @@
                           <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                           <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                           <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                          <PYTHON314_VERSION>-${ubi8-minimal.python314.version}</PYTHON314_VERSION>
+                          <PYTHON314_VERSION>${python314.version}</PYTHON314_VERSION>
                           <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                           <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                           <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
@@ -170,7 +169,6 @@
                           <FINDUTILS_VERSION>-${ubi8-minimal.findutils.version}</FINDUTILS_VERSION>
                           <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi8-minimal.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                           <TEMURIN_JDK_VERSION>-${ubi8-minimal.temurin-17-jdk.version}</TEMURIN_JDK_VERSION>
-                          <PYTHON_PIP_VERSION>-${ubi8-minimal.python314-pip.version}</PYTHON_PIP_VERSION>
                           <PYTHON_SETUPTOOLS_VERSION>==${python.setuptools.version}</PYTHON_SETUPTOOLS_VERSION>
                           <PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>${git-repo.confluent-docker-utils.tag}</PYTHON_CONFLUENT_DOCKER_UTILS_VERSION>
                           <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
