@@ -67,7 +67,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1770597478</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1770785328</ubi8-minimal.image.version>
         <ubi9.image.version>9.7-1770238273</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1766049073</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1770267347</ubi9-minimal.image.version>
@@ -120,7 +120,7 @@
         <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.25.7-trixie</golang.image.version>
+        <golang.image.version>1.26.0-trixie</golang.image.version>
 
         <!-- Application User Configuration
              User and group IDs for the non-root user (appuser) configured in Docker images.
