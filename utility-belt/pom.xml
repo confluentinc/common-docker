@@ -34,7 +34,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <assertj.version>2.2.0</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <apacheda.version>1.0.0-M33</apacheda.version>
         <apacheds.version>2.0.0-M21</apacheds.version>
         <argparse4j.version>0.7.0</argparse4j.version>
