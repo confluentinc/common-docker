@@ -66,9 +66,9 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1770021813</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1770785328</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1766049073</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.7-1769056855</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.7-1770267347</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9-minimal.openssl.version>3.5.1-7.el9_7</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>
@@ -111,7 +111,7 @@
         <git-repo.cp-docker-utils.tag>v1.0.6</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.25.6-trixie</golang.image.version>
+        <golang.image.version>1.26.0-trixie</golang.image.version>
 
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
