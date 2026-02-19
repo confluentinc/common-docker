@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[8.2.0-0, 8.2.1-0)</version>
+        <version>8.2.0-2219</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>8.2.0-0</version>
+    <version>8.2.0-66</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -33,7 +33,7 @@
         <docker.ubi9.os_type>ubi9</docker.ubi9.os_type>
         <docker.file>Dockerfile.${docker.ubi9.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
-        <io.confluent.common-docker.version>8.2.0-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>8.2.0-66</io.confluent.common-docker.version>
 
         <!-- ============================================================ -->
         <!-- AUTOMATED VERSION UPDATE PROPERTY NAMING CONVENTIONS         -->
