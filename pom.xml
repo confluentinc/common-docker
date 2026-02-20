@@ -108,7 +108,7 @@
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
 
         <!-- Python Package Versions -->
-        <python.setuptools.version>80.9.0</python.setuptools.version>
+        <python.setuptools.version>82.0.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.167</git-repo.confluent-docker-utils.tag>
