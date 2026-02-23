@@ -80,6 +80,7 @@ LABEL io.confluent.docker.git.repo="confluentinc/common-docker" \
 
 ENV LANG="C.UTF-8"
 ENV USE_LOG4J_2="True"
+ENV UB_CLASSPATH=/usr/share/java/cp-base-java-micro/*
 
 COPY --from=jdk-builder /microdir/ /
 
