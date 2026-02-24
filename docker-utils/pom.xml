@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common-docker</artifactId>
-        <version>7.5.13</version>
+        <version>7.5.13-24</version>
     </parent>
 
     <organization>
@@ -39,7 +39,7 @@
     <artifactId>docker-utils</artifactId>
     <packaging>jar</packaging>
     <name>docker-utils</name>
-    <version>7.5.13</version>
+    <version>7.5.13-24</version>
 
     <licenses>
         <license>
