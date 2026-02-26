@@ -66,7 +66,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1770785328</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1771947229</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.7-1771346390</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1771346502</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
@@ -111,7 +111,7 @@
         <python.setuptools.version>82.0.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.167</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.168</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.0-trixie</golang.image.version>
