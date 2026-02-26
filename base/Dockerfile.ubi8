@@ -93,6 +93,7 @@ RUN microdnf --nodocs install yum \
         libffi-devel \
         zlib-devel \
         sqlite-devel \
+        findutils \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
@@ -133,7 +134,7 @@ RUN python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && alternatives --set python /usr/bin/python3 \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
-    && yum remove -y git gcc gcc-c++ make perl-IPC-Cmd openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
+    && yum remove -y git gcc gcc-c++ make perl-IPC-Cmd openssl-devel bzip2-devel findutils libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
