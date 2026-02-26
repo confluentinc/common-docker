@@ -138,7 +138,7 @@ RUN python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
-    && chown appuser:appuser -R /etc/confluent/ /usr/logs \
+    && chown appuser:appuser -R /etc/confluent/ /usr/logs
 
 # This is a step that will cause the build to fail of the package manager detects a package update is availible and isn't installed.
 # The ARG SKIP_SECURITY_UPDATE_CHECK is an "escape" hatch if you want to by-pass this check and build the container anyways, which
