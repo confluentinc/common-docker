@@ -53,7 +53,7 @@ ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
 ARG OPENSSL_VERSION=""
 ARG WGET_VERSION=""
 ARG NETCAT_VERSION=""
-ARG PYTHON39_VERSION=""
+ARG PYTHON314_VERSION=""
 ARG TAR_VERSION=""
 ARG PROCPS_VERSION=""
 ARG KRB5_WORKSTATION_VERSION=""
@@ -76,6 +76,43 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 # This can be overriden for an offline/air-gapped builds
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
+# Install Python 3.14 from source FIRST
+RUN microdnf --nodocs install yum \
+    && yum --nodocs install -y --setopt=install_weak_deps=False \
+        gcc \
+        gcc-c++ \
+        make \
+        tar \
+        curl \
+        openssl-devel \
+        ca-certificates \
+        bzip2-devel \
+        libffi-devel \
+        zlib-devel \
+        sqlite-devel \
+        findutils \
+    && curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
+    && tar -xzf Python-${PYTHON314_VERSION}.tgz \
+    && cd Python-${PYTHON314_VERSION} \
+    && ./configure --enable-optimizations \
+                   --with-ensurepip=install \
+                   --with-openssl=/usr \
+                   --with-openssl-rpath=auto \
+    && make -j$(nproc) \
+    && make altinstall \
+    && cd .. \
+    && rm -rf Python-${PYTHON314_VERSION}* \
+    && ln -sf /usr/local/bin/python3.14 /usr/bin/python3 \
+    && ln -sf /usr/local/bin/python3.14 /usr/bin/python \
+    && ln -sf /usr/local/bin/pip3.14 /usr/bin/pip3 \
+    && ln -sf /usr/local/bin/pip3.14 /usr/bin/pip \
+    && python3 -c "import ssl; print('SSL module loaded successfully')" \
+    && pip3 --version \
+    && python3 -m pip --version \
+    && yum remove -y gcc gcc-c++ make curl tar openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel findutils \
+    && yum clean all \
+    && rm -rf /tmp/*
+
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
@@ -85,8 +122,6 @@ RUN microdnf --nodocs install yum \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
-        "python39${PYTHON39_VERSION}" \
-        "python39-pip${PYTHON_PIP_VERSION}" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
