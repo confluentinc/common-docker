@@ -126,7 +126,7 @@
                         <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                         <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                         <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                        <PYTHON314_VERSION>${python314.version}</PYTHON314_VERSION>
+                        <PYTHON314_VERSION>${python.python314.version}</PYTHON314_VERSION>
                         <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                         <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                         <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
@@ -155,7 +155,7 @@
                           <OPENSSL_VERSION>-${ubi8-minimal.openssl.version}</OPENSSL_VERSION>
                           <WGET_VERSION>-${ubi8-minimal.wget.version}</WGET_VERSION>
                           <NETCAT_VERSION>-${ubi8-minimal.nmap-ncat.version}</NETCAT_VERSION>
-                            <PYTHON314_VERSION>${python314.version}</PYTHON314_VERSION>
+                          <PYTHON314_VERSION>${python.python314.version}</PYTHON314_VERSION>
                           <TAR_VERSION>-${ubi8-minimal.tar.version}</TAR_VERSION>
                           <PROCPS_VERSION>-${ubi8-minimal.procps-ng.version}</PROCPS_VERSION>
                           <KRB5_WORKSTATION_VERSION>-${ubi8-minimal.krb5-workstation.version}</KRB5_WORKSTATION_VERSION>
