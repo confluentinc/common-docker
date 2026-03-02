@@ -147,7 +147,11 @@
                                 <tags>
                                     <tag>${docker.tag}</tag>
                                 </tags>
-                                <args>
+                                <args combine.self="override">
+                                    <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                    <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
+                                    <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                    <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                                     <APP_UID>${app.uid}</APP_UID>
                                     <APP_GID>${app.gid}</APP_GID>
                                     <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>

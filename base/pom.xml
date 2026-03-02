@@ -149,7 +149,11 @@
                                 <tags>
                                     <tag>${docker.tag}</tag>
                                 </tags>
-                                <args>
+                                <args combine.self="override">
+                                    <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                    <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
+                                    <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                    <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <OPENSSL_VERSION>-${ubi9-minimal.openssl.version}</OPENSSL_VERSION>
                                     <WGET_VERSION>-${ubi9-minimal.wget.version}</WGET_VERSION>

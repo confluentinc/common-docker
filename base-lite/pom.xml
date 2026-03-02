@@ -107,7 +107,11 @@
                                 <tags>
                                     <tag>${docker.tag}</tag>
                                 </tags>
-                                <args>
+                                <args combine.self="override">
+                                    <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
+                                    <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
+                                    <GIT_COMMIT>${GIT_COMMIT}</GIT_COMMIT>
+                                    <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>

@@ -76,7 +76,7 @@
                                 <tags>
                                     <tag>${docker.tag}</tag>
                                 </tags>
-                                <args>
+                                <args combine.self="override">
                                     <DOCKER_REGISTRY>${docker.upstream-registry}</DOCKER_REGISTRY>
                                     <DOCKER_TAG>${docker.upstream-tag}</DOCKER_TAG>
                                     <COMMIT_ID>${GIT_COMMIT}</COMMIT_ID>
