@@ -132,7 +132,7 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make perl-IPC-Cmd openssl-devel ca-certificates bzip2-devel libffi-devel zlib-devel sqlite-devel findutils \
+    && yum remove -y gcc gcc-c++ make perl-IPC-Cmd openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel findutils \
     && yum clean all \
     && rm -rf /tmp/*
 
