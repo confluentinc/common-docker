@@ -97,8 +97,6 @@ RUN microdnf --nodocs install yum \
         "openssl${OPENSSL_VERSION}" \
         "wget${WGET_VERSION}" \
         "nmap-ncat${NETCAT_VERSION}" \
-        "python39${PYTHON39_VERSION}" \
-        "python39-pip${PYTHON_PIP_VERSION}" \
         "tar${TAR_VERSION}" \
         "procps-ng${PROCPS_VERSION}" \
         "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
