@@ -80,7 +80,8 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluent
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
-    && yum --nodocs update -y
+    && yum --nodocs update -y \
+    && yum --nodocs install -y tar findutils
 
 # Install Python 3.14 from source (installed before Java and system packages)
 RUN yum --nodocs install -y --setopt=install_weak_deps=False \
@@ -95,7 +96,6 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False \
         libffi-devel \
         zlib-devel \
         sqlite-devel \
-        findutils \
     && curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
@@ -115,7 +115,7 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make perl-IPC-Cmd openssl-devel bzip2-devel findutils libffi-devel zlib-devel sqlite-devel \
+    && yum remove -y tar gcc gcc-c++ make perl-IPC-Cmd openssl-devel openssl-libs ca-certificates bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/*
 
