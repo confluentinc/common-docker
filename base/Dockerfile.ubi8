@@ -80,22 +80,39 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluent
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
     && yum --nodocs -y install https://cdn.azul.com/zulu/bin/zulu-repo-1.0.0-1.noarch.rpm \
-    && yum --nodocs update -y \
-    && yum --nodocs install -y tar findutils
+    && yum --nodocs update -y
 
-# Install Python 3.14 from source (installed before Java and system packages)
+# Install base system packages (needed for Python build and runtime)
+RUN yum --nodocs install -y --setopt=install_weak_deps=False \
+        "openssl${OPENSSL_VERSION}" \
+        "wget${WGET_VERSION}" \
+        "nmap-ncat${NETCAT_VERSION}" \
+        "tar${TAR_VERSION}" \
+        "procps-ng${PROCPS_VERSION}" \
+        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
+        "iputils${IPUTILS_VERSION}" \
+        "hostname${HOSTNAME_VERSION}" \
+        "xz-libs${XZ_LIBS_VERSION}" \
+        "glibc${GLIBC_VERSION}" \
+        "glibc-common${GLIBC_VERSION}" \
+        "glibc-minimal-langpack${GLIBC_VERSION}" \
+        "curl${CURL_VERSION}" \
+        "libcurl${CURL_VERSION}" \
+    && yum clean all
+
+# Install Python 3.14 from source (before Java)
 RUN yum --nodocs install -y --setopt=install_weak_deps=False \
         gcc \
         gcc-c++ \
         make \
         perl-IPC-Cmd \
         openssl-devel \
-        openssl-libs \
         ca-certificates \
         bzip2-devel \
         libffi-devel \
         zlib-devel \
         sqlite-devel \
+        findutils \
     && curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
@@ -115,26 +132,12 @@ RUN yum --nodocs install -y --setopt=install_weak_deps=False \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y tar gcc gcc-c++ make perl-IPC-Cmd openssl-devel openssl-libs ca-certificates bzip2-devel libffi-devel zlib-devel sqlite-devel \
+    && yum remove -y gcc gcc-c++ make perl-IPC-Cmd openssl-devel ca-certificates bzip2-devel libffi-devel zlib-devel sqlite-devel findutils \
     && yum clean all \
     && rm -rf /tmp/*
 
-# Install system packages and Java
+# Install Java
 RUN yum --nodocs install -y --setopt=install_weak_deps=False \
-        "openssl${OPENSSL_VERSION}" \
-        "wget${WGET_VERSION}" \
-        "nmap-ncat${NETCAT_VERSION}" \
-        "tar${TAR_VERSION}" \
-        "procps-ng${PROCPS_VERSION}" \
-        "krb5-workstation${KRB5_WORKSTATION_VERSION}" \
-        "iputils${IPUTILS_VERSION}" \
-        "hostname${HOSTNAME_VERSION}" \
-        "xz-libs${XZ_LIBS_VERSION}" \
-        "glibc${GLIBC_VERSION}" \
-        "glibc-common${GLIBC_VERSION}" \
-        "glibc-minimal-langpack${GLIBC_VERSION}" \
-        "curl${CURL_VERSION}" \
-        "libcurl${CURL_VERSION}" \
         "zulu11-ca-jdk-headless${ZULU_OPENJDK_VERSION}" "zulu11-ca-jre-headless${ZULU_OPENJDK_VERSION}" \
     && yum clean all
 
