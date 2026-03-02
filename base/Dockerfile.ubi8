@@ -109,7 +109,7 @@ RUN microdnf --nodocs install yum \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make curl tar openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel findutils \
+    && yum remove -y gcc gcc-c++ make curl tar openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/*
 
