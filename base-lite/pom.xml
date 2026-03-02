@@ -83,14 +83,12 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <configuration>
-                    <buildArgs>
-                        <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
-                        <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
-                        <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
-                        <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
-                    </buildArgs>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>package</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
@@ -99,13 +97,20 @@
                 <configuration>
                     <images>
                         <image>
+                            <name>confluentinc/${project.artifactId}</name>
+                            <registry>${docker.registry}</registry>
                             <build>
+                                <contextDir>${project.basedir}</contextDir>
+                                <dockerFile>${docker.file}</dockerFile>
+                                <imagePullPolicy>${docker.imagePullPolicy}</imagePullPolicy>
+                                <skip>${docker.skip-build}</skip>
+                                <tags>
+                                    <tag>${docker.tag}</tag>
+                                </tags>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
-                                    <SKIP_SECURITY_UPDATE_CHECK>
-                                        ${docker.skip-security-update-check}
-                                    </SKIP_SECURITY_UPDATE_CHECK>
+                                    <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                                 </args>
                             </build>
