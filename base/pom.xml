@@ -139,8 +139,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>confluentinc/${project.artifactId}</name>
-                            <registry>${docker.registry}</registry>
+                            <name>${docker.registry}confluentinc/${project.artifactId}</name>
                             <build>
                                 <contextDir>${project.basedir}</contextDir>
                                 <dockerFile>${docker.file}</dockerFile>
