@@ -123,23 +123,12 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <configuration>
-                    <buildArgs>
-                        <APP_UID>${app.uid}</APP_UID>
-                        <APP_GID>${app.gid}</APP_GID>
-                        <UBI_MICRO_VERSION>${ubi9-micro.image.version}</UBI_MICRO_VERSION>
-                        <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
-                        <TEMURIN_JDK_VERSION>-${ubi9.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
-                        <PROCPS_VERSION>-${ubi9.procps-ng.version}</PROCPS_VERSION>
-                        <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
-                        <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
-                        <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
-                        <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
-                        <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
-                        <SHADOW_UTILS_VERSION>-${ubi9.shadow-utils.version}</SHADOW_UTILS_VERSION>
-                        <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
-                    </buildArgs>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>package</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
@@ -148,7 +137,16 @@
                 <configuration>
                     <images>
                         <image>
+                            <name>confluentinc/${project.artifactId}</name>
+                            <registry>${docker.registry}</registry>
                             <build>
+                                <contextDir>${project.basedir}</contextDir>
+                                <dockerFile>${docker.file}</dockerFile>
+                                <imagePullPolicy>${docker.imagePullPolicy}</imagePullPolicy>
+                                <skip>${docker.skip-build}</skip>
+                                <tags>
+                                    <tag>${docker.tag}</tag>
+                                </tags>
                                 <args>
                                     <APP_UID>${app.uid}</APP_UID>
                                     <APP_GID>${app.gid}</APP_GID>
@@ -156,9 +154,7 @@
                                     <UBI9_VERSION>${ubi9.image.version}</UBI9_VERSION>
                                     <TEMURIN_JDK_VERSION>-${ubi9.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
                                     <PROCPS_VERSION>-${ubi9.procps-ng.version}</PROCPS_VERSION>
-                                    <SKIP_SECURITY_UPDATE_CHECK>
-                                        ${docker.skip-security-update-check}
-                                    </SKIP_SECURITY_UPDATE_CHECK>
+                                    <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                                     <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                                     <CRYPTO_POLICIES_SCRIPTS_VERSION>-${ubi9.crypto-policies-scripts.version}</CRYPTO_POLICIES_SCRIPTS_VERSION>
                                     <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
