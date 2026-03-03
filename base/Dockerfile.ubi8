@@ -67,7 +67,6 @@ ARG CURL_VERSION=""
 ARG ZULU_OPENJDK_VERSION=""
 
 # Python Module Versions
-ARG PYTHON_PIP_VERSION=""
 ARG PYTHON_SETUPTOOLS_VERSION=""
 
 # Confluent Docker Utils Version (Namely the tag or branch to grab from git to install)
@@ -91,7 +90,12 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-    && curl -O https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
+    && PYTHON_VERSION_URL=$(echo ${PYTHON314_VERSION} | sed 's/\.//g') \
+    && curl -fSL --compressed "https://www.python.org/downloads/release/python-${PYTHON_VERSION_URL}/" -o /tmp/release.html \
+    && PYTHON_SHA256=$(grep "Python-${PYTHON314_VERSION}.tgz" /tmp/release.html -A 20 | grep 'class="checksum"' | head -1 | sed 's/<[^>]*>//g' | tr -d ' \n') \
+    && rm /tmp/release.html \
+    && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
+    && echo "${PYTHON_SHA256}  Python-${PYTHON314_VERSION}.tgz" | sha256sum -c - \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
