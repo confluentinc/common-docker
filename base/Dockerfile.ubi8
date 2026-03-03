@@ -96,10 +96,11 @@ RUN microdnf --nodocs install yum \
     && python3.9 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.9 -m sigstore verify github Python-${PYTHON314_VERSION}.tgz \
+    && python3.9 -m sigstore verify identity \
         --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
-        --cert-identity https://github.com/python/release-tools/.github/workflows/release.yml@refs/heads/main \
-        --repository python/cpython \
+        --cert-identity hugo@python.org \
+        --cert-oidc-issuer https://github.com/login/oauth \
+        Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
