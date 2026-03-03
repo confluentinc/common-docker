@@ -90,13 +90,17 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-        gnupg2 \
-    && curl -fSL https://www.python.org/static/files/pubkeys.txt -o /tmp/python-pubkeys.txt \
-    && gpg --import /tmp/python-pubkeys.txt \
-    && rm /tmp/python-pubkeys.txt \
+        python39 \
+        python39-pip \
+    && python3.9 -m pip install --upgrade pip \
+    && python3.9 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
-    && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.asc \
-    && gpg --verify Python-${PYTHON314_VERSION}.tgz.asc Python-${PYTHON314_VERSION}.tgz \
+    && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
+    && python3.9 -m sigstore verify github Python-${PYTHON314_VERSION}.tgz \
+        --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
+        --cert-identity https://github.com/python/release-tools/.github/workflows/release.yml@refs/heads/main \
+        --repository python/cpython \
+    && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
@@ -113,9 +117,9 @@ RUN microdnf --nodocs install yum \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel gnupg2 \
+    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel python39 python39-pip \
     && yum clean all \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* /root/.cache
 
 RUN microdnf --nodocs install yum \
     && rpm --import https://www.azul.com/files/0xB1998361219BD9C9.txt \
