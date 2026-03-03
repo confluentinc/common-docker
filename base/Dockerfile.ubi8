@@ -104,6 +104,7 @@ RUN microdnf --nodocs install yum \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && python3.9 -m pip uninstall -y sigstore \
     && yum remove -y python39 python39-pip \
+    && rm -f /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.9 \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
