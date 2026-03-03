@@ -25,7 +25,7 @@ global_job_config:
     commands:
       - checkout
       - if [[ $SEMAPHORE_GIT_BRANCH =~ ^7\..* ]]; then sem-version java 8; else sem-version java 17; fi
-      - sem-version python 3.9
+      - sem-version python 3.11
 #      - . vault-setup
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -64,10 +64,10 @@ global_job_config:
               fi
           fi
           # Overwrite maven global configuration
-           . envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
+          envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
           # . vault-sem-get-secret maven-settings-cp-dockerfile
         else
-           . envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
+          envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
         fi
       - export DOCKER_DEV_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/dev/"
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
