@@ -70,7 +70,6 @@
         <ubi8-minimal.openssl.version>1.1.1k-15.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
-        <python.python314.version>3.14.3</python.python314.version>
         <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
         <ubi8-minimal.procps-ng.version>3.3.15-14.el8</ubi8-minimal.procps-ng.version>
         <ubi8-minimal.krb5-workstation.version>1.18.2-32.el8_10</ubi8-minimal.krb5-workstation.version>
@@ -82,6 +81,7 @@
         <ubi8-minimal.zulu11-ca-jdk-headless.version>11.0.30-3</ubi8-minimal.zulu11-ca-jdk-headless.version>
 
         <!-- Python Package Versions -->
+        <python.python314.version>3.14.3</python.python314.version>
         <python.setuptools.version>80.9.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
