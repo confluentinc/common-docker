@@ -25,8 +25,7 @@ global_job_config:
     commands:
       - checkout
       - if [[ $SEMAPHORE_GIT_BRANCH =~ ^7\..* ]]; then sem-version java 8; else sem-version java 17; fi
-      - sem-version python 3.9
-      - . vault-setup
+      - sem-version python 3.11
       - . cache-maven restore
       - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
@@ -34,6 +33,7 @@ global_job_config:
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       # For PR Builds using Packaging
       - pip install confluent-release-tools
+      - pip install cp-devtools
       - if [ $BRANCH_TAG == "master" ]; then export BUILD_KEY=$(pinto get-master-version); else export BUILD_KEY=$BRANCH_TAG; fi
       - export PACKAGING_BUCKET="s3://dev-confluent-packages-654654529379-us-west-2/$BRANCH_TAG/"
       - export LATEST_PACKAGING_BUILD_NUMBER=$(aws s3 ls $PACKAGING_BUCKET --no-paginate | grep 'PRE' | awk '{print $NF}' | awk '{print substr($1, 1, length($1)-1)}' | sort -n | tail -n 1)
@@ -63,7 +63,7 @@ global_job_config:
               fi
           fi
           # Overwrite maven global configuration
-          . vault-sem-get-secret maven-settings-cp-dockerfile
+          envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
         else
           echo "This job is not a isHotfixJob or isRcJob (What we know how to handle) - and we don't know how to handle it"
         fi
