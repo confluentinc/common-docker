@@ -90,13 +90,12 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-        python39 \
-        python39-pip \
-    && python3.9 -m pip install --upgrade pip \
-    && python3.9 -m pip install sigstore \
+
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.9 -m sigstore verify identity \
+    && python3 -m sigstore verify identity \
         --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
         --cert-identity hugo@python.org \
         --cert-oidc-issuer https://github.com/login/oauth \
@@ -118,7 +117,7 @@ RUN microdnf --nodocs install yum \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel python39 python39-pip \
+    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* /root/.cache
 
