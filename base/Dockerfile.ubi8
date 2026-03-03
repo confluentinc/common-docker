@@ -120,10 +120,10 @@ RUN microdnf --nodocs install yum \
     && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 100 \
     && update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.14 100 \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
-    && python --version && which python \
-    && python3 --version && which python3 \
-    && pip --version && which pip \
-    && pip3 --version && which pip3 \
+    && python --version \
+    && python3 --version \
+    && pip --version \
+    && pip3 --version \
     && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* /root/.cache
