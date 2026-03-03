@@ -90,19 +90,20 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-        python311 \
-    && python3.11 -m pip install --upgrade pip \
-    && python3.11 -m pip install sigstore \
+        python39 \
+        python39-pip \
+    && python3.9 -m pip install --upgrade pip \
+    && python3.9 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.11 -m sigstore verify identity \
+    && python3.9 -m sigstore verify identity \
         --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
         --cert-identity hugo@python.org \
         --cert-oidc-issuer https://github.com/login/oauth \
         Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.11 -m pip uninstall -y sigstore \
-    && yum remove -y python311 \
+    && python3.9 -m pip uninstall -y sigstore \
+    && yum remove -y python39 python39-pip \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
@@ -113,16 +114,15 @@ RUN microdnf --nodocs install yum \
     && make altinstall \
     && cd .. \
     && rm -rf Python-${PYTHON314_VERSION}* \
-    && alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.14 1 \
-    && alternatives --install /usr/bin/unversioned-python python /usr/local/bin/python3.14 1 \
-    && alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 1 \
-    && alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.14 1 \
-    && ln -sf /usr/bin/unversioned-python /usr/bin/python \
+    && update-alternatives --install /usr/bin/unversioned-python python /usr/local/bin/python3.14 100 --slave /usr/bin/python python /usr/local/bin/python3.14 \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.14 100 \
+    && update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.14 100 \
+    && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 100 \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
-    && python --version \
-    && pip3 --version \
-    && pip --version \
-    && python3 -m pip --version \
+    && python --version && which python \
+    && python3 --version && which python3 \
+    && pip --version && which pip \
+    && pip3 --version && which pip3 \
     && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* /root/.cache
