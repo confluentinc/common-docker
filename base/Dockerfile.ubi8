@@ -114,6 +114,7 @@ RUN microdnf --nodocs install yum \
     && make altinstall \
     && cd .. \
     && rm -rf Python-${PYTHON314_VERSION}* \
+    && rm -f /var/lib/alternatives/python /var/lib/alternatives/python3 /var/lib/alternatives/pip /var/lib/alternatives/pip3 \
     && update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.14 100 \
     && update-alternatives --install /usr/bin/python python /usr/local/bin/python3.14 100 \
     && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 100 \
