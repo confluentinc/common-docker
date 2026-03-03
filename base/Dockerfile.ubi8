@@ -90,17 +90,20 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-
-    && python -m pip install --upgrade pip \
-    && python -m pip install sigstore \
+        python311 \
+        python311-pip \
+    && python3.11 -m pip install --upgrade pip \
+    && python3.11 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python -m sigstore verify identity \
+    && python3.11 -m sigstore verify identity \
         --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
         --cert-identity hugo@python.org \
         --cert-oidc-issuer https://github.com/login/oauth \
         Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
+    && python3.11 -m pip uninstall -y sigstore \
+    && yum remove -y python311 python311-pip \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
@@ -114,8 +117,12 @@ RUN microdnf --nodocs install yum \
     && alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.14 1 \
     && alternatives --install /usr/bin/unversioned-python python /usr/local/bin/python3.14 1 \
     && alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 1 \
+    && alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.14 1 \
+    && ln -sf /usr/bin/unversioned-python /usr/bin/python \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
+    && python --version \
     && pip3 --version \
+    && pip --version \
     && python3 -m pip --version \
     && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
