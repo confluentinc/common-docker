@@ -90,12 +90,13 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-    && PYTHON_VERSION_URL=$(echo ${PYTHON314_VERSION} | sed 's/\.//g') \
-    && curl -fSL --compressed "https://www.python.org/downloads/release/python-${PYTHON_VERSION_URL}/" -o /tmp/release.html \
-    && PYTHON_SHA256=$(grep "Python-${PYTHON314_VERSION}.tgz" /tmp/release.html -A 20 | grep 'class="checksum"' | head -1 | sed 's/<[^>]*>//g' | tr -d ' \n') \
-    && rm /tmp/release.html \
+        gnupg2 \
+    && curl -fSL https://www.python.org/static/files/pubkeys.txt -o /tmp/python-pubkeys.txt \
+    && gpg --import /tmp/python-pubkeys.txt \
+    && rm /tmp/python-pubkeys.txt \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
-    && echo "${PYTHON_SHA256}  Python-${PYTHON314_VERSION}.tgz" | sha256sum -c - \
+    && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.asc \
+    && gpg --verify Python-${PYTHON314_VERSION}.tgz.asc Python-${PYTHON314_VERSION}.tgz \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
     && ./configure --enable-optimizations \
@@ -112,7 +113,7 @@ RUN microdnf --nodocs install yum \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && pip3 --version \
     && python3 -m pip --version \
-    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
+    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel gnupg2 \
     && yum clean all \
     && rm -rf /tmp/*
 
