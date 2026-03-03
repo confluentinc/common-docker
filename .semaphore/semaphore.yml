@@ -63,8 +63,8 @@ global_job_config:
               fi
           fi
           # Overwrite maven global configuration
-           . envsubst < "$(python3.11 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
-#          . vault-sem-get-secret maven-settings-cp-dockerfile
+           . envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
+          # . vault-sem-get-secret maven-settings-cp-dockerfile
         else
           echo "This job is not a isHotfixJob or isRcJob (What we know how to handle) - and we don't know how to handle it"
         fi
