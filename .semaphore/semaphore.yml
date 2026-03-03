@@ -28,7 +28,7 @@ global_job_config:
       - sem-version python 3.14
       - . vault-setup
       - . cache-maven restore
-      - pip install tox==4.0.0
+      - pip install tox==3.28.0
       - export GIT_COMMIT=$(git rev-parse --verify HEAD --short)
       - export BUILD_NUMBER=$(echo $SEMAPHORE_WORKFLOW_ID | cut -f1 -d"-")
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
