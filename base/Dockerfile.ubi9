@@ -92,6 +92,7 @@ RUN microdnf --nodocs -y install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
+        python3-pip \
     && python3 -m pip install --upgrade pip \
     && python3 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
@@ -103,6 +104,7 @@ RUN microdnf --nodocs -y install yum \
         Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && python3 -m pip uninstall -y sigstore \
+    && yum remove -y python3-pip \
     && rm -f /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.9 \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
