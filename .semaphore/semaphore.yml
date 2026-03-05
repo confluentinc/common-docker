@@ -25,7 +25,7 @@ global_job_config:
     commands:
       - checkout
       - if [[ $SEMAPHORE_GIT_BRANCH =~ ^7\..* ]]; then sem-version java 8; else sem-version java 17; fi
-      - sem-version python 3.9
+      - sem-version python 3.14
       - . vault-setup
       - . cache-maven restore
       - pip install tox==3.28.0
@@ -34,6 +34,7 @@ global_job_config:
       - export BRANCH_TAG=$(echo $SEMAPHORE_GIT_BRANCH | tr / -)
       # For PR Builds using Packaging
       - pip install confluent-release-tools
+      - pip install cp-devtools
       - if [ $BRANCH_TAG == "master" ]; then export BUILD_KEY=$(pinto get-master-version); else export BUILD_KEY=$BRANCH_TAG; fi
       - export PACKAGING_BUCKET="s3://dev-confluent-packages-654654529379-us-west-2/$BRANCH_TAG/"
       - export LATEST_PACKAGING_BUILD_NUMBER=$(aws s3 ls $PACKAGING_BUCKET --no-paginate | grep 'PRE' | awk '{print $NF}' | awk '{print substr($1, 1, length($1)-1)}' | sort -n | tail -n 1)
@@ -54,8 +55,9 @@ global_job_config:
             export PLATFORM_LABEL=""
         fi
       - export PACKAGING_BUILD_ARGS=" -DCONFLUENT_VERSION=$CONFLUENT_VERSION  -DCONFLUENT_PLATFORM_LABEL=$PLATFORM_LABEL -DCONFLUENT_DEB_VERSION=$CONFLUENT_DEB_VERSION  -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
+      - export PACKAGING_BUILD_NUMBER=12345
       - >-
-        if [[ $IS_RELEASE && $PACKAGING_BUILD_NUMBER ]]; then
+        if true; then
           if [[ $IS_RC ]]; then
               export MAVEN_PACKAGES_URL="https://s3.us-west-2.amazonaws.com/staging-confluent-packages-maven-654654529379-us-west-2/v$BRANCH_NAME/maven"
               if [[ $PACKAGES_MAVEN_URL ]]; then
@@ -63,7 +65,7 @@ global_job_config:
               fi
           fi
           # Overwrite maven global configuration
-          . vault-sem-get-secret maven-settings-cp-dockerfile
+          envsubst < "$(python3 -c "from cp_devtools.maven import get_maven_settings; print(get_maven_settings('maven-settings-cp-dockerfile.xml'))")" > ~/.m2/settings.xml
         else
           echo "This job is not a isHotfixJob or isRcJob (What we know how to handle) - and we don't know how to handle it"
         fi
@@ -71,7 +73,7 @@ global_job_config:
       - export DOCKER_PROD_REGISTRY="519856050701.dkr.ecr.us-west-2.amazonaws.com/docker/prod/"
       - export DOCKER_UPSTREAM_REGISTRY=$DOCKER_PROD_REGISTRY
       - export LATEST_TAG=$BRANCH_TAG-latest
-      - export DOCKER_UPSTREAM_TAG="$LATEST_TAG"
+      - export DOCKER_UPSTREAM_TAG="dev-7.4.x-f548d55a"
       - export DOCKER_REPOS="confluentinc/cp-base-java confluentinc/cp-base-new confluentinc/cp-base-lite confluentinc/cp-jmxterm"
       - export COMMUNITY_DOCKER_REPOS=""
       - |
@@ -123,7 +125,7 @@ blocks:
             - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
-              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9
+              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG$AMD_ARCH -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9
               $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             - >-
@@ -156,7 +158,7 @@ blocks:
             - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version
             - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY
-              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9
+              -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG$ARM_ARCH  -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9
               $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
             - for image in $ARM_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
