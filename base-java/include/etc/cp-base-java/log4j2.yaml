@@ -1,0 +1,18 @@
+Configuration:
+  Appenders:
+    Console:
+      name: stderr
+      target: SYSTEM_ERR
+      PatternLayout:
+        pattern: "%m%n"
+
+  Loggers:
+    Root:
+      level: OFF
+    Logger:
+      - name: org.apache.kafka
+        level: ERROR
+      - name: io.confluent.admin.utils
+        level: INFO
+        AppenderRef:
+          - ref: stderr

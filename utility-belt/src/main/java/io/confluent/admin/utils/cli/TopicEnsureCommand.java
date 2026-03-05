@@ -11,10 +11,10 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.apache.kafka.common.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -32,7 +32,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class TopicEnsureCommand {
 
-  private static final Logger log = LoggerFactory.getLogger(TopicEnsureCommand.class);
+  private static final Logger log = LogManager.getLogger(TopicEnsureCommand.class);
   public static final String TOPIC_ENSURE = "topic-ensure";
 
   private static ArgumentParser createArgsParser() {
