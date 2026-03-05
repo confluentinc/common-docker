@@ -107,7 +107,7 @@
         <python.setuptools.version>80.9.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.168</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.169</git-repo.confluent-docker-utils.tag>
         <git-repo.cp-docker-utils.tag>v1.0.8</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
