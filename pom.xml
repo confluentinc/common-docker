@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[8.2.0-0, 8.2.1-0)</version>
+        <version>[8.3.0-0, 8.3.1-0)</version>
     </parent>
 
     <groupId>io.confluent</groupId>
     <artifactId>common-docker</artifactId>
     <packaging>pom</packaging>
-    <version>8.2.0-0</version>
+    <version>8.3.0-0</version>
 
     <name>${project.artifactId}</name>
     <description>Common Docker utilities, new cp-base, and cp-base-lite image</description>
@@ -22,6 +22,7 @@
         <module>utility-belt</module>
         <module>docker-utils</module>
         <module>base-java</module>
+        <module>base-java-micro</module>
         <module>base</module>
         <module>base-lite</module>
         <module>jmxterm</module>
@@ -33,7 +34,7 @@
         <docker.ubi9.os_type>ubi9</docker.ubi9.os_type>
         <docker.file>Dockerfile.${docker.ubi9.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
-        <io.confluent.common-docker.version>8.2.0-0</io.confluent.common-docker.version>
+        <io.confluent.common-docker.version>8.3.0-0</io.confluent.common-docker.version>
 
         <!-- ============================================================ -->
         <!-- AUTOMATED VERSION UPDATE PROPERTY NAMING CONVENTIONS         -->
@@ -67,9 +68,17 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1772599255</ubi8-minimal.image.version>
+        <ubi9.image.version>9.7-1771346757</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1771346390</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1771346502</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
+        <ubi9.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9.temurin-21-jdk.version>
+        <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
+        <ubi9.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9.crypto-policies-scripts.version>
+        <ubi9.findutils.version>4.8.0-7.el9</ubi9.findutils.version>
+        <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
+        <ubi9.shadow-utils.version>4.9-15.el9</ubi9.shadow-utils.version>
+
         <ubi9-minimal.openssl.version>3.5.1-7.el9_7</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>
         <ubi9-minimal.nmap-ncat.version>7.92-3.el9</ubi9-minimal.nmap-ncat.version>
@@ -111,6 +120,14 @@
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.0-trixie</golang.image.version>
+
+        <!-- Application User Configuration
+             User and group IDs for the non-root user (appuser) configured in Docker images.
+             These values ensure consistent UID/GID across all container images and multi-stage builds,
+             preventing permission issues when copying files between stages or mounting volumes.
+             Can be overridden at build time via: -Dapp.uid=<value> -Dapp.gid=<value> -->
+        <app.uid>1000</app.uid>
+        <app.gid>1000</app.gid>
 
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
