@@ -59,6 +59,16 @@
            Example: golang.image.version
            Updates: Latest image tag available on Docker Hub
 
+        5. PyPI Package Versions:
+           Pattern: python.<package-name>.version
+           Example: python.setuptools.version
+           Updates: Latest version of the package available on PyPI
+
+        6. Python Runtime Versions:
+           Pattern: python-runtime.<major>-<minor>.version
+           Example: python-runtime.3-14.version
+           Updates: Latest patch version of CPython for the specified major.minor release
+
         When adding new properties for automated updates, follow these naming conventions to ensure
         the automation tooling can correctly identify and update them.
         -->
@@ -82,8 +92,10 @@
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
         <ubi8-minimal.zulu17-ca-jdk-headless.version>17.0.18-3</ubi8-minimal.zulu17-ca-jdk-headless.version>
 
-        <!-- Python Package Versions -->
-        <python.python314.version>3.14.3</python.python314.version>
+        <!-- Python Runtime Versions -->
+        <python-runtime.3-14.version>3.14.3</python-runtime.3-14.version>
+
+        <!-- PyPI Package Versions -->
         <python.setuptools.version>80.9.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
