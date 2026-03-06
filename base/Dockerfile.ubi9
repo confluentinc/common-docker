@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ARG UBI_MINIMAL_VERSION="latest"
-FROM registry.access.redhat.com/ubi8/ubi-minimal:${UBI_MINIMAL_VERSION}
+FROM registry.access.redhat.com/ubi9/ubi-minimal:${UBI_MINIMAL_VERSION}
 
 ARG PROJECT_VERSION
 ARG ARTIFACT_ID
@@ -42,6 +42,7 @@ ENV LANG="C.UTF-8"
 
 # Set the classpath for JARs required by `cub`
 ENV CUB_CLASSPATH='"/usr/share/java/cp-base-new/*"'
+ENV USE_LOG4J_2="True"
 
 # These ARGs are left blank indicating to the Dnf package manager to install the latest package
 # version that happens to be availible at this time. For reproducible builds, versions should be specified
@@ -78,13 +79,12 @@ ARG PYTHON_CONFLUENT_DOCKER_UTILS_VERSION="master"
 ARG PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC="git+https://github.com/confluentinc/confluent-docker-utils@${PYTHON_CONFLUENT_DOCKER_UTILS_VERSION}"
 
 # Install Python 3.14 from source FIRST
-RUN microdnf --nodocs install yum \
+RUN microdnf --nodocs -y install yum \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         gcc \
         gcc-c++ \
         make \
         tar \
-        curl \
         openssl-devel \
         ca-certificates \
         bzip2-devel \
@@ -92,20 +92,19 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
-        python39 \
-        python39-pip \
-    && python3.9 -m pip install --upgrade pip \
-    && python3.9 -m pip install sigstore \
+        python3-pip \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install sigstore \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz \
     && curl -fSLO https://www.python.org/ftp/python/${PYTHON314_VERSION}/Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.9 -m sigstore verify identity \
+    && python3 -m sigstore verify identity \
         --bundle Python-${PYTHON314_VERSION}.tgz.sigstore \
         --cert-identity hugo@python.org \
         --cert-oidc-issuer https://github.com/login/oauth \
         Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
-    && python3.9 -m pip uninstall -y sigstore \
-    && yum remove -y python39 python39-pip \
+    && python3 -m pip uninstall -y sigstore \
+    && yum remove -y python3-pip \
     && rm -f /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.9 \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
@@ -139,7 +138,7 @@ gpgcheck=1 \n\
 gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 " > /etc/yum.repos.d/adoptium.repo
 
-RUN microdnf --nodocs install yum \
+RUN microdnf --nodocs -y install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
         git \
@@ -155,11 +154,9 @@ RUN microdnf --nodocs install yum \
         "glibc${GLIBC_VERSION}" \
         "glibc-common${GLIBC_VERSION}" \
         "glibc-minimal-langpack${GLIBC_VERSION}" \
-        "curl${CURL_VERSION}" \
-        "libcurl${CURL_VERSION}" \
         "findutils${FINDUTILS_VERSION}" \
         "crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION}" \
-        "temurin-17-jdk${TEMURIN_JDK_VERSION}" "temurin-17-jre${TEMURIN_JDK_VERSION}" \
+        "temurin-21-jdk${TEMURIN_JDK_VERSION}" \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && yum remove -y git \

@@ -60,7 +60,7 @@ public class TopicEnsure {
     DescribeTopicsResult topicDescribeResult = adminClient.describeTopics(
         Collections.singletonList(spec.name()), new DescribeTopicsOptions().timeoutMs(timeOut)
     );
-    TopicDescription topic = topicDescribeResult.all().get().get(spec.name());
+    TopicDescription topic = topicDescribeResult.allTopicNames().get().get(spec.name());
 
     // Get topic config.
     ConfigResource configResource = new ConfigResource(ConfigResource.Type.TOPIC, spec.name());
@@ -99,7 +99,7 @@ public class TopicEnsure {
       DescribeTopicsResult topicDescribeResult = adminClient.describeTopics(
           Collections.singletonList(spec.name()), new DescribeTopicsOptions().timeoutMs(timeOut)
       );
-      topicDescribeResult.all().get().get(spec.name());
+      topicDescribeResult.allTopicNames().get().get(spec.name());
     } catch (ExecutionException e) {
       if (e.getCause() instanceof UnknownTopicOrPartitionException) {
         return false;

@@ -24,8 +24,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +50,7 @@ import static net.sourceforge.argparse4j.impl.Arguments.store;
  */
 public class KafkaReadyCommand {
 
-  private static final Logger log = LoggerFactory.getLogger(KafkaReadyCommand.class);
+  private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
 
   private static ArgumentParser createArgsParser() {
@@ -125,26 +125,10 @@ public class KafkaReadyCommand {
               res.getString("bootstrap_servers")
           );
         } else {
-          String zkConnectString = res.getString("zookeeper_connect");
-          boolean zkReady = ClusterStatus.isZookeeperReady(zkConnectString, res.getInt("timeout"));
-          if (!zkReady) {
-            throw new RuntimeException("Could not reach zookeeper " + zkConnectString);
-          }
-          Map<String, String> endpoints = ClusterStatus.getKafkaEndpointFromZookeeper(
-              zkConnectString,
-              res.getInt("timeout")
+          log.error("Bootstrap servers should be provided through config or bootstrap_servers");
+          throw new RuntimeException(
+              "Bootstrap servers should be provided through config or bootstrap_servers"
           );
-
-          String bootstrapBroker = endpoints.get(res.getString("security_protocol"));
-          if (bootstrapBroker == null) {
-            throw new RuntimeException(
-                "No endpoints found for security protocol ["
-                + res.getString("security_protocol")
-                + "]. Endpoints found in ZK [" + endpoints + "]"
-            );
-          }
-          workerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapBroker);
-
         }
         success = ClusterStatus.isKafkaReady(
             workerProps,
