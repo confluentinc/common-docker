@@ -141,6 +141,38 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-AMD
+  - name: Build s390x (fabric8 + BuildX)
+    dependencies: ["Validation"]
+    run:
+      when: "pull_request =~ '.*'"
+    task:
+      jobs:
+        - name: Build cp-base-java s390x
+          commands:
+            - export OS_TAG="-ubi9"
+            - export S390X_ARCH=.s390x
+            - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+            # Guard -D flags to prevent empty values overriding profile defaults with null (fabric8 pitfall 6)
+            - |
+              export PACKAGING_BUILD_ARGS=""
+              [[ -n "$CONFLUENT_VERSION" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_VERSION=$CONFLUENT_VERSION"
+              [[ -n "$PLATFORM_LABEL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PLATFORM_LABEL=$PLATFORM_LABEL"
+              [[ -n "$CONFLUENT_DEB_VERSION" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_DEB_VERSION=$CONFLUENT_DEB_VERSION"
+              [[ -n "$ALLOW_UNSIGNED" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
+              [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - ci-tools ci-update-version --direct-pom-edit
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean package -U -pl base-java -am
+              -Ddocker.registry=$DOCKER_DEV_REGISTRY
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT
+              -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9
+              -Ddocker.buildx.platforms=linux/s390x
+              $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
+      epilogue:
+        always:
+          commands:
+            - . publish-test-results
+            - artifact push workflow target/test-results
   - name: Build & Test ARM
     dependencies: ["Validation"]
     run:
