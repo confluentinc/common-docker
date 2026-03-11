@@ -90,7 +90,9 @@ RUN microdnf --nodocs install yum \
         zlib-devel \
         sqlite-devel \
         findutils \
+        perl \
         python39 \
+        python39-devel \
         python39-pip \
     && python3.9 -m pip install --upgrade pip \
     && python3.9 -m pip install sigstore \
@@ -125,7 +127,7 @@ RUN microdnf --nodocs install yum \
     && python3 --version \
     && pip --version \
     && pip3 --version \
-    && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
+    && yum remove -y gcc gcc-c++ make perl openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* /root/.cache
 
