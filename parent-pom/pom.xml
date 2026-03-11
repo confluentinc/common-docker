@@ -1442,7 +1442,8 @@
                      (e.g. golang:...) from Docker Hub instead of placeholder/. fabric8 skips prepending
                      for images that already have a registry (e.g. registry.access.redhat.com/...).
                      The output image name is controlled by docker.image.registry, not docker.registry. -->
-                <docker.registry>docker.io/</docker.registry>
+                <docker.registry>docker.io</docker.registry>
+                <docker.image.registry>placeholder/</docker.image.registry>
                 <ALLOW_UNSIGNED>true</ALLOW_UNSIGNED>
                 <CONFLUENT_DEB_VERSION>unknown</CONFLUENT_DEB_VERSION>
                 <CONFLUENT_PLATFORM_LABEL>unknown</CONFLUENT_PLATFORM_LABEL>
