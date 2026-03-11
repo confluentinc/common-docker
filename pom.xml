@@ -7,7 +7,8 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[7.4.14-0, 7.4.15-0)</version>
+        <version>7.4.14-0</version>
+        <relativePath>parent-pom/pom.xml</relativePath>
     </parent>
 
     <groupId>io.confluent</groupId>
@@ -28,6 +29,9 @@
     </modules>
 
     <properties>
+        <!-- Override parent's io.confluent.common.version to a published version
+             so assembly-plugin-boilerplate can be resolved from Maven repos -->
+        <io.confluent.common.version>7.4.14-23</io.confluent.common.version>
         <docker.ubi8.os_type>ubi8</docker.ubi8.os_type>
         <docker.file>Dockerfile.${docker.ubi8.os_type}</docker.file>
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi8.os_type}</docker.tag>
