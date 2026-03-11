@@ -92,6 +92,7 @@ RUN microdnf --nodocs install yum \
         findutils \
         perl \
         python39 \
+        python39-devel \
         python39-pip \
     && python3.9 -m pip install --upgrade pip \
     && python3.9 -m pip install sigstore \
