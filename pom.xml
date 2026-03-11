@@ -78,9 +78,9 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1772599255</ubi8-minimal.image.version>
-        <ubi9.image.version>9.7-1771346757</ubi9.image.version>
+        <ubi9.image.version>9.7-1773204657</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1771346390</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.7-1771346502</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.7-1773204619</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9.temurin-21-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
@@ -123,14 +123,14 @@
         <python-runtime.3-14.version>3.14.3</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
-        <python.setuptools.version>80.9.0</python.setuptools.version>
+        <python.setuptools.version>82.0.1</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.169</git-repo.confluent-docker-utils.tag>
-        <git-repo.cp-docker-utils.tag>v1.0.8</git-repo.cp-docker-utils.tag>
+        <git-repo.cp-docker-utils.tag>v1.0.9</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.26.0-trixie</golang.image.version>
+        <golang.image.version>1.26.1-trixie</golang.image.version>
 
         <!-- Application User Configuration
              User and group IDs for the non-root user (appuser) configured in Docker images.
