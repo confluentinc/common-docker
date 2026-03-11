@@ -1438,9 +1438,11 @@
             <id>docker-fabric8</id>
 
             <properties>
-                <!-- Disable fabric8's pre-pull of base images so it doesn't route FROM pulls through docker.registry.
-                     Docker itself handles base image resolution during 'docker build'. (see pitfall 7) -->
-                <docker.imagePullPolicy>Never</docker.imagePullPolicy>
+                <!-- Override docker.registry to docker.io so fabric8 pulls unqualified base images
+                     (e.g. golang:...) from Docker Hub instead of placeholder/. fabric8 skips prepending
+                     for images that already have a registry (e.g. registry.access.redhat.com/...).
+                     The output image name is controlled by docker.image.registry, not docker.registry. -->
+                <docker.registry>docker.io/</docker.registry>
                 <ALLOW_UNSIGNED>true</ALLOW_UNSIGNED>
                 <CONFLUENT_DEB_VERSION>unknown</CONFLUENT_DEB_VERSION>
                 <CONFLUENT_PLATFORM_LABEL>unknown</CONFLUENT_PLATFORM_LABEL>
