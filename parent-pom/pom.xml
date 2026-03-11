@@ -1438,6 +1438,9 @@
             <id>docker-fabric8</id>
 
             <properties>
+                <!-- Override docker.registry to empty so fabric8 doesn't use it for pulling base images (see pitfall 7).
+                     CI controls the output image name via docker.image.registry instead. -->
+                <docker.registry/>
                 <ALLOW_UNSIGNED>true</ALLOW_UNSIGNED>
                 <CONFLUENT_DEB_VERSION>unknown</CONFLUENT_DEB_VERSION>
                 <CONFLUENT_PLATFORM_LABEL>unknown</CONFLUENT_PLATFORM_LABEL>
