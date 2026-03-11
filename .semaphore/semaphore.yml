@@ -132,7 +132,7 @@ blocks:
               [[ -n "$CONFLUENT_DEB_VERSION" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_DEB_VERSION=$CONFLUENT_DEB_VERSION"
               [[ -n "$ALLOW_UNSIGNED" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
               [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.image.registry=$DOCKER_DEV_REGISTRY
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
@@ -172,7 +172,7 @@ blocks:
               [[ -n "$ALLOW_UNSIGNED" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
               [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
             - ci-tools ci-update-version --direct-pom-edit
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.image.registry=$DOCKER_DEV_REGISTRY
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
