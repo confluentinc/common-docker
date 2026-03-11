@@ -1525,7 +1525,7 @@
                                     <skip>${docker.skip-test}</skip>
                                     <environmentVariables>
                                         <TOX_TESTENV_PASSENV>DOCKER_REGISTRY DOCKER_TAG DOCKER_TEST_REGISTRY DOCKER_TEST_TAG DOCKER_HOST</TOX_TESTENV_PASSENV>
-                                        <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                                        <DOCKER_REGISTRY>${docker.image.registry}</DOCKER_REGISTRY>
                                         <DOCKER_TAG>${docker.tag}</DOCKER_TAG>
                                         <DOCKER_TEST_REGISTRY>${docker.test-registry}</DOCKER_TEST_REGISTRY>
                                         <DOCKER_TEST_TAG>${docker.test-tag}</DOCKER_TEST_TAG>
@@ -1571,7 +1571,7 @@
                                 <args>
                                   <ARTIFACT_ID>${project.artifactId}</ARTIFACT_ID>
                                   <BUILD_NUMBER>${BUILD_NUMBER}</BUILD_NUMBER>
-                                  <DOCKER_REGISTRY>${docker.registry}</DOCKER_REGISTRY>
+                                  <DOCKER_REGISTRY>${docker.image.registry}</DOCKER_REGISTRY>
                                   <DOCKER_TAG>${docker.tag}</DOCKER_TAG>
                                   <DOCKER_UPSTREAM_REGISTRY>${docker.upstream-registry}
                                   </DOCKER_UPSTREAM_REGISTRY>
