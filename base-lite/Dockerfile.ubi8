@@ -17,7 +17,7 @@ ARG UBI_MINIMAL_VERSION="latest"
 ARG GOLANG_VERSION
 ARG CURL_VERSION
 
-FROM golang:${GOLANG_VERSION} AS build-ub
+FROM docker.io/golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser ub/ ./
