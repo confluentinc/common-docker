@@ -7,7 +7,8 @@
     <parent>
         <groupId>io.confluent</groupId>
         <artifactId>common</artifactId>
-        <version>[8.3.0-0, 8.3.1-0)</version>
+        <version>8.3.0-0</version>
+        <relativePath>parent-pom/pom.xml</relativePath>
     </parent>
 
     <groupId>io.confluent</groupId>
