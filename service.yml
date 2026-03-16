@@ -5,11 +5,13 @@ git:
   enable: true
 semaphore:
   enable: true
-  execution_time_limit: {"hours": 1}
+  execution_time_limit: {"hours": 2}
   pipeline_type: cp-dockerfile
   docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
   community_docker_repos: []
   community_maven_modules: []
+  s390x_docker_repos: ['confluentinc/cp-base-java']
+  s390x_maven_modules: ['base-java']
   build_arm: true
   os_types: ["ubi9"]
   nano_version: true
