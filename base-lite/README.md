@@ -32,11 +32,19 @@ Properties are inherited from a top-level POM. Properties may be overridden on t
 
 This project uses `maven-assembly-plugin` and `dockerfile-maven-plugin` to build Docker images via Maven.
 
-To build SNAPSHOT images, configure `.m2/settings.xml` for SNAPSHOT dependencies. These must be available at build time.
+**Important:** Always build from a **post branch** (e.g., `7.7.2-post`, `8.0.1-post`, `8.2.0-post`). Post branches correspond to released versions for which public packages are available. Do not build from `master` or development branches (`8.x`, `7.x`) as their dependencies are not publicly available.
 
+Configure your `~/.m2/settings.xml` to include the Confluent Maven repository. See the [top-level README](../README.md#maven-settingsxml-configuration) for the required configuration.
+
+To build images, you must supply `CONFLUENT_PACKAGES_REPO` and `CONFLUENT_VERSION`:
+
+```bash
+mvn clean package -Pdocker -DskipTests \
+    -DCONFLUENT_PACKAGES_REPO='https://packages.confluent.io/rpm/8.2' \
+    -DCONFLUENT_VERSION='8.2.0'
 ```
-mvn clean package -Pdocker -DskipTests # Build local images
-```
+
+Replace the version values to match the post branch you have checked out. See the [top-level README](../README.md#building-images-locally) for more details.
 
 ## License
 
