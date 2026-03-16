@@ -1,3 +1,5 @@
+# $schema: https://raw.githubusercontent.com/semaphoreio/semaphore/98bb4752c79049d36324e8c76451cd704c7924f3/plumber/spec/priv/v1.0.yml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/semaphoreio/semaphore/98bb4752c79049d36324e8c76451cd704c7924f3/plumber/spec/priv/v1.0.yml
 # This file is managed by ServiceBot plugin - Semaphore. The content in this file is created using a common
 # template and configurations in service.yml.
 # Any modifications made to ths file will be overwritten by the generated content in nightly runs.
@@ -14,7 +16,7 @@ fail_fast:
     when: "true"
 
 execution_time_limit:
-  hours: 1
+  hours: 2
 
 queue:
   - when: "branch != 'master' and branch !~ '[0-9]+\\.[0-9]+\\.[0-9]+'"
@@ -53,8 +55,13 @@ global_job_config:
         else
             export PLATFORM_LABEL=""
         fi
-      - export PACKAGING_BUILD_ARGS=" -DCONFLUENT_VERSION=$CONFLUENT_VERSION  -DCONFLUENT_PLATFORM_LABEL=$PLATFORM_LABEL -DCONFLUENT_DEB_VERSION=$CONFLUENT_DEB_VERSION 
-        -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
+      # Guard -D flags: fabric8 fails when build args resolve to null from empty -D values (e.g. -DCONFLUENT_VERSION=)
+      - |
+        export PACKAGING_BUILD_ARGS=""
+        [[ -n "$CONFLUENT_VERSION" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_VERSION=$CONFLUENT_VERSION"
+        [[ -n "$PLATFORM_LABEL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PLATFORM_LABEL=$PLATFORM_LABEL"
+        [[ -n "$CONFLUENT_DEB_VERSION" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_DEB_VERSION=$CONFLUENT_DEB_VERSION"
+        [[ -n "$ALLOW_UNSIGNED" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DALLOW_UNSIGNED=$ALLOW_UNSIGNED"
       - >-
         if [[ $IS_RELEASE && $PACKAGING_BUILD_NUMBER ]]; then
           if [[ $IS_RC ]]; then
@@ -99,6 +106,8 @@ global_job_config:
       - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
+      - export S390X_ARCH=.s390x
+      - export S390X_DOCKER_REPOS="confluentinc/cp-base-java"
 blocks:
   - name: Validation
     dependencies: []
@@ -108,7 +117,7 @@ blocks:
       jobs:
         - name: Validation
           commands:
-            - . sem-pint -c
+            - ci-sem-pint -c
   - name: Build, Test, & Scan AMD
     dependencies: ["Validation"]
     run:
@@ -120,10 +129,11 @@ blocks:
             - export OS_TAG="-ubi9"
             - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
             - export AMD_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$AMD_ARCH }$AMD_ARCH
-            - ci-tools ci-update-version
-            - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
-            - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
+            - ci-tools ci-update-version --direct-pom-edit
+            - |
+              export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+              [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$AMD_ARCH 
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$AMD_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
@@ -153,10 +163,11 @@ blocks:
             - export OS_TAG="-ubi9"
             - export DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
             - export ARM_DOCKER_DEV_FULL_IMAGES=${DOCKER_DEV_FULL_IMAGES// /$ARM_ARCH }$ARM_ARCH
-            - export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
-            - export PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
-            - ci-tools ci-update-version
-            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
+            - |
+              export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+              [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - ci-tools ci-update-version --direct-pom-edit
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY 
               -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$ARM_ARCH 
               -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$ARM_ARCH -Ddocker.os_type=ubi9 $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true $MAVEN_EXTRA_ARGS
             - . cache-maven store
@@ -167,6 +178,32 @@ blocks:
             - . publish-test-results
             - artifact push workflow target/test-results
             - artifact push workflow target --destination target-ARM
+  - name: Build & Test s390x
+    dependencies: ["Validation"]
+    run:
+      when: "pull_request =~ '.*'"
+    task:
+      jobs:
+        - name: Build & Test s390x ubi9
+          commands:
+            - export OS_TAG="-ubi9"
+            - ci-tools ci-update-version --direct-pom-edit
+            - |
+              export OS_PACKAGES_URL=$(echo "$PACKAGES_URL" | sed "s/PACKAGE_TYPE/rpm/g")
+              [[ -n "$OS_PACKAGES_URL" ]] && PACKAGING_BUILD_ARGS="$PACKAGING_BUILD_ARGS -DCONFLUENT_PACKAGES_REPO=$OS_PACKAGES_URL"
+            - mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -pl base-java -am -Ddocker.registry=$DOCKER_DEV_REGISTRY 
+              -Ddocker.upstream-registry=$DOCKER_UPSTREAM_REGISTRY -DBUILD_NUMBER=$BUILD_NUMBER -DGIT_COMMIT=$GIT_COMMIT -Ddocker.tag=$DOCKER_DEV_TAG$OS_TAG$S390X_ARCH 
+              -Ddocker.upstream-tag=$DOCKER_UPSTREAM_TAG$OS_TAG -Darch.type=$S390X_ARCH -Ddocker.os_type=ubi9 -Ddocker.buildx.platforms=linux/s390x $PACKAGING_BUILD_ARGS -Ddependency.check.skip=true 
+              $MAVEN_EXTRA_ARGS
+            - . cache-maven store
+            - export S390X_DOCKER_DEV_FULL_IMAGES=$DOCKER_DEV_REGISTRY${S390X_DOCKER_REPOS// /:$DOCKER_DEV_TAG$OS_TAG $DOCKER_DEV_REGISTRY}:$DOCKER_DEV_TAG$OS_TAG
+            - export S390X_DOCKER_DEV_FULL_IMAGES=${S390X_DOCKER_DEV_FULL_IMAGES// /$S390X_ARCH }$S390X_ARCH
+            - for image in $S390X_DOCKER_DEV_FULL_IMAGES; do echo "Pushing $image" && docker push $image; done
+      epilogue:
+        always:
+          commands:
+            - . publish-test-results
+            - artifact push workflow target/test-results
 after_pipeline:
   task:
     agent:
