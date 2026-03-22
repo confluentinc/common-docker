@@ -24,7 +24,6 @@
         <module>base</module>
         <module>base-lite</module>
         <module>jmxterm</module>
-        <module>jacoco-aggregate-common-docker</module>
         <!-- <module>kerberos</module> -->
     </modules>
 
