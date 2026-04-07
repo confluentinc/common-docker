@@ -93,7 +93,7 @@
         <ubi8-minimal.temurin-17-jdk.version>17.0.18.0.0.8-0</ubi8-minimal.temurin-17-jdk.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.3</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.4</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>82.0.1</python.setuptools.version>
