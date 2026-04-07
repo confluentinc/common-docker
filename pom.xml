@@ -78,7 +78,7 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1775152441</ubi8-minimal.image.version>
-        <ubi9.image.version>9.7-1774415752</ubi9.image.version>
+        <ubi9.image.version>9.7-1775575763</ubi9.image.version>
         <ubi9-micro.image.version>9.7-1773894938</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1773939694</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
@@ -120,7 +120,7 @@
         <ubi8-minimal.temurin-17-jdk.version>17.0.18.0.0.8-0</ubi8-minimal.temurin-17-jdk.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.3</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.4</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>82.0.1</python.setuptools.version>
