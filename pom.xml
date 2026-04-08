@@ -91,7 +91,7 @@
         <ubi8-minimal.zulu11-ca-jdk-headless.version>11.0.30-3</ubi8-minimal.zulu11-ca-jdk-headless.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.3</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.4</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>82.0.1</python.setuptools.version>
@@ -100,7 +100,7 @@
         <git-repo.confluent-docker-utils.tag>v0.0.169</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
-        <golang.image.version>1.26.1-trixie</golang.image.version>
+        <golang.image.version>1.26.2-trixie</golang.image.version>
         <!-- In base/{pom.xml,Dockerfile.ubi} this property is used to to fail a build if the Yum/Dnf package manager
         detects that there is security update availible to be installed. Set to true if you want to skip the check
         (more accurately the check is still done, it just won't fail if an update is detected), or leave it as
