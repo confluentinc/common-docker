@@ -2,6 +2,9 @@ ARG GOLANG_VERSION
 ARG UBI_MINIMAL_VERSION
 
 
+# Explicit docker.io/ prefix is needed for s390x cross-compilation via Docker BuildX.
+# Without it, BuildX resolves the golang base image using the host architecture instead
+# of the target platform. The registry prefix ensures the correct platform-specific image is pulled.
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 ENV GO_BIN="/go/bin"
 ARG CP_DOCKER_UTILS_VERSION
