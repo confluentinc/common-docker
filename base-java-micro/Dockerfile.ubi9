@@ -6,6 +6,9 @@ ARG UBI9_VERSION
 ARG GOLANG_VERSION
 
 # --- Stage 1: Build Go Binaries ---
+# Explicit docker.io/ prefix is required for the fabric8 docker-maven-plugin.
+# Without it, fabric8 prepends its default docker.registry property value (a placeholder),
+# causing the build to try pulling a non-existent image like placeholder/golang.
 FROM docker.io/golang:${GOLANG_VERSION} AS build-ub-package-dedupe
 ENV GO_BIN="/go/bin"
 
