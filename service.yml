@@ -19,9 +19,6 @@ semaphore:
   use_packages: true
   cp_images: true
   sign_images: true
-  cp_dockerfile:
-    s390x_docker_repos: ['confluentinc/cp-base-java', 'confluentinc/cp-base-java-micro']
-    s390x_maven_modules: ['base-java', 'base-java-micro']
   tasks:
     - name: cp-dockerfile-build
       branch: master
@@ -84,6 +81,9 @@ semaphore:
           options:
             - 'True'
             - 'False'
+cp_dockerfile:
+  s390x_docker_repos: ['confluentinc/cp-base-java', 'confluentinc/cp-base-java-micro']
+  s390x_maven_modules: ['base-java', 'base-java-micro']
 code_artifact:
   enable: true
   package_paths:
