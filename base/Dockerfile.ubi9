@@ -85,6 +85,7 @@ RUN microdnf --nodocs -y install yum \
         gcc-c++ \
         make \
         tar \
+        gzip \
         openssl-devel \
         ca-certificates \
         bzip2-devel \
