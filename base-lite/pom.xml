@@ -86,7 +86,7 @@
                 <configuration>
                     <buildArgs>
                         <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
-                        <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                        <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-25-jdk.version}</TEMURIN_JDK_VERSION>
                         <SKIP_SECURITY_UPDATE_CHECK>${docker.skip-security-update-check}</SKIP_SECURITY_UPDATE_CHECK>
                         <GOLANG_VERSION>${golang.image.version}</GOLANG_VERSION>
                     </buildArgs>
@@ -102,7 +102,7 @@
                             <build>
                                 <args>
                                     <UBI_MINIMAL_VERSION>${ubi9-minimal.image.version}</UBI_MINIMAL_VERSION>
-                                    <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-21-jdk.version}</TEMURIN_JDK_VERSION>
+                                    <TEMURIN_JDK_VERSION>-${ubi9-minimal.temurin-25-jdk.version}</TEMURIN_JDK_VERSION>
                                     <SKIP_SECURITY_UPDATE_CHECK>
                                         ${docker.skip-security-update-check}
                                     </SKIP_SECURITY_UPDATE_CHECK>
