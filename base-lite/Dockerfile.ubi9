@@ -70,7 +70,7 @@ gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
 RUN microdnf --nodocs -y install yum \
     && yum --nodocs update -y \
     && yum --nodocs install -y --setopt=install_weak_deps=False \
-        "temurin-21-jre${TEMURIN_JDK_VERSION}" \
+        "temurin-25-jre${TEMURIN_JDK_VERSION}" \
     && microdnf clean all \
     && yum clean all \
     && rm -rf /tmp/* \
