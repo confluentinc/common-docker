@@ -82,7 +82,7 @@
         <ubi9-micro.image.version>9.7-1773894938</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.7-1776833838</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
-        <ubi9.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9.temurin-21-jdk.version>
+        <ubi9.temurin-25-jdk.version>25.0.2.0.0.10-0</ubi9.temurin-25-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
         <ubi9.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9.crypto-policies-scripts.version>
         <ubi9.findutils.version>4.8.0-7.el9</ubi9.findutils.version>
@@ -101,7 +101,7 @@
         <ubi9-minimal.glibc.version>2.34-231.el9_7.10</ubi9-minimal.glibc.version>
         <ubi9-minimal.findutils.version>4.8.0-7.el9</ubi9-minimal.findutils.version>
         <ubi9-minimal.crypto-policies-scripts.version>20250905-1.git377cc42.el9_7</ubi9-minimal.crypto-policies-scripts.version>
-        <ubi9-minimal.temurin-21-jdk.version>21.0.10.0.0.7-0</ubi9-minimal.temurin-21-jdk.version>
+        <ubi9-minimal.temurin-25-jdk.version>25.0.2.0.0.10-0</ubi9-minimal.temurin-25-jdk.version>
         <ubi9-minimal.python3-pip.version>21.3.1-1.el9</ubi9-minimal.python3-pip.version>
 
         <ubi8-minimal.openssl.version>1.1.1k-15.el8_6</ubi8-minimal.openssl.version>
