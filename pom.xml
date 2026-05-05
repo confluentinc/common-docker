@@ -107,11 +107,14 @@
         <ubi8-minimal.crypto-policies-scripts.version>20230731-1.git3177e06.el8</ubi8-minimal.crypto-policies-scripts.version>
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
 
-        <!-- Python Package Versions -->
+        <!-- Python Runtime Versions -->
+        <python-runtime.3-14.version>3.14.4</python-runtime.3-14.version>
+
+        <!-- PyPI Package Versions -->
         <python.setuptools.version>82.0.1</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.169</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.170</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.2-trixie</golang.image.version>
