@@ -194,13 +194,13 @@ public class KafkaReadyCommand {
         throw e;
       }
       log.warn("Config provider class could not be loaded during kafka-ready check: {}",
-          e.getMessage());
+          e.getMessage(), e);
 
       stripConfigProviders(workerProps);
 
       List<String> unresolvedKeys = findUnresolvedConfigProviderVars(workerProps);
       if (!unresolvedKeys.isEmpty()) {
-        log.warn("Skipping kafka-ready check — the following properties contain unresolved "
+        log.warn("Skipping kafka-ready check - the following properties contain unresolved "
             + "config provider variable references that cannot be resolved without the "
             + "config provider plugin: {}. The Connect worker will verify broker connectivity "
             + "on startup.", unresolvedKeys);
@@ -232,13 +232,18 @@ public class KafkaReadyCommand {
    * Removes config.providers entries from the properties map.
    */
   static void stripConfigProviders(Map<String, String> props) {
+    List<String> removed = new java.util.ArrayList<>();
     Iterator<Map.Entry<String, String>> it = props.entrySet().iterator();
     while (it.hasNext()) {
       String key = it.next().getKey();
       if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
-        log.warn("Removing property '{}' from kafka-ready config.", key);
+        removed.add(key);
         it.remove();
       }
+    }
+    if (!removed.isEmpty()) {
+      log.warn("Removed {} config provider properties from kafka-ready config: {}",
+          removed.size(), removed);
     }
   }
 
