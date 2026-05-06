@@ -29,7 +29,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.kafka.common.config.ConfigException;
 
 import io.confluent.admin.utils.ClusterStatus;
 
@@ -54,6 +59,8 @@ public class KafkaReadyCommand {
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
   private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
+  // Matches Kafka config provider variable syntax: ${provider-name:path:key}
+  private static final Pattern CONFIG_PROVIDER_VAR_PATTERN = Pattern.compile("\\$\\{[^}]+}");
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -120,7 +127,6 @@ public class KafkaReadyCommand {
       } else {
         if (res.getString("config") != null) {
           workerProps = Utils.propsToStringMap(Utils.loadProps(res.getString("config")));
-          stripConfigProviders(workerProps);
         }
         if (res.getString("bootstrap_servers") != null) {
           workerProps.put(
@@ -133,7 +139,7 @@ public class KafkaReadyCommand {
               "Bootstrap servers should be provided through config or bootstrap_servers"
           );
         }
-        success = ClusterStatus.isKafkaReady(
+        success = checkKafkaReadyWithConfigProviderResilience(
             workerProps,
             res.getInt("min_expected_brokers"),
             res.getInt("timeout")
@@ -161,30 +167,89 @@ public class KafkaReadyCommand {
   }
 
   /**
-   * Removes config.providers entries from the properties map. These entries cause
-   * ClassNotFoundException during AdminClient creation when the config provider
-   * plugin JARs are not on the kafka-ready classpath (they live on the worker's
-   * plugin.path instead). The kafka-ready preflight check does not need config
-   * providers, so stripping them is safe.
+   * Attempts the kafka-ready check, handling config provider class loading failures gracefully.
+   *
+   * <p>Strategy:
+   * 1. Try with the full config (config providers may be loadable if on the classpath).
+   * 2. If config provider class loading fails (ConfigException wrapping ClassNotFoundException),
+   *    strip config.providers entries and check for unresolved variable references.
+   * 3. If remaining properties contain unresolved ${provider:...} references (i.e. security
+   *    properties depend on config providers), skip the check with a warning — the Connect
+   *    worker will verify connectivity itself on startup.
+   * 4. Otherwise, retry the check without config.providers.
+   */
+  static boolean checkKafkaReadyWithConfigProviderResilience(
+      Map<String, String> workerProps,
+      int minBrokerCount,
+      int timeoutMs
+  ) {
+    if (!hasConfigProviders(workerProps)) {
+      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+    }
+
+    try {
+      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+    } catch (ConfigException e) {
+      if (!isConfigProviderLoadFailure(e)) {
+        throw e;
+      }
+      log.warn("Config provider class could not be loaded during kafka-ready check: {}",
+          e.getMessage());
+
+      stripConfigProviders(workerProps);
+
+      List<String> unresolvedKeys = findUnresolvedConfigProviderVars(workerProps);
+      if (!unresolvedKeys.isEmpty()) {
+        log.warn("Skipping kafka-ready check — the following properties contain unresolved "
+            + "config provider variable references that cannot be resolved without the "
+            + "config provider plugin: {}. The Connect worker will verify broker connectivity "
+            + "on startup.", unresolvedKeys);
+        return true;
+      }
+
+      log.warn("Retrying kafka-ready check without config provider properties.");
+      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+    }
+  }
+
+  /**
+   * Returns true if the properties map contains config.providers entries.
+   */
+  static boolean hasConfigProviders(Map<String, String> props) {
+    return props.containsKey(CONFIG_PROVIDERS_PREFIX);
+  }
+
+  /**
+   * Returns true if the exception is a ConfigException caused by a config provider
+   * class loading failure.
+   */
+  static boolean isConfigProviderLoadFailure(ConfigException e) {
+    String msg = e.getMessage();
+    return msg != null && msg.contains("config.providers") && msg.contains("Could not load");
+  }
+
+  /**
+   * Removes config.providers entries from the properties map.
    */
   static void stripConfigProviders(Map<String, String> props) {
     Iterator<Map.Entry<String, String>> it = props.entrySet().iterator();
-    boolean found = false;
     while (it.hasNext()) {
       String key = it.next().getKey();
       if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
-        log.warn("Removing property '{}' from kafka-ready config — config provider classes "
-            + "are not needed for the preflight broker connectivity check and may not be on "
-            + "the classpath.", key);
+        log.warn("Removing property '{}' from kafka-ready config.", key);
         it.remove();
-        found = true;
       }
     }
-    if (found) {
-      log.warn("Config provider properties were stripped from the kafka-ready check. "
-          + "If your Connect worker config uses config providers to resolve security "
-          + "properties (e.g. passwords from a secrets manager), ensure those values are "
-          + "also available as literal values or environment variables for the preflight check.");
-    }
+  }
+
+  /**
+   * Returns property keys whose values contain unresolved config provider variable
+   * references (e.g. ${secretmanager:path:key}).
+   */
+  static List<String> findUnresolvedConfigProviderVars(Map<String, String> props) {
+    return props.entrySet().stream()
+        .filter(e -> CONFIG_PROVIDER_VAR_PATTERN.matcher(e.getValue()).find())
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 }
