@@ -59,8 +59,10 @@ public class KafkaReadyCommand {
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
   private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
-  // Matches Kafka config provider variable syntax: ${provider-name:path:key}
-  private static final Pattern CONFIG_PROVIDER_VAR_PATTERN = Pattern.compile("\\$\\{[^}]+}");
+  // Matches Kafka config provider variable syntax: ${provider-name:path[:key]}
+  // Requires at least one colon separator to distinguish from other ${...} placeholders.
+  private static final Pattern CONFIG_PROVIDER_VAR_PATTERN =
+      Pattern.compile("\\$\\{[^:}]+:[^}]+}");
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -221,9 +223,18 @@ public class KafkaReadyCommand {
 
   /**
    * Returns true if the exception is a ConfigException caused by a config provider
-   * class loading failure.
+   * class loading failure. Checks both the cause chain for ClassNotFoundException /
+   * NoClassDefFoundError and the message for config.providers references as a fallback.
    */
   static boolean isConfigProviderLoadFailure(ConfigException e) {
+    Throwable cause = e.getCause();
+    while (cause != null) {
+      if (cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError) {
+        return true;
+      }
+      cause = cause.getCause();
+    }
+    // Fallback: check message in case the cause chain is truncated
     String msg = e.getMessage();
     return msg != null && msg.contains("config.providers") && msg.contains("Could not load");
   }

@@ -106,9 +106,37 @@ public class KafkaReadyCommandTest {
   // --- isConfigProviderLoadFailure ---
 
   @Test
-  public void isConfigProviderLoadFailure_trueForClassLoadError() {
+  public void isConfigProviderLoadFailure_trueForClassNotFoundException() {
+    ConfigException e = new ConfigException("Could not load config provider class");
+    e.initCause(new ClassNotFoundException(
+        "io.confluent.csid.config.provider.aws.SecretsManagerConfigProvider"));
+
+    assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
+  }
+
+  @Test
+  public void isConfigProviderLoadFailure_trueForNoClassDefFoundError() {
+    ConfigException e = new ConfigException("Could not instantiate config provider");
+    e.initCause(new NoClassDefFoundError("software/amazon/awssdk/core/SdkClient"));
+
+    assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
+  }
+
+  @Test
+  public void isConfigProviderLoadFailure_trueForNestedClassNotFound() {
+    ClassNotFoundException cnfe = new ClassNotFoundException("com.example.Provider");
+    RuntimeException wrapper = new RuntimeException("wrapper", cnfe);
+    ConfigException e = new ConfigException("config error");
+    e.initCause(wrapper);
+
+    assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
+  }
+
+  @Test
+  public void isConfigProviderLoadFailure_trueForMessageFallback() {
+    // No ClassNotFoundException in cause chain, but message matches
     ConfigException e = new ConfigException(
-        "Invalid value io.confluent.csid.config.provider.aws.SecretsManagerConfigProvider "
+        "Invalid value com.example.Provider "
         + "for configuration config.providers.secretmanager.class: "
         + "Could not load config provider class or one of its dependencies");
 
@@ -136,6 +164,21 @@ public class KafkaReadyCommandTest {
 
     assertThat(unresolved).hasSize(2);
     assertThat(unresolved).contains("ssl.keystore.password", "sasl.jaas.config");
+  }
+
+  @Test
+  public void findUnresolvedVars_ignoresNonProviderPlaceholders() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    // Shell-style ${ENV_VAR} without colons should NOT be matched
+    props.put("some.prop", "${SOME_ENV_VAR}");
+    // But provider-style ${provider:path} should be matched
+    props.put("ssl.keystore.password", "${secretmanager:my-secret:password}");
+
+    List<String> unresolved = KafkaReadyCommand.findUnresolvedConfigProviderVars(props);
+
+    assertThat(unresolved).hasSize(1);
+    assertThat(unresolved).contains("ssl.keystore.password");
   }
 
   @Test
