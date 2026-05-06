@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.confluent.admin.utils.ClusterStatus;
@@ -52,6 +53,7 @@ public class KafkaReadyCommand {
 
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
+  private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -118,6 +120,7 @@ public class KafkaReadyCommand {
       } else {
         if (res.getString("config") != null) {
           workerProps = Utils.propsToStringMap(Utils.loadProps(res.getString("config")));
+          stripConfigProviders(workerProps);
         }
         if (res.getString("bootstrap_servers") != null) {
           workerProps.put(
@@ -154,6 +157,34 @@ public class KafkaReadyCommand {
       System.exit(0);
     } else {
       System.exit(1);
+    }
+  }
+
+  /**
+   * Removes config.providers entries from the properties map. These entries cause
+   * ClassNotFoundException during AdminClient creation when the config provider
+   * plugin JARs are not on the kafka-ready classpath (they live on the worker's
+   * plugin.path instead). The kafka-ready preflight check does not need config
+   * providers, so stripping them is safe.
+   */
+  static void stripConfigProviders(Map<String, String> props) {
+    Iterator<Map.Entry<String, String>> it = props.entrySet().iterator();
+    boolean found = false;
+    while (it.hasNext()) {
+      String key = it.next().getKey();
+      if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
+        log.warn("Removing property '{}' from kafka-ready config — config provider classes "
+            + "are not needed for the preflight broker connectivity check and may not be on "
+            + "the classpath.", key);
+        it.remove();
+        found = true;
+      }
+    }
+    if (found) {
+      log.warn("Config provider properties were stripped from the kafka-ready check. "
+          + "If your Connect worker config uses config providers to resolve security "
+          + "properties (e.g. passwords from a secrets manager), ensure those values are "
+          + "also available as literal values or environment variables for the preflight check.");
     }
   }
 }
