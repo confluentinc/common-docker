@@ -28,7 +28,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.kafka.common.config.ConfigException;
 
 import io.confluent.admin.utils.ClusterStatus;
 
@@ -52,6 +58,17 @@ public class KafkaReadyCommand {
 
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
+  private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
+
+  @FunctionalInterface
+  interface KafkaReadyChecker {
+    boolean isReady(Map<String, String> config, int minBrokerCount, int timeoutMs);
+  }
+
+  // Matches Kafka config provider variable syntax: ${provider-name:path[:key]}
+  // Requires at least one colon separator to distinguish from other ${...} placeholders.
+  private static final Pattern CONFIG_PROVIDER_VAR_PATTERN =
+      Pattern.compile("\\$\\{[^:}]+:[^}]+}");
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -130,7 +147,7 @@ public class KafkaReadyCommand {
               "Bootstrap servers should be provided through config or bootstrap_servers"
           );
         }
-        success = ClusterStatus.isKafkaReady(
+        success = checkKafkaReadyWithConfigProviderResilience(
             workerProps,
             res.getInt("min_expected_brokers"),
             res.getInt("timeout")
@@ -155,5 +172,116 @@ public class KafkaReadyCommand {
     } else {
       System.exit(1);
     }
+  }
+
+  /**
+   * Attempts the kafka-ready check, handling config provider class loading failures gracefully.
+   *
+   * <p>Strategy:
+   * 1. Try with the full config (config providers may be loadable if on the classpath).
+   * 2. If config provider class loading fails (ConfigException wrapping ClassNotFoundException),
+   *    strip config.providers entries and check for unresolved variable references.
+   * 3. If remaining properties contain unresolved ${provider:...} references (i.e. security
+   *    properties depend on config providers), skip the check with a warning — the Connect
+   *    worker will verify connectivity itself on startup.
+   * 4. Otherwise, retry the check without config.providers.
+   */
+  static boolean checkKafkaReadyWithConfigProviderResilience(
+      Map<String, String> workerProps,
+      int minBrokerCount,
+      int timeoutMs
+  ) {
+    return checkKafkaReadyWithConfigProviderResilience(
+        workerProps, minBrokerCount, timeoutMs, ClusterStatus::isKafkaReady);
+  }
+
+  static boolean checkKafkaReadyWithConfigProviderResilience(
+      Map<String, String> workerProps,
+      int minBrokerCount,
+      int timeoutMs,
+      KafkaReadyChecker checker
+  ) {
+    if (!hasConfigProviders(workerProps)) {
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
+    }
+
+    try {
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
+    } catch (ConfigException e) {
+      if (!isConfigProviderLoadFailure(e)) {
+        throw e;
+      }
+      log.warn("Config provider class could not be loaded during kafka-ready check: {}",
+          e.getMessage(), e);
+
+      stripConfigProviders(workerProps);
+
+      List<String> unresolvedKeys = findUnresolvedConfigProviderVars(workerProps);
+      if (!unresolvedKeys.isEmpty()) {
+        log.warn("Skipping kafka-ready check - the following properties contain unresolved "
+            + "config provider variable references that cannot be resolved without the "
+            + "config provider plugin: {}. The Connect worker will verify broker connectivity "
+            + "on startup.", unresolvedKeys);
+        return true;
+      }
+
+      log.warn("Retrying kafka-ready check without config provider properties.");
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
+    }
+  }
+
+  /**
+   * Returns true if the properties map contains config.providers entries.
+   */
+  static boolean hasConfigProviders(Map<String, String> props) {
+    return props.containsKey(CONFIG_PROVIDERS_PREFIX);
+  }
+
+  /**
+   * Returns true if the exception is a ConfigException caused by a config provider
+   * class loading failure. Checks both the cause chain for ClassNotFoundException /
+   * NoClassDefFoundError and the message for config.providers references as a fallback.
+   */
+  static boolean isConfigProviderLoadFailure(ConfigException e) {
+    Throwable cause = e.getCause();
+    while (cause != null) {
+      if (cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError) {
+        return true;
+      }
+      cause = cause.getCause();
+    }
+    // Fallback: check message in case the cause chain is truncated
+    String msg = e.getMessage();
+    return msg != null && msg.contains("config.providers") && msg.contains("Could not load");
+  }
+
+  /**
+   * Removes config.providers entries from the properties map.
+   */
+  static void stripConfigProviders(Map<String, String> props) {
+    List<String> removed = new java.util.ArrayList<>();
+    Iterator<Map.Entry<String, String>> it = props.entrySet().iterator();
+    while (it.hasNext()) {
+      String key = it.next().getKey();
+      if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
+        removed.add(key);
+        it.remove();
+      }
+    }
+    if (!removed.isEmpty()) {
+      log.warn("Removed {} config provider properties from kafka-ready config: {}",
+          removed.size(), removed);
+    }
+  }
+
+  /**
+   * Returns property keys whose values contain unresolved config provider variable
+   * references (e.g. ${secretmanager:path:key}).
+   */
+  static List<String> findUnresolvedConfigProviderVars(Map<String, String> props) {
+    return props.entrySet().stream()
+        .filter(e -> CONFIG_PROVIDER_VAR_PATTERN.matcher(e.getValue()).find())
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 }
