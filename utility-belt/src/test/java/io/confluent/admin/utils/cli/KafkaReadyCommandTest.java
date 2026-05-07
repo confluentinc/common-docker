@@ -109,16 +109,19 @@ public class KafkaReadyCommandTest {
 
   @Test
   public void isConfigProviderLoadFailure_trueForClassNotFoundException() {
-    ConfigException e = new ConfigException("Could not load config provider class");
-    e.initCause(new ClassNotFoundException(
-        "io.confluent.csid.config.provider.aws.SecretsManagerConfigProvider"));
+    ConfigException e = new ConfigException(
+        "Invalid value com.example.Provider for configuration "
+        + "config.providers.secretmanager.class: Could not load class");
+    e.initCause(new ClassNotFoundException("com.example.Provider"));
 
     assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
   }
 
   @Test
   public void isConfigProviderLoadFailure_trueForNoClassDefFoundError() {
-    ConfigException e = new ConfigException("Could not instantiate config provider");
+    ConfigException e = new ConfigException(
+        "Invalid value com.example.Provider for configuration "
+        + "config.providers.secretmanager.class: Could not load class");
     e.initCause(new NoClassDefFoundError("software/amazon/awssdk/core/SdkClient"));
 
     assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
@@ -128,7 +131,8 @@ public class KafkaReadyCommandTest {
   public void isConfigProviderLoadFailure_trueForNestedClassNotFound() {
     ClassNotFoundException cnfe = new ClassNotFoundException("com.example.Provider");
     RuntimeException wrapper = new RuntimeException("wrapper", cnfe);
-    ConfigException e = new ConfigException("config error");
+    ConfigException e = new ConfigException(
+        "config.providers.vault.class: Could not load");
     e.initCause(wrapper);
 
     assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isTrue();
@@ -148,6 +152,28 @@ public class KafkaReadyCommandTest {
   @Test
   public void isConfigProviderLoadFailure_falseForOtherConfigException() {
     ConfigException e = new ConfigException("Unknown configuration key: bad.key");
+
+    assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isFalse();
+  }
+
+  @Test
+  public void isConfigProviderLoadFailure_falseForSaslClassNotFound() {
+    // CNFE for a SASL handler class should NOT be treated as a config provider failure
+    ConfigException e = new ConfigException(
+        "Invalid value com.example.SaslHandler for configuration "
+        + "sasl.client.callback.handler.class: Could not load class");
+    e.initCause(new ClassNotFoundException("com.example.SaslHandler"));
+
+    assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isFalse();
+  }
+
+  @Test
+  public void isConfigProviderLoadFailure_falseForSslClassNotFound() {
+    // CNFE for an SSL engine factory should NOT match
+    ConfigException e = new ConfigException(
+        "Invalid value com.example.SslFactory for configuration "
+        + "ssl.engine.factory.class: Could not load class");
+    e.initCause(new ClassNotFoundException("com.example.SslFactory"));
 
     assertThat(KafkaReadyCommand.isConfigProviderLoadFailure(e)).isFalse();
   }

@@ -23,6 +23,7 @@ import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.kafka.common.config.ConfigException;
 
 import io.confluent.admin.utils.ClusterStatus;
 
@@ -238,11 +237,20 @@ public class KafkaReadyCommand {
   }
 
   /**
-   * Returns true if the exception is a ConfigException caused by a config provider
-   * class loading failure. Checks both the cause chain for ClassNotFoundException /
-   * NoClassDefFoundError and the message for config.providers references as a fallback.
+   * Returns true if the exception is a ConfigException specifically caused by a config
+   * provider class loading failure. Requires both:
+   * - The exception message references "config.providers" (to distinguish from SASL/SSL
+   *   handler class loading failures which also throw ConfigException with CNFE)
+   * - Either a ClassNotFoundException/NoClassDefFoundError in the cause chain, or
+   *   "Could not load" in the message (fallback for truncated cause chains)
    */
   static boolean isConfigProviderLoadFailure(ConfigException e) {
+    String msg = e.getMessage();
+    boolean mentionsConfigProviders = msg != null && msg.contains("config.providers");
+    if (!mentionsConfigProviders) {
+      return false;
+    }
+
     Throwable cause = e.getCause();
     while (cause != null) {
       if (cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError) {
@@ -250,9 +258,8 @@ public class KafkaReadyCommand {
       }
       cause = cause.getCause();
     }
-    // Fallback: check message in case the cause chain is truncated
-    String msg = e.getMessage();
-    return msg != null && msg.contains("config.providers") && msg.contains("Could not load");
+    // Fallback: message-only check when cause chain is truncated
+    return msg.contains("Could not load");
   }
 
   /**
