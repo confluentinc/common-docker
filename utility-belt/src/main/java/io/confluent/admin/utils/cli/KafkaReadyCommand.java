@@ -59,6 +59,12 @@ public class KafkaReadyCommand {
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
   private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
+
+  @FunctionalInterface
+  interface KafkaReadyChecker {
+    boolean isReady(Map<String, String> config, int minBrokerCount, int timeoutMs);
+  }
+
   // Matches Kafka config provider variable syntax: ${provider-name:path[:key]}
   // Requires at least one colon separator to distinguish from other ${...} placeholders.
   private static final Pattern CONFIG_PROVIDER_VAR_PATTERN =
@@ -185,12 +191,22 @@ public class KafkaReadyCommand {
       int minBrokerCount,
       int timeoutMs
   ) {
+    return checkKafkaReadyWithConfigProviderResilience(
+        workerProps, minBrokerCount, timeoutMs, ClusterStatus::isKafkaReady);
+  }
+
+  static boolean checkKafkaReadyWithConfigProviderResilience(
+      Map<String, String> workerProps,
+      int minBrokerCount,
+      int timeoutMs,
+      KafkaReadyChecker checker
+  ) {
     if (!hasConfigProviders(workerProps)) {
-      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
     }
 
     try {
-      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
     } catch (ConfigException e) {
       if (!isConfigProviderLoadFailure(e)) {
         throw e;
@@ -210,7 +226,7 @@ public class KafkaReadyCommand {
       }
 
       log.warn("Retrying kafka-ready check without config provider properties.");
-      return ClusterStatus.isKafkaReady(workerProps, minBrokerCount, timeoutMs);
+      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
     }
   }
 

@@ -21,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class KafkaReadyCommandTest {
 
@@ -198,5 +200,117 @@ public class KafkaReadyCommandTest {
     List<String> unresolved = KafkaReadyCommand.findUnresolvedConfigProviderVars(new HashMap<>());
 
     assertThat(unresolved).isEmpty();
+  }
+
+  // --- checkKafkaReadyWithConfigProviderResilience orchestration ---
+
+  @Test
+  public void resilience_noConfigProviders_callsCheckerOnce() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    AtomicInteger callCount = new AtomicInteger(0);
+    KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
+      callCount.incrementAndGet();
+      return true;
+    };
+
+    boolean result = KafkaReadyCommand.checkKafkaReadyWithConfigProviderResilience(
+        props, 1, 5000, checker);
+
+    assertThat(result).isTrue();
+    assertThat(callCount.get()).isEqualTo(1);
+  }
+
+  @Test
+  public void resilience_configProvidersLoadable_succeedsFirstTry() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    props.put("config.providers", "secretmanager");
+    props.put("config.providers.secretmanager.class", "com.example.Provider");
+    AtomicInteger callCount = new AtomicInteger(0);
+    KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
+      callCount.incrementAndGet();
+      return true;
+    };
+
+    boolean result = KafkaReadyCommand.checkKafkaReadyWithConfigProviderResilience(
+        props, 1, 5000, checker);
+
+    assertThat(result).isTrue();
+    assertThat(callCount.get()).isEqualTo(1);
+    // config.providers still present since first try succeeded
+    assertThat(props).containsKey("config.providers");
+  }
+
+  @Test
+  public void resilience_classNotFound_literalProps_stripsAndRetries() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    props.put("security.protocol", "SASL_SSL");
+    props.put("sasl.mechanism", "PLAIN");
+    props.put("config.providers", "secretmanager");
+    props.put("config.providers.secretmanager.class", "com.example.MissingProvider");
+    AtomicInteger callCount = new AtomicInteger(0);
+    KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
+      int call = callCount.incrementAndGet();
+      if (call == 1) {
+        ConfigException ex = new ConfigException("Could not load");
+        ex.initCause(new ClassNotFoundException("com.example.MissingProvider"));
+        throw ex;
+      }
+      return true;
+    };
+
+    boolean result = KafkaReadyCommand.checkKafkaReadyWithConfigProviderResilience(
+        props, 1, 5000, checker);
+
+    assertThat(result).isTrue();
+    assertThat(callCount.get()).isEqualTo(2);
+    // config.providers should have been stripped before retry
+    assertThat(props).doesNotContainKey("config.providers");
+    assertThat(props).doesNotContainKey("config.providers.secretmanager.class");
+    assertThat(props).containsKey("bootstrap.servers");
+  }
+
+  @Test
+  public void resilience_classNotFound_unresolvedVars_skipsWithWarning() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    props.put("ssl.keystore.password", "${secretmanager:secret:password}");
+    props.put("config.providers", "secretmanager");
+    props.put("config.providers.secretmanager.class", "com.example.MissingProvider");
+    AtomicInteger callCount = new AtomicInteger(0);
+    KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
+      callCount.incrementAndGet();
+      ConfigException ex = new ConfigException("Could not load");
+      ex.initCause(new ClassNotFoundException("com.example.MissingProvider"));
+      throw ex;
+    };
+
+    boolean result = KafkaReadyCommand.checkKafkaReadyWithConfigProviderResilience(
+        props, 1, 5000, checker);
+
+    // Should skip (return true) without retrying
+    assertThat(result).isTrue();
+    assertThat(callCount.get()).isEqualTo(1);
+  }
+
+  @Test
+  public void resilience_nonProviderConfigException_rethrows() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    props.put("config.providers", "secretmanager");
+    props.put("config.providers.secretmanager.class", "com.example.Provider");
+    KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
+      throw new ConfigException("Unknown configuration key: bad.key");
+    };
+
+    try {
+      KafkaReadyCommand.checkKafkaReadyWithConfigProviderResilience(
+          props, 1, 5000, checker);
+      fail("Expected ConfigException to be rethrown");
+    } catch (ConfigException e) {
+      assertThat(e.getMessage()).contains("bad.key");
+    }
   }
 }
