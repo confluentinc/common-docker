@@ -17,16 +17,30 @@ package io.confluent.admin.utils;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.test.TestUtils;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class ClusterWaitTest {
+
+  private static final long WAIT_TIMEOUT_MS = 60_000;
+  private static final long WAIT_POLL_INTERVAL_MS = 100;
+
+  private static void waitForCondition(BooleanSupplier condition, String conditionDetails)
+      throws InterruptedException {
+    long deadline = System.currentTimeMillis() + WAIT_TIMEOUT_MS;
+    while (!condition.getAsBoolean()) {
+      if (System.currentTimeMillis() > deadline) {
+        throw new AssertionError("Condition not met: " + conditionDetails);
+      }
+      Thread.sleep(WAIT_POLL_INTERVAL_MS);
+    }
+  }
 
   @Test(timeout = 180000)
   public void isKafkaReadyWait() throws Exception {
@@ -48,7 +62,7 @@ public class ClusterWaitTest {
     });
 
     kafkaClusterThread.start();
-    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
+    waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
         "unable to get bootstrap server list.");
 
     try {
@@ -87,7 +101,7 @@ public class ClusterWaitTest {
     });
 
     kafkaClusterThread.start();
-    TestUtils.waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
+    waitForCondition(() -> !kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT).isEmpty(),
             "unable to get bootstrap server list.");
     try {
       String bootstrap_broker = kafkaWait.getBootstrapBrokers(SecurityProtocol.PLAINTEXT);
