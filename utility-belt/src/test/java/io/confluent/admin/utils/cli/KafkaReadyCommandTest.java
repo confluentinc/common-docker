@@ -228,6 +228,22 @@ public class KafkaReadyCommandTest {
     assertThat(unresolved).isEmpty();
   }
 
+  @Test
+  public void findUnresolvedVars_ignoresNonClientKeys() {
+    Map<String, String> props = new HashMap<>();
+    props.put("bootstrap.servers", "localhost:9092");
+    // Non-client key with provider reference should be ignored
+    props.put("connector.password", "${secretmanager:secret:connector-pw}");
+    props.put("group.id", "${secretmanager:secret:group}");
+    // Client key with provider reference should be detected
+    props.put("ssl.keystore.password", "${secretmanager:secret:keystore-pw}");
+
+    List<String> unresolved = KafkaReadyCommand.findUnresolvedConfigProviderVars(props);
+
+    assertThat(unresolved).hasSize(1);
+    assertThat(unresolved).contains("ssl.keystore.password");
+  }
+
   // --- checkKafkaReadyWithConfigProviderResilience orchestration ---
 
   @Test
@@ -280,7 +296,9 @@ public class KafkaReadyCommandTest {
     KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
       int call = callCount.incrementAndGet();
       if (call == 1) {
-        ConfigException ex = new ConfigException("Could not load");
+        ConfigException ex = new ConfigException(
+            "Invalid value com.example.MissingProvider for configuration "
+            + "config.providers.secretmanager.class: Could not load");
         ex.initCause(new ClassNotFoundException("com.example.MissingProvider"));
         throw ex;
       }

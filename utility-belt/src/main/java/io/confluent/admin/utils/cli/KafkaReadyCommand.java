@@ -69,6 +69,14 @@ public class KafkaReadyCommand {
   private static final Pattern CONFIG_PROVIDER_VAR_PATTERN =
       Pattern.compile("\\$\\{[^:}]+:[^}]+}");
 
+  // Property key prefixes that affect Kafka client connectivity. Only these are checked
+  // for unresolved config provider variable references when deciding whether to skip
+  // the kafka-ready check. Non-client keys (e.g. connector configs) are irrelevant
+  // since AdminClient ignores them.
+  private static final String[] KAFKA_CLIENT_KEY_PREFIXES = {
+      "security.", "sasl.", "ssl.", "bootstrap.servers"
+  };
+
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
         .newArgumentParser(KAFKA_READY)
@@ -282,13 +290,25 @@ public class KafkaReadyCommand {
   }
 
   /**
-   * Returns property keys whose values contain unresolved config provider variable
-   * references (e.g. ${secretmanager:path:key}).
+   * Returns Kafka client connectivity property keys whose values contain unresolved
+   * config provider variable references (e.g. ${secretmanager:path:key}). Only checks
+   * keys that affect broker connectivity (security.*, sasl.*, ssl.*, bootstrap.servers)
+   * since non-client keys are ignored by AdminClient and won't cause failures.
    */
   static List<String> findUnresolvedConfigProviderVars(Map<String, String> props) {
     return props.entrySet().stream()
+        .filter(e -> isKafkaClientKey(e.getKey()))
         .filter(e -> CONFIG_PROVIDER_VAR_PATTERN.matcher(e.getValue()).find())
         .map(Map.Entry::getKey)
         .collect(Collectors.toList());
+  }
+
+  private static boolean isKafkaClientKey(String key) {
+    for (String prefix : KAFKA_CLIENT_KEY_PREFIXES) {
+      if (key.startsWith(prefix)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
