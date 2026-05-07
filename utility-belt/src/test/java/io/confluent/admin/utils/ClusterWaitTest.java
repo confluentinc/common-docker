@@ -17,7 +17,7 @@ package io.confluent.admin.utils;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.common.test.TestUtils;
+import org.apache.kafka.test.TestUtils;
 import org.junit.Test;
 
 import java.util.HashMap;
