@@ -310,9 +310,9 @@ public class KafkaReadyCommandTest {
 
     assertThat(result).isTrue();
     assertThat(callCount.get()).isEqualTo(2);
-    // config.providers should have been stripped before retry
-    assertThat(props).doesNotContainKey("config.providers");
-    assertThat(props).doesNotContainKey("config.providers.secretmanager.class");
+    // caller's map should not be mutated
+    assertThat(props).containsKey("config.providers");
+    assertThat(props).containsKey("config.providers.secretmanager.class");
     assertThat(props).containsKey("bootstrap.servers");
   }
 

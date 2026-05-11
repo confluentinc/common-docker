@@ -185,13 +185,16 @@ public class KafkaReadyCommand {
    * Attempts the kafka-ready check, handling config provider class loading failures gracefully.
    *
    * <p>Strategy:
+   * 0. If no config.providers entries are present, run the check directly (fast path).
    * 1. Try with the full config (config providers may be loadable if on the classpath).
    * 2. If config provider class loading fails (ConfigException wrapping ClassNotFoundException),
-   *    strip config.providers entries and check for unresolved variable references.
-   * 3. If remaining properties contain unresolved ${provider:...} references (i.e. security
-   *    properties depend on config providers), skip the check with a warning — the Connect
-   *    worker will verify connectivity itself on startup.
-   * 4. Otherwise, retry the check without config.providers.
+   *    strip config.providers entries from a copy and check for unresolved variable references
+   *    in Kafka client connectivity properties (security.*, sasl.*, ssl.*).
+   * 3. If client connectivity properties contain unresolved ${provider:path:key} references,
+   *    skip the check with a warning - the Connect worker will verify connectivity on startup.
+   * 4. Otherwise, retry the check with the stripped copy (without config.providers).
+   *
+   * <p>The caller's workerProps map is never mutated.
    */
   static boolean checkKafkaReadyWithConfigProviderResilience(
       Map<String, String> workerProps,
@@ -221,9 +224,10 @@ public class KafkaReadyCommand {
       log.warn("Config provider class could not be loaded during kafka-ready check: {}",
           e.getMessage(), e);
 
-      stripConfigProviders(workerProps);
+      Map<String, String> strippedProps = new HashMap<>(workerProps);
+      stripConfigProviders(strippedProps);
 
-      List<String> unresolvedKeys = findUnresolvedConfigProviderVars(workerProps);
+      List<String> unresolvedKeys = findUnresolvedConfigProviderVars(strippedProps);
       if (!unresolvedKeys.isEmpty()) {
         log.warn("Skipping kafka-ready check - the following properties contain unresolved "
             + "config provider variable references that cannot be resolved without the "
@@ -233,7 +237,7 @@ public class KafkaReadyCommand {
       }
 
       log.warn("Retrying kafka-ready check without config provider properties.");
-      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
+      return checker.isReady(strippedProps, minBrokerCount, timeoutMs);
     }
   }
 
