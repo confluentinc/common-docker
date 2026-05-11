@@ -16,7 +16,7 @@
 package io.confluent.admin.utils.cli;
 
 import org.apache.kafka.common.config.ConfigException;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
