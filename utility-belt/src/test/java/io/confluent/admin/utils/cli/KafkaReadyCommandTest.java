@@ -326,7 +326,9 @@ public class KafkaReadyCommandTest {
     AtomicInteger callCount = new AtomicInteger(0);
     KafkaReadyCommand.KafkaReadyChecker checker = (config, brokers, timeout) -> {
       callCount.incrementAndGet();
-      ConfigException ex = new ConfigException("Could not load");
+      ConfigException ex = new ConfigException(
+          "Invalid value com.example.MissingProvider for configuration "
+          + "config.providers.secretmanager.class: Could not load");
       ex.initCause(new ClassNotFoundException("com.example.MissingProvider"));
       throw ex;
     };
