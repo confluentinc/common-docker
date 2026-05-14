@@ -27,6 +27,12 @@ ARG TEMURIN_JDK_VERSION
 ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
+# s390x uses IBM Semeru Open JRE (tarball) instead of Temurin (RPM) — required for FIPS
+# (BoringSSL FIPS has no s390x build; Semeru ships IBM JSSE2 FIPS natively) and to
+# auto-leverage CPACF hardware crypto.
+ARG SEMERU_JRE_VERSION
+ARG SEMERU_JRE_S390X_SHA256
+ARG TARGET_ARCH
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
@@ -50,17 +56,47 @@ LABEL io.confluent.docker=true
 ENV LANG="C.UTF-8"
 ENV USE_LOG4J_2="True"
 
-RUN printf "[temurin-jre] \n\
-name=temurin-jre \n\
-baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
-" > /etc/yum.repos.d/adoptium.repo
+# JRE install — arch-specific.
+#   s390x  → IBM Semeru Open JRE, tarball from github.com/ibmruntimes/semeru25-binaries
+#            (IBM does not publish Semeru in a yum/dnf repo). Extracted to /opt/java/openjdk
+#            with /usr/bin/java symlinked so downstream apps work identically to the RPM path.
+#            The legal/ tree inside the tarball is preserved under /opt/java/openjdk/legal/
+#            (GPLv2+CPE attribution).
+#
+#            After extraction we grep java.security for OpenJCEPlus — IBM's FIPS-capable
+#            crypto provider that ships in Semeru Open Edition and (on s390x specifically)
+#            auto-routes through CPACF hardware crypto. The check guards against a future
+#            Semeru tarball refresh silently dropping or renaming the provider entry, which
+#            would regress the s390x FIPS path that is the entire reason we're on Semeru
+#            here instead of Temurin.
+#
+#            What this proves: the provider line is present in the config shipped by IBM.
+#            What it does NOT prove: (1) com.ibm.crypto.plus.provider.OpenJCEPlus actually
+#            loads at runtime — JRE has no compiler and jrunscript was removed in JDK 15+,
+#            so a class-load test would require shipping a precompiled .class file just to
+#            run it; (2) FIPS mode actually engages — that needs a real z box with CPACF
+#            and an actual Cipher.getInstance(...) call, neither of which QEMU can emulate.
+#
+#   other  → Eclipse Temurin JRE via Adoptium RPM repo (existing path, unchanged behaviour).
+RUN if [ "$TARGET_ARCH" = ".s390x" ]; then \
+        echo "Installing IBM Semeru Open JRE ${SEMERU_JRE_VERSION} for s390x" \
+        && microdnf install -y tar gzip \
+        && mkdir -p /opt/java/openjdk \
+        && curl -fsSL -o /tmp/semeru-jre.tar.gz \
+            "https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-${SEMERU_JRE_VERSION}/ibm-semeru-open-jre_s390x_linux_${SEMERU_JRE_VERSION}.tar.gz" \
+        && echo "${SEMERU_JRE_S390X_SHA256}  /tmp/semeru-jre.tar.gz" | sha256sum -c - \
+        && tar -xzf /tmp/semeru-jre.tar.gz -C /opt/java/openjdk --strip-components=1 \
+        && (grep -qE "^security\.provider\.[0-9]+=OpenJCEPlus" /opt/java/openjdk/conf/security/java.security \
+              || (echo "ERROR: OpenJCEPlus provider missing from Semeru java.security — possible tarball regression" && exit 1)) \
+        && rm /tmp/semeru-jre.tar.gz \
+        && ln -sf /opt/java/openjdk/bin/java /usr/bin/java; \
+    else \
+        printf "[temurin-jre] \nname=temurin-jre \nbaseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \nenabled=1 \ngpgcheck=1 \ngpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n" > /etc/yum.repos.d/adoptium.repo \
+        && echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
+        && microdnf install -y temurin-25-jre${TEMURIN_JDK_VERSION}; \
+    fi
 
-RUN echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
-    && microdnf install -y temurin-25-jre${TEMURIN_JDK_VERSION} \
-    && microdnf install -y procps-ng${PROCPS_VERSION} \
+RUN microdnf install -y procps-ng${PROCPS_VERSION} \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
@@ -69,7 +105,7 @@ RUN echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses \
-    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+    && rm -f /etc/yum.repos.d/adoptium.repo
 
 # enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
 RUN update-crypto-policies --set FIPS

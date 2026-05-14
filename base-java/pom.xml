@@ -140,6 +140,12 @@
                                     <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <!-- IBM Semeru Open JRE (used on s390x only; see Dockerfile.ubi9) -->
+                                    <SEMERU_JRE_VERSION>${semeru-25-jre.version}</SEMERU_JRE_VERSION>
+                                    <SEMERU_JRE_S390X_SHA256>${semeru-25-jre.s390x.sha256}</SEMERU_JRE_S390X_SHA256>
+                                    <!-- arch.type is set in .semaphore/semaphore.yml as .amd64/.arm64/.s390x.
+                                         Dockerfile branches on this to choose Temurin RPM vs Semeru tarball. -->
+                                    <TARGET_ARCH>${arch.type}</TARGET_ARCH>
                                 </args>
                             </build>
                         </image>

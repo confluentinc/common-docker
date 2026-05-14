@@ -27,28 +27,67 @@ ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
 ARG SHADOW_UTILS_VERSION
-
-RUN printf "[temurin-jre] \n\
-name=temurin-jre \n\
-baseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n\
-" > /etc/yum.repos.d/adoptium.repo
+# libstdc++ is only consumed by the s390x branch below (the Temurin path pulls it
+# transitively via the temurin-25-jre RPM, so leaving this ARG empty for non-s390x
+# builds is fine — the suffix expands to "" and dnf installs the latest).
+ARG LIBSTDCXX_VERSION
+# s390x uses IBM Semeru Open JRE (tarball) instead of Temurin (RPM) — see base-java/Dockerfile.ubi9
+# for full rationale (FIPS via IBM JSSE2, CPACF auto-integration).
+ARG SEMERU_JRE_VERSION
+ARG SEMERU_JRE_S390X_SHA256
+ARG TARGET_ARCH
 
 RUN mkdir -p /microdir
 
-RUN echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
-    && dnf install --installroot=/microdir --releasever=9 --setopt=install_weak_deps=False --nodocs -y \
-       temurin-25-jre${TEMURIN_JDK_VERSION} \
-       procps-ng${PROCPS_VERSION} \
-       crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
-       findutils${FINDUTILS_VERSION} \
-       hostname${HOSTNAME_VERSION} \
-       shadow-utils${SHADOW_UTILS_VERSION} \
-    && dnf --installroot=/microdir clean all \
-    && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
-    && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
+# JRE install into the /microdir rootfs.
+#   s390x  → IBM Semeru Open JRE tarball extracted to /microdir/opt/java/openjdk,
+#            with /microdir/usr/bin/java symlinked. Non-JRE packages (procps-ng,
+#            crypto-policies-scripts, findutils, hostname, shadow-utils, libstdc++) still
+#            come via dnf — libstdc++ is needed because the tarball's libjvm.so links
+#            against libstdc++.so.6 and ubi9-micro (unlike ubi9-minimal) does not bundle
+#            it, so we install it into /microdir so the final stage's rootfs-copy carries
+#            it along.
+#
+#            After extraction we grep java.security for OpenJCEPlus — see the long-form
+#            note in base-java/Dockerfile.ubi9 for full rationale. Same regression-guard,
+#            same limitations (proves the provider line is present; does NOT prove class
+#            load at runtime or actual FIPS engagement — those need real z hardware).
+#
+#   other  → existing dnf-into-installroot path with Temurin RPM, unchanged behaviour.
+RUN if [ "$TARGET_ARCH" = ".s390x" ]; then \
+        echo "Installing IBM Semeru Open JRE ${SEMERU_JRE_VERSION} for s390x" \
+        && mkdir -p /microdir/opt/java/openjdk /microdir/usr/bin \
+        && curl -fsSL -o /tmp/semeru-jre.tar.gz \
+            "https://github.com/ibmruntimes/semeru25-binaries/releases/download/jdk-${SEMERU_JRE_VERSION}/ibm-semeru-open-jre_s390x_linux_${SEMERU_JRE_VERSION}.tar.gz" \
+        && echo "${SEMERU_JRE_S390X_SHA256}  /tmp/semeru-jre.tar.gz" | sha256sum -c - \
+        && tar -xzf /tmp/semeru-jre.tar.gz -C /microdir/opt/java/openjdk --strip-components=1 \
+        && (grep -qE "^security\.provider\.[0-9]+=OpenJCEPlus" /microdir/opt/java/openjdk/conf/security/java.security \
+              || (echo "ERROR: OpenJCEPlus provider missing from Semeru java.security — possible tarball regression" && exit 1)) \
+        && rm /tmp/semeru-jre.tar.gz \
+        && ln -sf /opt/java/openjdk/bin/java /microdir/usr/bin/java \
+        && dnf install --installroot=/microdir --releasever=9 --setopt=install_weak_deps=False --nodocs -y \
+            procps-ng${PROCPS_VERSION} \
+            crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+            findutils${FINDUTILS_VERSION} \
+            hostname${HOSTNAME_VERSION} \
+            shadow-utils${SHADOW_UTILS_VERSION} \
+            libstdc++${LIBSTDCXX_VERSION} \
+        && dnf --installroot=/microdir clean all \
+        && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.*; \
+    else \
+        printf "[temurin-jre] \nname=temurin-jre \nbaseurl=https://adoptium.jfrog.io/artifactory/rpm/rhel/\$releasever/\$basearch \nenabled=1 \ngpgcheck=1 \ngpgkey=https://adoptium.jfrog.io/artifactory/api/gpg/key/public \n" > /etc/yum.repos.d/adoptium.repo \
+        && echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
+        && dnf install --installroot=/microdir --releasever=9 --setopt=install_weak_deps=False --nodocs -y \
+            temurin-25-jre${TEMURIN_JDK_VERSION} \
+            procps-ng${PROCPS_VERSION} \
+            crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
+            findutils${FINDUTILS_VERSION} \
+            hostname${HOSTNAME_VERSION} \
+            shadow-utils${SHADOW_UTILS_VERSION} \
+        && dnf --installroot=/microdir clean all \
+        && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
+        && rm /etc/yum.repos.d/adoptium.repo; \
+    fi
 
 # Create the user/group with EXPLICIT IDs inside the micro rootfs
 RUN chroot /microdir groupadd -g ${APP_GID} appuser && \
