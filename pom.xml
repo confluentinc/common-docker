@@ -117,7 +117,7 @@
         <python.setuptools.version>82.0.1</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.171</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
         <git-repo.cp-docker-utils.tag>v1.0.11</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
