@@ -104,6 +104,7 @@ RUN microdnf --nodocs -y install yum \
         Python-${PYTHON314_VERSION}.tgz \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && python3 -m pip uninstall -y sigstore \
+    && rm -rf /usr/local/lib/python3.9/site-packages/* \
     && yum remove -y python3-pip \
     && rm -f /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.9 \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
