@@ -64,7 +64,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1778072014</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1778735208</ubi8-minimal.image.version>
 
         <!-- OS Package Versions -->
         <ubi8-minimal.openssl.version>1.1.1k-15.el8_6</ubi8-minimal.openssl.version>
@@ -73,7 +73,7 @@
         <ubi8-minimal.python39.version>3.9.25-2.module+el8.10.0+23718+1842ae33</ubi8-minimal.python39.version>
         <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
         <ubi8-minimal.procps-ng.version>3.3.15-14.el8</ubi8-minimal.procps-ng.version>
-        <ubi8-minimal.krb5-workstation.version>1.18.2-33.el8_10</ubi8-minimal.krb5-workstation.version>
+        <ubi8-minimal.krb5-workstation.version>1.18.2-34.el8_10</ubi8-minimal.krb5-workstation.version>
         <ubi8-minimal.iputils.version>20180629-11.el8</ubi8-minimal.iputils.version>
         <ubi8-minimal.hostname.version>3.20-6.el8</ubi8-minimal.hostname.version>
         <ubi8-minimal.xz-libs.version>5.2.4-4.el8_6</ubi8-minimal.xz-libs.version>
@@ -86,7 +86,7 @@
         <python.setuptools.version>82.0.1</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
-        <git-repo.confluent-docker-utils.tag>v0.0.171</git-repo.confluent-docker-utils.tag>
+        <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.3-trixie</golang.image.version>
