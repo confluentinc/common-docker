@@ -142,7 +142,17 @@
                                     <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                                     <SHADOW_UTILS_VERSION>-${ubi9.shadow-utils.version}</SHADOW_UTILS_VERSION>
+                                    <!-- libstdc++ explicitly installed for the s390x Semeru rootfs-copy path
+                                         (see Dockerfile.ubi9). XML names disallow '+'; '__plus__' encoding is
+                                         decoded by cp-build-release's dependency-update automation. -->
+                                    <LIBSTDCXX_VERSION>-${ubi9.libstdc__plus____plus__.version}</LIBSTDCXX_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <!-- IBM Semeru Open JRE (used on s390x only; see Dockerfile.ubi9) -->
+                                    <SEMERU_JRE_VERSION>${semeru-25-jre.version}</SEMERU_JRE_VERSION>
+                                    <SEMERU_JRE_S390X_SHA256>${semeru-25-jre.s390x.sha256}</SEMERU_JRE_S390X_SHA256>
+                                    <!-- arch.type is set in .semaphore/semaphore.yml as .amd64/.arm64/.s390x.
+                                         Dockerfile branches on this to choose Temurin RPM vs Semeru tarball. -->
+                                    <TARGET_ARCH>${arch.type}</TARGET_ARCH>
                                 </args>
                             </build>
                         </image>

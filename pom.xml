@@ -88,6 +88,13 @@
         <ubi9.findutils.version>4.8.0-7.el9</ubi9.findutils.version>
         <ubi9.hostname.version>3.23-6.el9</ubi9.hostname.version>
         <ubi9.shadow-utils.version>4.9-15.el9</ubi9.shadow-utils.version>
+        <!-- libstdc++ is required in /microdir for cp-base-java-micro's s390x build:
+             the Semeru tarball's libjvm.so links libstdc++.so.6, and ubi9-micro (unlike
+             ubi9-minimal) does not bundle the C++ stdlib. XML element names cannot contain
+             '+'; the cp-build-release dependency-update automation decodes '__plus__' back
+             to '+' at the upstream-lookup boundary. See PROPERTY_NAME_ENCODING_MAP in
+             scheduled_tasks/update_docker_dependencies/lib/constants.py. -->
+        <ubi9.libstdc__plus____plus__.version>11.5.0-11.el9</ubi9.libstdc__plus____plus__.version>
 
         <ubi9-minimal.openssl.version>3.5.1-7.el9_7</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>
@@ -128,6 +135,20 @@
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
         <git-repo.cp-docker-utils.tag>v1.0.11</git-repo.cp-docker-utils.tag>
+
+        <!-- IBM Semeru Runtime Open Edition (s390x JRE for cp-base-java*)
+             Tarball distribution from github.com/ibmruntimes/semeru25-binaries.
+             IBM does not publish Semeru in a yum/dnf repo, so this install path
+             is curl+sha256+tar rather than the RPM pattern used for Temurin.
+             URL template (see base-java/Dockerfile.ubi9 and base-java-micro/Dockerfile.ubi9):
+               https://github.com/ibmruntimes/semeru25-binaries/releases/download/
+                 jdk-${semeru-25-jre.version}/
+                 ibm-semeru-open-jre_<arch>_linux_${semeru-25-jre.version}.tar.gz
+             Only s390x is consumed today (see service.yml s390x_docker_repos).
+             When refreshing: bump version, fetch new sha256 from the matching
+             *.tar.gz.sha256.txt asset on the same GitHub release. -->
+        <semeru-25-jre.version>25.0.3.0</semeru-25-jre.version>
+        <semeru-25-jre.s390x.sha256>5f24293d1352355c1c77bd373a7fcf68a0f9dd986cc575f208cc72978c4ada53</semeru-25-jre.s390x.sha256>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.3-trixie</golang.image.version>
