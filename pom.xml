@@ -77,7 +77,7 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1778735208</ubi8-minimal.image.version>
-        <ubi9-micro.image.version>9.8-1777876409</ubi9-micro.image.version>
+        <ubi9-micro.image.version>9.8-1779377090</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.8-1777460003</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
 
@@ -94,7 +94,7 @@
         <ubi9-minimal.findutils.version>4.8.0-7.el9</ubi9-minimal.findutils.version>
         <ubi9-minimal.crypto-policies-scripts.version>20260224-1.gitea0f072.el9_8</ubi9-minimal.crypto-policies-scripts.version>
         <ubi9-minimal.temurin-21-jdk.version>21.0.11.0.0.10-0</ubi9-minimal.temurin-21-jdk.version>
-        <ubi9-minimal.python3-pip.version>21.3.1-1.el9</ubi9-minimal.python3-pip.version>
+        <ubi9-minimal.python3-pip.version>21.3.1-2.el9_8</ubi9-minimal.python3-pip.version>
 
         <ubi8-minimal.openssl.version>1.1.1k-15.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
