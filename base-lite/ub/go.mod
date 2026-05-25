@@ -1,12 +1,12 @@
 //module base-lite
 module ub
 
-go 1.19
+go 1.25.0
 
 require (
 	github.com/spf13/cobra v1.7.0
 	golang.org/x/exp v0.0.0-20230419192730-864b3d6c5c2c
-	golang.org/x/sys v0.7.0
+	golang.org/x/sys v0.44.0
 )
 
 require (
