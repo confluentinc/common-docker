@@ -139,7 +139,7 @@ public class KafkaReadyCommand {
           );
         }
 
-        if (isConfigProviderResilienceEnabled()) {
+        if (isSkipConfigProvidersEnabled()) {
           workerProps = stripConfigProviders(workerProps);
         }
 
@@ -172,27 +172,36 @@ public class KafkaReadyCommand {
 
   /**
    * Returns a copy of the properties map with config.providers entries removed.
-   * If no config.providers entries are found, returns the original map.
+   * If no config.providers entries are found, returns the original map unmodified.
    */
   static Map<String, String> stripConfigProviders(Map<String, String> props) {
-    if (!props.containsKey(CONFIG_PROVIDERS_PREFIX)) {
+    boolean hasProviderKeys = false;
+    for (String key : props.keySet()) {
+      if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
+        hasProviderKeys = true;
+        break;
+      }
+    }
+    if (!hasProviderKeys) {
       return props;
     }
 
     Map<String, String> result = new HashMap<>(props);
+    int count = 0;
     Iterator<String> it = result.keySet().iterator();
     while (it.hasNext()) {
       String key = it.next();
       if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
-        log.warn("Stripping property '{}' from kafka-ready config "
-            + "({}=true).", key, SKIP_CONFIG_PROVIDERS_ENV);
         it.remove();
+        count++;
       }
     }
+    log.info("Stripped {} config.providers properties from kafka-ready config ({}=true).",
+        count, SKIP_CONFIG_PROVIDERS_ENV);
     return result;
   }
 
-  static boolean isConfigProviderResilienceEnabled() {
+  static boolean isSkipConfigProvidersEnabled() {
     return "true".equalsIgnoreCase(System.getenv(SKIP_CONFIG_PROVIDERS_ENV));
   }
 }
