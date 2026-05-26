@@ -23,17 +23,13 @@ import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import io.confluent.admin.utils.ClusterStatus;
 
@@ -59,23 +55,11 @@ public class KafkaReadyCommand {
   public static final String KAFKA_READY = "kafka-ready";
   private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
 
-  @FunctionalInterface
-  interface KafkaReadyChecker {
-    boolean isReady(Map<String, String> config, int minBrokerCount, int timeoutMs);
-  }
-
-  // Matches Kafka config provider variable syntax: ${provider-name:path[:key]}
-  // Requires at least one colon separator to distinguish from other ${...} placeholders.
-  private static final Pattern CONFIG_PROVIDER_VAR_PATTERN =
-      Pattern.compile("\\$\\{[^:}]+:[^}]+}");
-
-  // Property key prefixes that affect Kafka client connectivity. Only these are checked
-  // for unresolved config provider variable references when deciding whether to skip
-  // the kafka-ready check. Non-client keys (e.g. connector configs) are irrelevant
-  // since AdminClient ignores them.
-  private static final String[] KAFKA_CLIENT_KEY_PREFIXES = {
-      "security.", "sasl.", "ssl.", "bootstrap.servers"
-  };
+  // When set to "true", config.providers entries are stripped from the worker config
+  // before running the kafka-ready check. This prevents ClassNotFoundException when
+  // config provider plugin JARs are on the worker's plugin.path but not on the
+  // CUB_CLASSPATH used by kafka-ready. Default: disabled (original behavior).
+  static final String SKIP_CONFIG_PROVIDERS_ENV = "CUB_KAFKA_READY_SKIP_CONFIG_PROVIDERS";
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -154,7 +138,12 @@ public class KafkaReadyCommand {
               "Bootstrap servers should be provided through config or bootstrap_servers"
           );
         }
-        success = checkKafkaReadyWithConfigProviderResilience(
+
+        if (isConfigProviderResilienceEnabled()) {
+          workerProps = stripConfigProviders(workerProps);
+        }
+
+        success = ClusterStatus.isKafkaReady(
             workerProps,
             res.getInt("min_expected_brokers"),
             res.getInt("timeout")
@@ -182,137 +171,28 @@ public class KafkaReadyCommand {
   }
 
   /**
-   * Attempts the kafka-ready check, handling config provider class loading failures gracefully.
-   *
-   * <p>Strategy:
-   * 0. If no config.providers entries are present, run the check directly (fast path).
-   * 1. Try with the full config (config providers may be loadable if on the classpath).
-   * 2. If config provider class loading fails (ConfigException wrapping ClassNotFoundException),
-   *    strip config.providers entries from a copy and check for unresolved variable references
-   *    in Kafka client connectivity properties (security.*, sasl.*, ssl.*).
-   * 3. If client connectivity properties contain unresolved ${provider:path:key} references,
-   *    skip the check with a warning - the Connect worker will verify connectivity on startup.
-   * 4. Otherwise, retry the check with the stripped copy (without config.providers).
-   *
-   * <p>The caller's workerProps map is never mutated.
+   * Returns a copy of the properties map with config.providers entries removed.
+   * If no config.providers entries are found, returns the original map.
    */
-  static boolean checkKafkaReadyWithConfigProviderResilience(
-      Map<String, String> workerProps,
-      int minBrokerCount,
-      int timeoutMs
-  ) {
-    return checkKafkaReadyWithConfigProviderResilience(
-        workerProps, minBrokerCount, timeoutMs, ClusterStatus::isKafkaReady);
-  }
-
-  static boolean checkKafkaReadyWithConfigProviderResilience(
-      Map<String, String> workerProps,
-      int minBrokerCount,
-      int timeoutMs,
-      KafkaReadyChecker checker
-  ) {
-    if (!hasConfigProviders(workerProps)) {
-      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
+  static Map<String, String> stripConfigProviders(Map<String, String> props) {
+    if (!props.containsKey(CONFIG_PROVIDERS_PREFIX)) {
+      return props;
     }
 
-    try {
-      return checker.isReady(workerProps, minBrokerCount, timeoutMs);
-    } catch (ConfigException e) {
-      if (!isConfigProviderLoadFailure(e)) {
-        throw e;
-      }
-      log.warn("Config provider class could not be loaded during kafka-ready check: {}",
-          e.getMessage(), e);
-
-      Map<String, String> strippedProps = new HashMap<>(workerProps);
-      stripConfigProviders(strippedProps);
-
-      List<String> unresolvedKeys = findUnresolvedConfigProviderVars(strippedProps);
-      if (!unresolvedKeys.isEmpty()) {
-        log.warn("Skipping kafka-ready check - the following properties contain unresolved "
-            + "config provider variable references that cannot be resolved without the "
-            + "config provider plugin: {}. The Connect worker will verify broker connectivity "
-            + "on startup.", unresolvedKeys);
-        return true;
-      }
-
-      log.warn("Retrying kafka-ready check without config provider properties.");
-      return checker.isReady(strippedProps, minBrokerCount, timeoutMs);
-    }
-  }
-
-  /**
-   * Returns true if the properties map contains config.providers entries.
-   */
-  static boolean hasConfigProviders(Map<String, String> props) {
-    return props.containsKey(CONFIG_PROVIDERS_PREFIX);
-  }
-
-  /**
-   * Returns true if the exception is a ConfigException specifically caused by a config
-   * provider class loading failure. Requires both:
-   * - The exception message references "config.providers" (to distinguish from SASL/SSL
-   *   handler class loading failures which also throw ConfigException with CNFE)
-   * - Either a ClassNotFoundException/NoClassDefFoundError in the cause chain, or
-   *   "Could not load" in the message (fallback for truncated cause chains)
-   */
-  static boolean isConfigProviderLoadFailure(ConfigException e) {
-    String msg = e.getMessage();
-    boolean mentionsConfigProviders = msg != null && msg.contains("config.providers");
-    if (!mentionsConfigProviders) {
-      return false;
-    }
-
-    Throwable cause = e.getCause();
-    while (cause != null) {
-      if (cause instanceof ClassNotFoundException || cause instanceof NoClassDefFoundError) {
-        return true;
-      }
-      cause = cause.getCause();
-    }
-    // Fallback: message-only check when cause chain is truncated
-    return msg.contains("Could not load");
-  }
-
-  /**
-   * Removes config.providers entries from the properties map.
-   */
-  static void stripConfigProviders(Map<String, String> props) {
-    List<String> removed = new java.util.ArrayList<>();
-    Iterator<Map.Entry<String, String>> it = props.entrySet().iterator();
+    Map<String, String> result = new HashMap<>(props);
+    Iterator<String> it = result.keySet().iterator();
     while (it.hasNext()) {
-      String key = it.next().getKey();
+      String key = it.next();
       if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
-        removed.add(key);
+        log.warn("Stripping property '{}' from kafka-ready config "
+            + "({}=true).", key, SKIP_CONFIG_PROVIDERS_ENV);
         it.remove();
       }
     }
-    if (!removed.isEmpty()) {
-      log.warn("Removed {} config provider properties from kafka-ready config: {}",
-          removed.size(), removed);
-    }
+    return result;
   }
 
-  /**
-   * Returns Kafka client connectivity property keys whose values contain unresolved
-   * config provider variable references (e.g. ${secretmanager:path:key}). Only checks
-   * keys that affect broker connectivity (security.*, sasl.*, ssl.*, bootstrap.servers)
-   * since non-client keys are ignored by AdminClient and won't cause failures.
-   */
-  static List<String> findUnresolvedConfigProviderVars(Map<String, String> props) {
-    return props.entrySet().stream()
-        .filter(e -> isKafkaClientKey(e.getKey()))
-        .filter(e -> CONFIG_PROVIDER_VAR_PATTERN.matcher(e.getValue()).find())
-        .map(Map.Entry::getKey)
-        .collect(Collectors.toList());
-  }
-
-  private static boolean isKafkaClientKey(String key) {
-    for (String prefix : KAFKA_CLIENT_KEY_PREFIXES) {
-      if (key.startsWith(prefix)) {
-        return true;
-      }
-    }
-    return false;
+  static boolean isConfigProviderResilienceEnabled() {
+    return "true".equalsIgnoreCase(System.getenv(SKIP_CONFIG_PROVIDERS_ENV));
   }
 }
