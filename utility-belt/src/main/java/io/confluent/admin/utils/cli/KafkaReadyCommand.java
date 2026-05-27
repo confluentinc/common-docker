@@ -177,7 +177,7 @@ public class KafkaReadyCommand {
   static Map<String, String> stripConfigProviders(Map<String, String> props) {
     boolean hasProviderKeys = false;
     for (String key : props.keySet()) {
-      if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
+      if (key.startsWith(CONFIG_PROVIDERS_PREFIX)) {
         hasProviderKeys = true;
         break;
       }
@@ -191,7 +191,7 @@ public class KafkaReadyCommand {
     Iterator<String> it = result.keySet().iterator();
     while (it.hasNext()) {
       String key = it.next();
-      if (key.equals(CONFIG_PROVIDERS_PREFIX) || key.startsWith(CONFIG_PROVIDERS_PREFIX + ".")) {
+      if (key.startsWith(CONFIG_PROVIDERS_PREFIX)) {
         it.remove();
         count++;
       }
