@@ -127,7 +127,7 @@
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
-        <git-repo.cp-docker-utils.tag>v1.0.13</git-repo.cp-docker-utils.tag>
+        <git-repo.cp-docker-utils.tag>v1.0.15</git-repo.cp-docker-utils.tag>
 
         <!-- Docker Hub Image Versions -->
         <golang.image.version>1.26.4-trixie</golang.image.version>
