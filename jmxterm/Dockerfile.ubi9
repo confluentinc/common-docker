@@ -16,7 +16,7 @@
 ARG DOCKER_REGISTRY
 ARG DOCKER_TAG
 
-FROM ${DOCKER_REGISTRY}confluentinc/cp-base-new:${DOCKER_TAG}
+FROM ${DOCKER_REGISTRY}confluentinc/cp-base-java:${DOCKER_TAG}
 
 MAINTAINER partner-support@confluent.io
 LABEL io.confluent.docker=true
