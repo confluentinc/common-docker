@@ -85,7 +85,7 @@ RUN microdnf --nodocs install yum \
         make \
         tar \
         curl \
-        openssl-devel \
+        openssl-devel-1:1.1.1k-15.el8_6 \
         ca-certificates \
         bzip2-devel \
         libffi-devel \
