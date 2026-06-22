@@ -74,10 +74,10 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1780550539</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1781701121</ubi8-minimal.image.version>
 
         <!-- OS Package Versions -->
-        <ubi8-minimal.openssl.version>1.1.1k-15.el8_6</ubi8-minimal.openssl.version>
+        <ubi8-minimal.openssl.version>1.1.1k-16.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-12.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
         <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
@@ -91,7 +91,7 @@
         <ubi8-minimal.zulu11-ca-jdk-headless.version>11.0.31-3</ubi8-minimal.zulu11-ca-jdk-headless.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.5</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.6</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>82.0.1</python.setuptools.version>
