@@ -63,7 +63,7 @@
         <dependency>
             <groupId>io.prometheus.jmx</groupId>
             <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
+            <version>1.3.0</version>
         </dependency>
 
         <dependency>
