@@ -75,10 +75,10 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1784625896</ubi8-minimal.image.version>
-        <ubi9.image.version>9.8-1784625744</ubi9.image.version>
-        <ubi9-micro.image.version>9.8-1782840931</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.8-1784596070</ubi9-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1784730826</ubi8-minimal.image.version>
+        <ubi9.image.version>9.8-1784720169</ubi9.image.version>
+        <ubi9-micro.image.version>9.8-1784702951</ubi9-micro.image.version>
+        <ubi9-minimal.image.version>9.8-1784705586</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9.temurin-25-jdk.version>25.0.3.0.0.9-0</ubi9.temurin-25-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
@@ -96,7 +96,7 @@
         <ubi9-minimal.iputils.version>20210202-15.el9_7</ubi9-minimal.iputils.version>
         <ubi9-minimal.hostname.version>3.23-6.el9</ubi9-minimal.hostname.version>
         <ubi9-minimal.xz-libs.version>5.2.5-8.el9_0</ubi9-minimal.xz-libs.version>
-        <ubi9-minimal.glibc.version>2.34-272.el9_8</ubi9-minimal.glibc.version>
+        <ubi9-minimal.glibc.version>2.34-274.el9_8</ubi9-minimal.glibc.version>
         <ubi9-minimal.findutils.version>4.8.0-7.el9</ubi9-minimal.findutils.version>
         <ubi9-minimal.crypto-policies-scripts.version>20260224-1.gitea0f072.el9_8</ubi9-minimal.crypto-policies-scripts.version>
         <ubi9-minimal.temurin-25-jdk.version>25.0.3.0.0.9-0</ubi9-minimal.temurin-25-jdk.version>
