@@ -35,8 +35,10 @@ This project uses `maven-assembly-plugin` and `dockerfile-maven-plugin` to build
 To build SNAPSHOT images, configure `.m2/settings.xml` for SNAPSHOT dependencies. These must be available at build time.
 
 ```
-mvn clean package -Pdocker -DskipTests # Build local images
+mvn -Dmaven.wagon.http.retryHandler.count=3 --batch-mode -P jenkins,docker-fabric8 clean install dependency:analyze validate -U -Ddocker.registry=$DOCKER_DEV_REGISTRY # Build local images
 ```
+
+`-Pdocker` alone doesn't pin the `io.fabric8:docker-maven-plugin` version, so Maven hangs trying to resolve it. Use the `jenkins,docker-fabric8` profile combination CI actually uses (see [`.semaphore/semaphore.yml`](../.semaphore/semaphore.yml)).
 
 ## License
 
