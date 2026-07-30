@@ -15,14 +15,14 @@
  */
 package io.confluent.admin.utils;
 
-import kafka.security.JaasTestUtils;
-import kafka.security.minikdc.MiniKdc;
 import kafka.server.KafkaBroker;
 import kafka.utils.TestUtils;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.apache.kafka.security.JaasTestUtils;
+import org.apache.kafka.security.minikdc.MiniKdc;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.Option;
