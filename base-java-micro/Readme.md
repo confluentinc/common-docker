@@ -52,7 +52,7 @@ To build SNAPSHOT images, configure `.m2/settings.xml` for SNAPSHOT dependencies
 mvn clean package -P docker-fabric8 -DskipTests # Build local images
 ```
 
-`-Pdocker` alone doesn't pin the `io.fabric8:docker-maven-plugin` version, so Maven hangs trying to resolve it. Use the `docker-fabric8` profile instead, which pins it correctly.
+The `docker` profile leaves `io.fabric8:docker-maven-plugin` unbound, so the build passes without producing any image. `docker-fabric8` binds it to the `package` phase.
 
 ## License
 
