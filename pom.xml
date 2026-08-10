@@ -77,8 +77,8 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1785825911</ubi8-minimal.image.version>
-        <ubi9-micro.image.version>9.8-1784702951</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.8-1785906621</ubi9-minimal.image.version>
+        <ubi9-micro.image.version>9.8-1786321990</ubi9-micro.image.version>
+        <ubi9-minimal.image.version>9.8-1786380870</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9-minimal.openssl.version>3.5.5-6.el9_8</ubi9-minimal.openssl.version>
         <ubi9-minimal.wget.version>1.21.1-8.el9_4</ubi9-minimal.wget.version>
@@ -114,7 +114,7 @@
         <python-runtime.3-14.version>3.14.7</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
-        <python.setuptools.version>83.0.0</python.setuptools.version>
+        <python.setuptools.version>84.0.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
