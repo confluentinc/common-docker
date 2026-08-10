@@ -35,8 +35,10 @@ This project uses `maven-assembly-plugin` and `dockerfile-maven-plugin` to build
 To build SNAPSHOT images, configure `.m2/settings.xml` for SNAPSHOT dependencies. These must be available at build time.
 
 ```
-mvn clean package -Pdocker -DskipTests # Build local images
+mvn clean package -P docker-fabric8 -DskipTests # Build local images
 ```
+
+The `docker` profile leaves `io.fabric8:docker-maven-plugin` unbound, so the build passes without producing any image. `docker-fabric8` binds it to the `package` phase.
 
 ## License
 
