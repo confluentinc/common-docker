@@ -27,6 +27,12 @@ ARG TEMURIN_JDK_VERSION
 ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
+ARG CURL_MINIMAL_VERSION
+
+# POC: fetched directly from GitHub Releases instead of resolved as a Maven
+# dependency, per CPBR-3841 discussion.
+ARG JMX_PROMETHEUS_JAVAAGENT_VERSION=1.6.0
+ARG JMX_PROMETHEUS_JAVAAGENT_SHA256=a95983fd96e865d2bcdf911cc500e7c82808c27ab9fd226bf96732b6c3d8c46e
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
@@ -64,6 +70,7 @@ RUN echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
+    && microdnf install -y curl-minimal${CURL_MINIMAL_VERSION} \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
@@ -80,6 +87,14 @@ COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+
+# POC: fetch jmx_prometheus_javaagent via curl from GitHub Releases instead of
+# resolving it as a Maven dependency (removed from pom.xml on this branch).
+RUN curl -fsSL -o /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar \
+      "https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
+    && echo "${JMX_PROMETHEUS_JAVAAGENT_SHA256}  /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" | sha256sum -c - \
+    && chown appuser:appuser /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar
+
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 
