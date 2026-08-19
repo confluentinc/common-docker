@@ -38,6 +38,13 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
+        <!-- POC-only override: common's property is still 0.20.0 until PR #958
+             (CPBR-3611) merges, and 0.20.0 predates upstream's move to GitHub
+             Releases (no jar asset exists for it there - only Maven Central).
+             Overriding here purely so this POC branch's CI actually exercises
+             the curl-fetch path against a version that has a real GitHub
+             Release asset. Remove this override once common is bumped for real. -->
+        <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
     <dependencies>
