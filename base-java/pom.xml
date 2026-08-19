@@ -60,11 +60,12 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus.jmx</groupId>
-            <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
-        </dependency>
+        <!-- jmx_prometheus_javaagent removed as a Maven dependency for POC — the
+             version still comes from common's jmx_prometheus_javaagent.version
+             property (single source of truth, unchanged), but it's now passed to
+             Dockerfile.ubi9 as a build arg (see docker-maven-plugin config below)
+             and fetched via curl from GitHub Releases instead of being resolved
+             by Maven. See CPBR-3841 discussion. -->
 
         <dependency>
             <groupId>io.confluent</groupId>
@@ -140,6 +141,7 @@
                                     <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <JMX_PROMETHEUS_JAVAAGENT_VERSION>${jmx_prometheus_javaagent.version}</JMX_PROMETHEUS_JAVAAGENT_VERSION>
                                 </args>
                             </build>
                         </image>
