@@ -60,9 +60,9 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <!-- jmx_prometheus_javaagent removed from here for POC — fetched directly
+        <!-- jmx_prometheus_javaagent removed from here for POC — fetched via curl
              from GitHub Releases in Dockerfile.ubi9 instead of resolved as a Maven
-             dependency. See jmx-poc-wget-base-image branch / CPBR-3841 discussion. -->
+             dependency. See CPBR-3841 discussion. -->
 
         <dependency>
             <groupId>io.confluent</groupId>
