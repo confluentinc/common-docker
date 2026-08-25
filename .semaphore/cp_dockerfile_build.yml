@@ -118,7 +118,11 @@ global_job_config:
           export S390X_DOCKER_REPOS
           echo "S390X_DOCKER_REPOS after skipping community images - $S390X_DOCKER_REPOS"
         fi
-      - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$BUILD_NUMBER"
+      # POC-only (CPBR-3841): use PACKAGING_BUILD_NUMBER instead of this run's own
+      # BUILD_NUMBER, so the dev tag is deterministic and identical across every
+      # repo built on this same branch (BUILD_NUMBER differs per-repo since each
+      # gets its own independent Semaphore workflow).
+      - export DOCKER_DEV_TAG="dev-$BRANCH_TAG-$PACKAGING_BUILD_NUMBER"
       - export AMD_ARCH=.amd64
       - export ARM_ARCH=.arm64
       - export S390X_ARCH=.s390x
