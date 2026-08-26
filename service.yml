@@ -19,6 +19,7 @@ semaphore:
   use_packages: true
   cp_images: true
   sign_images: true
+  push_images_to_icr: false
   tasks:
     - name: cp-dockerfile-build
       branch: master

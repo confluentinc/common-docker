@@ -324,6 +324,65 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$S390X_ARCH
                   docker push $DOCKER_REPO:latest-$OS_TYPE$S390X_ARCH
               fi
+
+  # ILLUSTRATIVE, added by hand for a real test (2026-08-26) -- normally this file is
+  # ServiceBot-generated from service.yml + the external cp-dockerfile template; the real
+  # version of this block belongs in that template, gated on service.yml's
+  # push_images_to_icr flag. dependencies: [] deliberately mirrors Promote AMD/ARM/s390x
+  # above -- this reads the same pre-promotion ECR artifact those blocks read, so it runs
+  # in parallel with Docker Hub promotion rather than waiting on it. ICR_USER/ICR_APIKEY
+  # and the preprod.icr.io/cp/confluentinc/* destination match the real, already-validated
+  # staging pipeline from CPBR-3746 (content-enterprise account ibm-confluent-platform).
+  - name: Push to ICR AMD
+    dependencies: []
+    task:
+      jobs:
+        - name: Push confluentinc/cp-base-java ubi9 to ICR AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java
+          commands:
+            - export OS_TYPE="ubi9"
+            - export DOCKER_REPO="confluentinc/cp-base-java"
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
+            - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
+            - export ICR_REGISTRY="preprod.icr.io/cp/"
+            - docker login --username iamapikey --password "$ICR_APIKEY" preprod.icr.io
+            - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
+            - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+            - docker push $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+        - name: Push confluentinc/cp-base-java-micro ubi9 to ICR AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-base-java-micro
+          commands:
+            - export OS_TYPE="ubi9"
+            - export DOCKER_REPO="confluentinc/cp-base-java-micro"
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
+            - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
+            - export ICR_REGISTRY="preprod.icr.io/cp/"
+            - docker login --username iamapikey --password "$ICR_APIKEY" preprod.icr.io
+            - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
+            - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+            - docker push $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+        - name: Push confluentinc/cp-jmxterm ubi9 to ICR AMD
+          env_vars:
+            - name: DOCKER_IMAGE
+              value: confluentinc/cp-jmxterm
+          commands:
+            - export OS_TYPE="ubi9"
+            - export DOCKER_REPO="confluentinc/cp-jmxterm"
+            - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
+            - export INTERNAL_IMAGE_TAG="$BRANCH_TAG-$PACKAGING_BUILD_NUMBER$OS_TAG$AMD_ARCH"
+            - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG$AMD_ARCH"
+            - export ICR_REGISTRY="preprod.icr.io/cp/"
+            - docker login --username iamapikey --password "$ICR_APIKEY" preprod.icr.io
+            - docker pull $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG
+            - docker tag $DOCKER_PROD_REGISTRY$DOCKER_REPO:$INTERNAL_IMAGE_TAG $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+            - docker push $ICR_REGISTRY$DOCKER_REPO:$PROMOTED_TAG
+
   - name: Create Manifest
     dependencies: ["Promote AMD", "Promote ARM", "Promote s390x"]
     task:
