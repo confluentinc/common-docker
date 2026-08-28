@@ -38,6 +38,13 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
+        <!-- POC-only override: common's property is still 0.20.0 until PR #958
+             (CPBR-3611) merges, and 0.20.0 predates upstream's move to GitHub
+             Releases (no jar asset exists for it there - only Maven Central).
+             Overriding here purely so this POC branch's CI actually exercises
+             the curl-fetch path against a version that has a real GitHub
+             Release asset. Remove this override once common is bumped for real. -->
+        <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
     <dependencies>
@@ -60,11 +67,12 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus.jmx</groupId>
-            <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
-        </dependency>
+        <!-- jmx_prometheus_javaagent removed as a Maven dependency for POC — the
+             version still comes from common's jmx_prometheus_javaagent.version
+             property (single source of truth, unchanged), but it's now passed to
+             Dockerfile.ubi9 as a build arg (see docker-maven-plugin config below)
+             and fetched via curl from GitHub Releases instead of being resolved
+             by Maven. See CPBR-3841 discussion. -->
 
         <dependency>
             <groupId>io.confluent</groupId>
@@ -140,6 +148,7 @@
                                     <FINDUTILS_VERSION>-${ubi9-minimal.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9-minimal.hostname.version}</HOSTNAME_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <JMX_PROMETHEUS_JAVAAGENT_VERSION>${jmx_prometheus_javaagent.version}</JMX_PROMETHEUS_JAVAAGENT_VERSION>
                                 </args>
                             </build>
                         </image>
