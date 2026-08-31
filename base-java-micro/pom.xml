@@ -38,6 +38,11 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
+        <!-- TEMP: common's jmx_prometheus_javaagent.version (common#958) is
+             still 0.20.0, pre-dating GitHub Releases assets. Remove this
+             override once common#958 merges and inherit the property instead
+             - the curl-fetch mechanism doesn't change. -->
+        <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
     <dependencies>
@@ -59,11 +64,8 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus.jmx</groupId>
-            <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
-        </dependency>
+        <!-- jmx_prometheus_javaagent: removed as a Maven dependency, fetched via
+             curl from GitHub Releases instead. -->
 
         <dependency>
             <groupId>io.confluent</groupId>
@@ -143,6 +145,7 @@
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                                     <SHADOW_UTILS_VERSION>-${ubi9.shadow-utils.version}</SHADOW_UTILS_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <JMX_PROMETHEUS_JAVAAGENT_VERSION>${jmx_prometheus_javaagent.version}</JMX_PROMETHEUS_JAVAAGENT_VERSION>
                                 </args>
                             </build>
                         </image>
