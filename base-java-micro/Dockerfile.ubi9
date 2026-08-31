@@ -68,8 +68,6 @@ ARG GIT_COMMIT
 ARG BUILD_NUMBER=-1
 
 # Fetched via curl from GitHub Releases, not Maven.
-# Version (pom.xml) is hardcoded until common#958 bumps common's property;
-# only the version source changes then, not this fetch step.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # EXPORT these as ENV so downstream images can use them via ${APP_UID}
