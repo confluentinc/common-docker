@@ -29,7 +29,7 @@ ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
 ARG CURL_MINIMAL_VERSION
 
-# Fetched via curl from GitHub Releases, not Maven (CPBR-3841) - permanent.
+# Fetched via curl from GitHub Releases, not Maven.
 # Version (pom.xml) is hardcoded until common#958 bumps common's property;
 # only the version source changes then, not this fetch step.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
@@ -88,8 +88,8 @@ COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-# Fetch jmx_prometheus_javaagent via curl from GitHub Releases (CPBR-3841,
-# permanent mechanism), verified against the .sha256 sidecar asset.
+# Fetch jmx_prometheus_javaagent via curl from GitHub Releases, verified
+# against the .sha256 sidecar asset.
 RUN JAR_NAME="jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
     && JAR_PATH="/usr/share/java/${ARTIFACT_ID}/${JAR_NAME}" \
     && JAR_URL="https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/${JAR_NAME}" \
