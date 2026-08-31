@@ -30,8 +30,6 @@ ARG HOSTNAME_VERSION
 ARG CURL_MINIMAL_VERSION
 
 # Fetched via curl from GitHub Releases, not Maven.
-# Version (pom.xml) is hardcoded until common#958 bumps common's property;
-# only the version source changes then, not this fetch step.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # Remember where we came from
