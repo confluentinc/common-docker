@@ -38,12 +38,10 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
-        <!-- TEMP (CPBR-3841): common's jmx_prometheus_javaagent.version (common#958)
-             is still 0.20.0, which predates upstream's GitHub Releases jar assets.
-             Override here so the curl-fetch below has a real asset to fetch.
-             Remove once common#958 merges and source
-             ${jmx_prometheus_javaagent.version} from common instead - the
-             curl-fetch mechanism itself doesn't change. -->
+        <!-- TEMP (CPBR-3841): common's jmx_prometheus_javaagent.version
+             (common#958) is still 0.20.0, pre-dating GitHub Releases assets.
+             Remove this override once common#958 merges and inherit the
+             property instead - the curl-fetch mechanism doesn't change. -->
         <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
@@ -68,8 +66,7 @@
         </dependency>
 
         <!-- jmx_prometheus_javaagent: removed as a Maven dependency, fetched via
-             curl from GitHub Releases instead (CPBR-3841, permanent mechanism). -->
-
+             curl from GitHub Releases instead (CPBR-3841, permanent). -->
 
         <dependency>
             <groupId>io.confluent</groupId>
