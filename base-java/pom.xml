@@ -63,7 +63,10 @@
         <dependency>
             <groupId>io.prometheus.jmx</groupId>
             <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
+            <!-- TEMP (CPBR-3841): hardcoded ahead of common's own jmx_prometheus_javaagent.version bump
+                 (still 0.20.0 as of this pin, common#958). Revert to ${jmx_prometheus_javaagent.version}
+                 once that property is bumped to 1.6.0+. -->
+            <version>1.6.0</version>
         </dependency>
 
         <dependency>
