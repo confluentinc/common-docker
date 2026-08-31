@@ -67,13 +67,10 @@ ARG ARTIFACT_ID
 ARG GIT_COMMIT
 ARG BUILD_NUMBER=-1
 
-# Fetched directly from GitHub Releases instead of resolved as a Maven
-# dependency (CPBR-3841) - this fetch mechanism is permanent, not an interim
-# workaround. Version is TEMPORARILY hardcoded below (base-java-micro/pom.xml)
-# because common's jmx_prometheus_javaagent.version property (common#958) is
-# still 0.20.0. Once common#958 merges, drop the hardcoded value and source
-# ${jmx_prometheus_javaagent.version} from common's property instead, still
-# fetched via this same curl step.
+# Fetched from GitHub Releases via curl, not Maven (CPBR-3841) - permanent
+# mechanism. Version below (base-java-micro/pom.xml) is temporarily hardcoded
+# until common#958 merges common's jmx_prometheus_javaagent.version property;
+# only the version source changes, not this fetch step.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # EXPORT these as ENV so downstream images can use them via ${APP_UID}
@@ -110,11 +107,9 @@ COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/ub /us
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-# Fetch jmx_prometheus_javaagent via curl from GitHub Releases instead of
-# resolving it as a Maven dependency (removed from pom.xml on this branch) -
-# this is the permanent fetch mechanism for CPBR-3841, not a temporary
-# workaround. Verifies against the .sha256 sidecar GitHub Releases publishes
-# per-asset, same approach dependency-mirrors' own mirroring pipeline uses.
+# Fetch jmx_prometheus_javaagent from GitHub Releases via curl instead of
+# Maven (CPBR-3841) - permanent mechanism, not interim. Verifies against the
+# .sha256 sidecar GitHub Releases publishes per asset.
 RUN JAR_NAME="jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
     && JAR_PATH="/usr/share/java/${ARTIFACT_ID}/${JAR_NAME}" \
     && JAR_URL="https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/${JAR_NAME}" \
