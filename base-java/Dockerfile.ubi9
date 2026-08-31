@@ -27,6 +27,16 @@ ARG TEMURIN_JDK_VERSION
 ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
+ARG CURL_MINIMAL_VERSION
+
+# Fetched directly from GitHub Releases instead of resolved as a Maven
+# dependency (CPBR-3841) - this fetch mechanism is permanent, not an interim
+# workaround. Version is TEMPORARILY hardcoded below (base-java/pom.xml)
+# because common's jmx_prometheus_javaagent.version property (common#958) is
+# still 0.20.0. Once common#958 merges, drop the hardcoded value and source
+# ${jmx_prometheus_javaagent.version} from common's property instead, still
+# fetched via this same curl step.
+ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # Remember where we came from
 LABEL io.confluent.docker.git.repo="confluentinc/common-docker"
@@ -64,6 +74,7 @@ RUN echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
+    && microdnf install -y curl-minimal${CURL_MINIMAL_VERSION} \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
@@ -80,6 +91,19 @@ COPY --from=build-ub-package-dedupe /go/bin/ub /usr/bin/ub
 
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+
+# Fetch jmx_prometheus_javaagent via curl from GitHub Releases instead of
+# resolving it as a Maven dependency (removed from pom.xml on this branch) -
+# this is the permanent fetch mechanism for CPBR-3841, not a temporary
+# workaround. Verifies against the .sha256 sidecar GitHub Releases publishes
+# per-asset, same approach dependency-mirrors' own mirroring pipeline uses.
+RUN JAR_NAME="jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
+    && JAR_PATH="/usr/share/java/${ARTIFACT_ID}/${JAR_NAME}" \
+    && JAR_URL="https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/${JAR_NAME}" \
+    && curl -fsSL -o "${JAR_PATH}" "${JAR_URL}" \
+    && echo "$(curl -fsSL "${JAR_URL}.sha256" | awk '{print $1}')  ${JAR_PATH}" | sha256sum -c - \
+    && chown appuser:appuser "${JAR_PATH}"
+
 COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=appuser:appuser include/etc/cp-base-java /etc/cp-base-java
 

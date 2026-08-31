@@ -38,6 +38,16 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
+        <!-- TEMP (CPBR-3841): common's jmx_prometheus_javaagent.version property
+             (common#958) is still 0.20.0, and 0.20.0 predates upstream's move to
+             GitHub Releases (no jar asset exists there for it - only Maven
+             Central). Overriding here so the curl-fetch step below (see
+             Dockerfile.ubi9) has a real GitHub Release asset to fetch. Once
+             common#958 merges, remove this local override and source
+             ${jmx_prometheus_javaagent.version} from common's property instead -
+             the curl-fetch mechanism itself stays either way, only the
+             version's source changes. -->
+        <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
     <dependencies>
@@ -59,11 +69,12 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus.jmx</groupId>
-            <artifactId>jmx_prometheus_javaagent</artifactId>
-            <version>${jmx_prometheus_javaagent.version}</version>
-        </dependency>
+        <!-- jmx_prometheus_javaagent removed as a Maven dependency - fetched via
+             curl from GitHub Releases in Dockerfile.ubi9 instead (CPBR-3841).
+             This fetch mechanism is permanent, not an interim workaround; only
+             the version source (see the property above) changes once
+             common#958 merges. -->
+
 
         <dependency>
             <groupId>io.confluent</groupId>
@@ -143,6 +154,7 @@
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                                     <SHADOW_UTILS_VERSION>-${ubi9.shadow-utils.version}</SHADOW_UTILS_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
+                                    <JMX_PROMETHEUS_JAVAAGENT_VERSION>${jmx_prometheus_javaagent.version}</JMX_PROMETHEUS_JAVAAGENT_VERSION>
                                 </args>
                             </build>
                         </image>
