@@ -42,10 +42,11 @@
              (common#958) is still 0.20.0, and 0.20.0 predates upstream's move to
              GitHub Releases (no jar asset exists there for it - only Maven
              Central). Overriding here so the curl-fetch step below (see
-             Dockerfile.ubi9) has a real GitHub Release asset to fetch. Remove
-             this override and this property entirely once common#958 merges,
-             reverting to inheriting ${jmx_prometheus_javaagent.version} from
-             common directly. -->
+             Dockerfile.ubi9) has a real GitHub Release asset to fetch. Once
+             common#958 merges, remove this local override and source
+             ${jmx_prometheus_javaagent.version} from common's property instead -
+             the curl-fetch mechanism itself stays either way, only the
+             version's source changes. -->
         <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
     </properties>
 
@@ -69,10 +70,11 @@
             <version>${jolokia-jvm.version}</version>
         </dependency>
 
-        <!-- jmx_prometheus_javaagent removed as a Maven dependency (TEMP,
-             CPBR-3841) - fetched via curl from GitHub Releases in
-             Dockerfile.ubi9 instead, since 1.6.0 predates Maven Central
-             availability. Revert once common#958 merges. -->
+        <!-- jmx_prometheus_javaagent removed as a Maven dependency - fetched via
+             curl from GitHub Releases in Dockerfile.ubi9 instead (CPBR-3841).
+             This fetch mechanism is permanent, not an interim workaround; only
+             the version source (see the property above) changes once
+             common#958 merges. -->
 
 
         <dependency>
