@@ -27,10 +27,6 @@ ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
 ARG SHADOW_UTILS_VERSION
-
-# Fetched via curl from GitHub Releases, not Maven. Runs here (not in the
-# final ubi9-micro stage) so ubi9-micro never needs a curl package of its
-# own - curl is already native to this stage's ubi9 base.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 RUN printf "[temurin-jre] \n\
@@ -55,8 +51,9 @@ RUN echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
 
-# Fetch jmx_prometheus_javaagent via curl from GitHub Releases, verified
-# against the .sha256 sidecar asset.
+# Fetched via curl from GitHub Releases (not Maven), verified against the
+# .sha256 sidecar asset. Runs here rather than in the final ubi9-micro stage
+# so that stage never needs curl of its own.
 RUN JAR_NAME="jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
     && JAR_URL="https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/${JAR_NAME}" \
     && curl -fsSL -o "/tmp/${JAR_NAME}" "${JAR_URL}" \
@@ -76,8 +73,6 @@ ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 ARG GIT_COMMIT
 ARG BUILD_NUMBER=-1
-
-# Fetched via curl from GitHub Releases, not Maven.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # EXPORT these as ENV so downstream images can use them via ${APP_UID}
