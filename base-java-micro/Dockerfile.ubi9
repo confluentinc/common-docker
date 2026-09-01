@@ -101,7 +101,7 @@ ENV USE_LOG4J_2="True"
 ENV UB_DEFAULT_CLASSPATH=/usr/share/java/cp-base-java-micro/*
 
 COPY --from=jdk-builder /microdir/ /
-COPY --from=jdk-builder /tmp/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar
+COPY --from=jdk-builder --chown=${APP_UID}:${APP_GID} /tmp/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar
 
 RUN update-crypto-policies --set FIPS && \
     mkdir -p /etc/confluent/docker /usr/logs /licenses && \
@@ -114,8 +114,6 @@ COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/ub /us
 
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
-
-RUN chown ${APP_UID}:${APP_GID} /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar
 
 COPY --chown=${APP_UID}:${APP_GID} include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=${APP_UID}:${APP_GID} include/etc/cp-base-java-micro /etc/cp-base-java-micro
