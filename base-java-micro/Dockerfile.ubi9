@@ -27,6 +27,7 @@ ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
 ARG SHADOW_UTILS_VERSION
+ARG CURL_MINIMAL_VERSION
 
 RUN printf "[temurin-jre] \n\
 name=temurin-jre \n\
@@ -46,6 +47,7 @@ RUN echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
        findutils${FINDUTILS_VERSION} \
        hostname${HOSTNAME_VERSION} \
        shadow-utils${SHADOW_UTILS_VERSION} \
+       curl-minimal${CURL_MINIMAL_VERSION} \
     && dnf --installroot=/microdir clean all \
     && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures

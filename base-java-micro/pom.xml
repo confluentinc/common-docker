@@ -144,6 +144,7 @@
                                     <FINDUTILS_VERSION>-${ubi9.findutils.version}</FINDUTILS_VERSION>
                                     <HOSTNAME_VERSION>-${ubi9.hostname.version}</HOSTNAME_VERSION>
                                     <SHADOW_UTILS_VERSION>-${ubi9.shadow-utils.version}</SHADOW_UTILS_VERSION>
+                                    <CURL_MINIMAL_VERSION>-${ubi9.curl-minimal.version}</CURL_MINIMAL_VERSION>
                                     <CP_DOCKER_UTILS_VERSION>${git-repo.cp-docker-utils.tag}</CP_DOCKER_UTILS_VERSION>
                                     <JMX_PROMETHEUS_JAVAAGENT_VERSION>${jmx_prometheus_javaagent.version}</JMX_PROMETHEUS_JAVAAGENT_VERSION>
                                 </args>
