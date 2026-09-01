@@ -27,7 +27,6 @@ ARG TEMURIN_JDK_VERSION
 ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
-ARG CURL_MINIMAL_VERSION
 
 # Fetched via curl from GitHub Releases, not Maven.
 ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
@@ -68,7 +67,6 @@ RUN echo "installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
-    && microdnf install -y curl-minimal${CURL_MINIMAL_VERSION} \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
