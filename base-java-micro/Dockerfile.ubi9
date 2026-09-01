@@ -27,6 +27,7 @@ ARG CRYPTO_POLICIES_SCRIPTS_VERSION
 ARG FINDUTILS_VERSION
 ARG HOSTNAME_VERSION
 ARG SHADOW_UTILS_VERSION
+ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 RUN printf "[temurin-jre] \n\
 name=temurin-jre \n\
@@ -50,6 +51,14 @@ RUN echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
     && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
 
+# Fetched via curl from GitHub Releases (not Maven), verified against the
+# .sha256 sidecar asset. Runs here rather than in the final ubi9-micro stage
+# so that stage never needs curl of its own.
+RUN JAR_NAME="jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar" \
+    && JAR_URL="https://github.com/prometheus/jmx_exporter/releases/download/${JMX_PROMETHEUS_JAVAAGENT_VERSION}/${JAR_NAME}" \
+    && curl -fsSL -o "/tmp/${JAR_NAME}" "${JAR_URL}" \
+    && echo "$(curl -fsSL "${JAR_URL}.sha256" | awk '{print $1}')  /tmp/${JAR_NAME}" | sha256sum -c -
+
 # Create the user/group with EXPLICIT IDs inside the micro rootfs
 RUN chroot /microdir groupadd -g ${APP_GID} appuser && \
     chroot /microdir useradd -u ${APP_UID} -g ${APP_GID} --no-log-init --create-home --shell /bin/bash appuser
@@ -64,6 +73,7 @@ ARG PROJECT_VERSION
 ARG ARTIFACT_ID
 ARG GIT_COMMIT
 ARG BUILD_NUMBER=-1
+ARG JMX_PROMETHEUS_JAVAAGENT_VERSION
 
 # EXPORT these as ENV so downstream images can use them via ${APP_UID}
 ENV APP_UID=${APP_UID}
@@ -86,6 +96,7 @@ ENV USE_LOG4J_2="True"
 ENV UB_DEFAULT_CLASSPATH=/usr/share/java/cp-base-java-micro/*
 
 COPY --from=jdk-builder /microdir/ /
+COPY --from=jdk-builder --chown=${APP_UID}:${APP_GID} /tmp/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar /usr/share/java/${ARTIFACT_ID}/jmx_prometheus_javaagent-${JMX_PROMETHEUS_JAVAAGENT_VERSION}.jar
 
 RUN update-crypto-policies --set FIPS && \
     mkdir -p /etc/confluent/docker /usr/logs /licenses && \
@@ -98,6 +109,7 @@ COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/ub /us
 
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=${APP_UID}:${APP_GID} target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
+
 COPY --chown=${APP_UID}:${APP_GID} include/etc/confluent/docker /etc/confluent/docker
 COPY --chown=${APP_UID}:${APP_GID} include/etc/cp-base-java-micro /etc/cp-base-java-micro
 
