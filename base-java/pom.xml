@@ -38,6 +38,7 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
+        <!-- control commit: trivial no-op to re-trigger CI -->
     </properties>
 
     <dependencies>
