@@ -38,11 +38,7 @@
         <docker.skip-test>false</docker.skip-test>
         <docker.pull-image>true</docker.pull-image>
         <docker.file>Dockerfile.ubi9</docker.file>
-        <!-- TEMP: common's jmx_prometheus_javaagent.version (common#958) is
-             still 0.20.0, pre-dating GitHub Releases assets. Remove this
-             override once common#958 merges and inherit the property instead
-             - the curl-fetch mechanism doesn't change. -->
-        <jmx_prometheus_javaagent.version>1.6.0</jmx_prometheus_javaagent.version>
+        <!-- control commit: trivial no-op to re-trigger CI -->
     </properties>
 
     <dependencies>
