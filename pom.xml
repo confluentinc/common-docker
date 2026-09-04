@@ -54,7 +54,7 @@
         <ubi8-minimal.temurin-17-jdk.version>17.0.20.1.0.1-0</ubi8-minimal.temurin-17-jdk.version>
         <!-- Python Module Versions -->
         <ubi8-minimal.python39-pip.version>20.2.4-9.module+el8.10.0+21329+8d76b841</ubi8-minimal.python39-pip.version>
-        <python.setuptools.version>84.0.0</python.setuptools.version>
+        <python.setuptools.version>82.0.1</python.setuptools.version>
         <python.confluent.docker.utils.version>v0.0.162</python.confluent.docker.utils.version>
         <!-- Golang Version -->
         <golang.image.version>1.27.1-trixie</golang.image.version>
