@@ -116,6 +116,7 @@ RUN microdnf --nodocs -y install yum \
                    --with-openssl-rpath=auto \
     && make -j$(nproc) \
     && make altinstall \
+    && rm -rf /usr/local/lib/python3.14/test \
     && cd .. \
     && rm -rf Python-${PYTHON314_VERSION}* \
     && rm -f /var/lib/alternatives/python /var/lib/alternatives/python3 /var/lib/alternatives/pip /var/lib/alternatives/pip3 \
