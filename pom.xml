@@ -34,11 +34,8 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.5.0-0</io.confluent.common-docker.version>
 
-        <!-- TEMP: common's exec-maven-plugin.version still points to 1.6.0, which throws a
+        <!-- TEMP: common's exec-maven-plugin.version points to 1.6.0, which throws a
              NullPointerException in create-licenses-for-docker (mojohaus/exec-maven-plugin#76).
-             Set here (not just in base-java/base-java-micro/jmxterm) because downstream repos
-             (kafka-images, schema-registry-images, etc.) parent off this root pom directly, not
-             off those modules, and were still resolving 1.6.0 and hitting the same NPE.
              Remove this override once common moves past 1.6.0 and inherit the property instead. -->
         <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
 
