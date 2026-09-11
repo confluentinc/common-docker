@@ -82,7 +82,6 @@ RUN microdnf --nodocs install yum \
         gcc-c++ \
         make \
         tar \
-        gzip \
         curl \
         openssl-devel \
         ca-certificates \
