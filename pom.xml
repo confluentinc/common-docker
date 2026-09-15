@@ -34,6 +34,11 @@
         <docker.tag>${io.confluent.common-docker.version}-${docker.ubi9.os_type}</docker.tag>
         <io.confluent.common-docker.version>8.5.0-0</io.confluent.common-docker.version>
 
+        <!-- TEMP: common's exec-maven-plugin.version points to 1.6.0, which throws a
+             NullPointerException in create-licenses-for-docker (mojohaus/exec-maven-plugin#76).
+             Remove this override once common moves past 1.6.0 and inherit the property instead. -->
+        <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+
         <!-- ============================================================ -->
         <!-- AUTOMATED VERSION UPDATE PROPERTY NAMING CONVENTIONS         -->
         <!-- ============================================================ -->
