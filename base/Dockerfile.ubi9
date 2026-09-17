@@ -106,7 +106,7 @@ RUN microdnf --nodocs -y install yum \
     && rm -f Python-${PYTHON314_VERSION}.tgz.sigstore \
     && python3 -m pip uninstall -y sigstore \
     && yum remove -y python3-pip \
-    && rm -rf /usr/local/lib/python3.9/site-packages/* /usr/local/lib64/python3.9/site-packages/* \
+    && rm -rf /usr/local/lib/python3.9 /usr/local/lib64/python3.9 \
     && rm -f /usr/local/bin/pip /usr/local/bin/pip3 /usr/local/bin/pip3.9 \
     && tar -xzf Python-${PYTHON314_VERSION}.tgz \
     && cd Python-${PYTHON314_VERSION} \
@@ -116,6 +116,7 @@ RUN microdnf --nodocs -y install yum \
                    --with-openssl-rpath=auto \
     && make -j$(nproc) \
     && make altinstall \
+    && rm -rf /usr/local/lib/python3.14/test \
     && cd .. \
     && rm -rf Python-${PYTHON314_VERSION}* \
     && rm -f /var/lib/alternatives/python /var/lib/alternatives/python3 /var/lib/alternatives/pip /var/lib/alternatives/pip3 \
