@@ -7,7 +7,7 @@ semaphore:
   enable: true
   execution_time_limit: {"hours": 2}
   pipeline_type: cp-dockerfile
-  docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
+  docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-java-micro','confluentinc/cp-base-new', 'confluentinc/cp-base-lite', 'confluentinc/cp-jmxterm']
   community_docker_repos: []
   community_maven_modules: []
   build_arm: true
@@ -82,8 +82,8 @@ semaphore:
             - 'True'
             - 'False'
 cp_dockerfile:
-  s390x_docker_repos: ['confluentinc/cp-base-java']
-  s390x_maven_modules: ['base-java']
+  s390x_docker_repos: ['confluentinc/cp-base-java', 'confluentinc/cp-base-java-micro']
+  s390x_maven_modules: ['base-java', 'base-java-micro']
 code_artifact:
   enable: true
   package_paths:
@@ -94,3 +94,4 @@ code_artifact:
     - maven-snapshots/maven/io.confluent/utility-belt
     - maven-snapshots/maven/io.confluent/common-docker
     - maven-snapshots/maven/io.confluent/cp-base-java
+    - maven-snapshots/maven/io.confluent/cp-base-java-micro
