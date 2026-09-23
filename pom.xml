@@ -74,14 +74,14 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1789361795</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1790175679</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.8-1789345812</ubi9-micro.image.version>
 
         <!-- OS Package Versions -->
         <ubi8-minimal.openssl.version>1.1.1k-17.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-16.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
-        <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
+        <ubi8-minimal.tar.version>1.30-13.el8_10</ubi8-minimal.tar.version>
         <ubi8-minimal.procps-ng.version>3.3.15-14.el8</ubi8-minimal.procps-ng.version>
         <ubi8-minimal.krb5-workstation.version>1.18.2-34.el8_10</ubi8-minimal.krb5-workstation.version>
         <ubi8-minimal.iputils.version>20180629-11.el8</ubi8-minimal.iputils.version>
