@@ -77,10 +77,10 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1789521592</ubi8-minimal.image.version>
-        <ubi9.image.version>9.8-1789646010</ubi9.image.version>
+        <ubi8-minimal.image.version>8.10-1790175679</ubi8-minimal.image.version>
+        <ubi9.image.version>9.8-1790067847</ubi9.image.version>
         <ubi9-micro.image.version>9.8-1789345812</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.8-1789639776</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.8-1790074235</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9.temurin-25-jdk.version>25.0.4.1.0.1-0</ubi9.temurin-25-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
@@ -107,7 +107,7 @@
         <ubi8-minimal.openssl.version>1.1.1k-17.el8_6</ubi8-minimal.openssl.version>
         <ubi8-minimal.wget.version>1.19.5-16.el8_10</ubi8-minimal.wget.version>
         <ubi8-minimal.nmap-ncat.version>7.92-2.el8_10</ubi8-minimal.nmap-ncat.version>
-        <ubi8-minimal.tar.version>1.30-11.el8_10</ubi8-minimal.tar.version>
+        <ubi8-minimal.tar.version>1.30-13.el8_10</ubi8-minimal.tar.version>
         <ubi8-minimal.procps-ng.version>3.3.15-14.el8</ubi8-minimal.procps-ng.version>
         <ubi8-minimal.krb5-workstation.version>1.18.2-34.el8_10</ubi8-minimal.krb5-workstation.version>
         <ubi8-minimal.iputils.version>20180629-11.el8</ubi8-minimal.iputils.version>
