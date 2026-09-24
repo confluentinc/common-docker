@@ -12,7 +12,7 @@ This project contains a Dockerfile for building *cp-base-java*, the common base 
 Properties are inherited from a top-level POM. Properties may be overridden on the command line (`-Ddocker.registry=testing.example.com:8080/`), or in a subproject's POM.
 
 - *docker.skip-build*: (Optional) Set to `false` to include Docker images as part of build. Default is 'false'.
-- *docker.skip-test*: (Optional) Set to `false` to include Docker image integration tests as part of the build. Requires Python 2.7, `tox`. Default is 'true'.
+- *docker.skip-test*: (Optional) Set to `false` to include Docker image integration tests as part of the build. Requires Python, `tox`. Default is 'false'.
 - *docker.registry*: (Optional) Specify a registry other than `placeholder/`. Used as `DOCKER_REGISTRY` during `docker build` and testing. Trailing `/` is required. Defaults to `placeholder/`.
 - *docker.tag*: (Optional) Tag for built images. Used as `DOCKER_TAG` during `docker build` and testing. Defaults to the value of `project.version`.
 - *docker.upstream-registry*: (Optional) Registry to pull base images from. Trailing `/` is required. Used as `DOCKER_UPSTREAM_REGISTRY` during `docker build`. Defaults to the value of `docker.registry`.
