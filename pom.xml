@@ -74,7 +74,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1790175679</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1790571603</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.8-1789345812</ubi9-micro.image.version>
 
         <!-- OS Package Versions -->
