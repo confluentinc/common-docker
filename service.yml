@@ -1,20 +1,19 @@
 name: common-docker
 lang: python
-lang_version: "3.14"
+lang_version: '3.14'
 git:
   enable: true
 semaphore:
   enable: true
-  execution_time_limit: {"hours": 2}
+  execution_time_limit: {hours: 2}
   pipeline_type: cp-dockerfile
-  docker_repos: ['confluentinc/cp-base-java','confluentinc/cp-base-java-micro','confluentinc/cp-jmxterm']
+  docker_repos: [confluentinc/cp-base-java, confluentinc/cp-base-java-micro, confluentinc/cp-jmxterm]
   community_docker_repos: []
   community_maven_modules: []
   build_arm: true
-  os_types: ["ubi9"]
+  os_types: [ubi9]
   nano_version: true
   maven_skip_deploy: true
-  pip_install_package: 'tox==3.28.0'
   push_latest: true
   use_packages: true
   cp_images: true
@@ -26,16 +25,16 @@ semaphore:
       parameters:
         - name: CONFLUENT_VERSION
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: PACKAGES_URL
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: PACKAGES_MAVEN_URL
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: PACKAGING_BUILD_NUMBER
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: ALLOW_UNSIGNED
           required: true
           default_value: 'False'
@@ -48,7 +47,7 @@ semaphore:
         - name: SKIP_COMMUNITY
           required: false
           default_value: 'False'
-          description: 'Skip building community docker images'
+          description: Skip building community docker images
           options:
             - 'True'
             - 'False'
@@ -58,32 +57,33 @@ semaphore:
       parameters:
         - name: CONFLUENT_VERSION
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: IMAGE_REVISION
           required: true
           default_value: '1'
         - name: UPDATE_LATEST_TAG
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: PACKAGING_BUILD_NUMBER
           required: true
-          default_value: 'NONE'
+          default_value: NONE
         - name: PROMOTE_OS_TYPE
           required: true
-          default_value: 'NONE'
+          default_value: NONE
           options:
-            - 'deb'
-            - 'ubi'
+            - deb
+            - ubi
         - name: SKIP_COMMUNITY
           required: false
           default_value: 'False'
-          description: 'Skip publishing community docker images'
+          description: Skip publishing community docker images
           options:
             - 'True'
             - 'False'
+  pip_install_packages: tox==3.28.0
 cp_dockerfile:
-  s390x_docker_repos: ['confluentinc/cp-base-java', 'confluentinc/cp-base-java-micro']
-  s390x_maven_modules: ['base-java', 'base-java-micro']
+  s390x_docker_repos: [confluentinc/cp-base-java, confluentinc/cp-base-java-micro]
+  s390x_maven_modules: [base-java, base-java-micro]
 code_artifact:
   enable: true
   package_paths:
