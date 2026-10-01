@@ -74,7 +74,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1790666041</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1790840782</ubi8-minimal.image.version>
 
         <!-- OS Package Versions -->
         <ubi8-minimal.openssl.version>1.1.1k-17.el8_6</ubi8-minimal.openssl.version>
@@ -93,7 +93,7 @@
         <ubi8-minimal.zulu17-ca-jdk-headless.version>17.0.20.1-1</ubi8-minimal.zulu17-ca-jdk-headless.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.7</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.8</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>84.0.0</python.setuptools.version>
