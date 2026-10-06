@@ -81,9 +81,9 @@
 
         <!-- Base Image Versions -->
         <ubi8-minimal.image.version>8.10-1790840782</ubi8-minimal.image.version>
-        <ubi9.image.version>9.8-1791179325</ubi9.image.version>
+        <ubi9.image.version>9.8-1791269371</ubi9.image.version>
         <ubi9-micro.image.version>9.8-1789345812</ubi9-micro.image.version>
-        <ubi9-minimal.image.version>9.8-1790754119</ubi9-minimal.image.version>
+        <ubi9-minimal.image.version>9.8-1791279563</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
         <ubi9.temurin-25-jdk.version>25.0.4.1.0.1-0</ubi9.temurin-25-jdk.version>
         <ubi9.procps-ng.version>3.3.17-14.el9</ubi9.procps-ng.version>
