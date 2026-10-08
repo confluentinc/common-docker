@@ -66,14 +66,14 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1790840782</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1791442285</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.8-1789345812</ubi9-micro.image.version>
         <ubi9-minimal.image.version>9.8-1791279563</ubi9-minimal.image.version>
         <!-- OS Package Versions -->
 
-        <ubi9-minimal.openssl.version>3.5.8-1.el9_8</ubi9-minimal.openssl.version>
+        <ubi9-minimal.openssl.version>3.5.8-2.el9_8</ubi9-minimal.openssl.version>
         <!-- OpenSSL-libs version (must match openssl version exactly for FIPS compliance) -->
-        <ubi9-minimal.openssl-libs.version>3.5.8-1.el9_8</ubi9-minimal.openssl-libs.version>
+        <ubi9-minimal.openssl-libs.version>3.5.8-2.el9_8</ubi9-minimal.openssl-libs.version>
         <!-- OpenSSL version that is FIPS compliant (for source compilation in base image) -->
         <fips.openssl.version>3.1.2</fips.openssl.version>
         <!-- Redhat Package Versions -->
