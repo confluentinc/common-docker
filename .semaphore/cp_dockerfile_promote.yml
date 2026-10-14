@@ -256,7 +256,6 @@ blocks:
                   docker tag $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
                   docker push $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
               fi
-
   - name: Create Manifest
     dependencies: ["Promote AMD", "Promote ARM"]
     task:
@@ -296,21 +295,21 @@ blocks:
             - if [[ ! "$OS_TYPE" ]]; then export OS_TAG=""; elif [[ "$OS_TYPE" =~ $PROMOTE_OS_TYPE* ]]; then export OS_TAG="-$OS_TYPE"; fi
             - export DOCKER_REPO="confluentinc/cp-base-java-micro"
             - export PROMOTED_TAG="$PROMOTED_TAG_PREFIX$OS_TAG"
-            - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH 
+            - docker manifest create $DOCKER_REPO:$PROMOTED_TAG $DOCKER_REPO:$PROMOTED_TAG$AMD_ARCH $DOCKER_REPO:$PROMOTED_TAG$ARM_ARCH
             - docker manifest push $DOCKER_REPO:$PROMOTED_TAG
             - >-
               if [[ ! "$OS_TYPE" ]] || [[ "$OS_TYPE" =~ ubi* ]]; then
-                  docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH 
+                  docker manifest create $DOCKER_REPO:$CONFLUENT_VERSION $DOCKER_REPO:$CONFLUENT_VERSION$AMD_ARCH $DOCKER_REPO:$CONFLUENT_VERSION$ARM_ARCH
                   docker manifest push $DOCKER_REPO:$CONFLUENT_VERSION
                   export APPLIED="true"
               fi
             - >-
               if [[ $UPDATE_LATEST_TAG == "True" ]]; then
                   if [[ $APPLIED ]]; then
-                  docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH 
+                  docker manifest create $DOCKER_REPO:latest $DOCKER_REPO:latest$AMD_ARCH $DOCKER_REPO:latest$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest
                   fi
-                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH 
+                  docker manifest create $DOCKER_REPO:latest-$OS_TYPE $DOCKER_REPO:latest-$OS_TYPE$AMD_ARCH $DOCKER_REPO:latest-$OS_TYPE$ARM_ARCH
                   docker manifest push $DOCKER_REPO:latest-$OS_TYPE
               fi
         - name: Create Manifest confluentinc/cp-jmxterm ubi9
