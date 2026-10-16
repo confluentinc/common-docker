@@ -17,7 +17,10 @@ ARG UBI_MINIMAL_VERSION="latest"
 ARG GOLANG_VERSION
 ARG CURL_VERSION
 
-FROM golang:${GOLANG_VERSION} AS build-ub
+# Explicit docker.io/ prefix is required for the fabric8 docker-maven-plugin.
+# Without it, fabric8 prepends its default docker.registry property value (a placeholder),
+# causing the build to try pulling a non-existent image like placeholder/golang.
+FROM docker.io/golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser ub/ ./
@@ -91,8 +94,8 @@ RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
-COPY --chown=appuser:appuser include/etc/confluent/docker /etc/confluent/docker
-COPY --chown=appuser:appuser include/etc/cp-base-lite /etc/cp-base-lite
+COPY --chown=appuser:appuser target/include/etc/confluent/docker /etc/confluent/docker
+COPY --chown=appuser:appuser target/include/etc/cp-base-lite /etc/cp-base-lite
 COPY --from=build-ub /build/ub /usr/bin
 
 RUN mkdir /licenses
