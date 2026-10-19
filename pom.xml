@@ -74,7 +74,7 @@
         -->
 
         <!-- Base Image Versions -->
-        <ubi8-minimal.image.version>8.10-1791896186</ubi8-minimal.image.version>
+        <ubi8-minimal.image.version>8.10-1792385393</ubi8-minimal.image.version>
         <ubi9-micro.image.version>9.8-1791895366</ubi9-micro.image.version>
 
         <!-- OS Package Versions -->
@@ -97,7 +97,7 @@
         <python-runtime.3-14.version>3.14.8</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
-        <python.setuptools.version>84.0.0</python.setuptools.version>
+        <python.setuptools.version>84.2.0</python.setuptools.version>
 
         <!-- GitHub Repository Tags -->
         <git-repo.confluent-docker-utils.tag>v0.0.172</git-repo.confluent-docker-utils.tag>
