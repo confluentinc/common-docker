@@ -120,13 +120,9 @@ RUN microdnf --nodocs -y install yum \
     && rm -f /var/lib/alternatives/python /var/lib/alternatives/python3 /var/lib/alternatives/pip /var/lib/alternatives/pip3 \
     && update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.14 100 \
     && update-alternatives --install /usr/bin/python python /usr/local/bin/python3.14 100 \
-    && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.14 100 \
-    && update-alternatives --install /usr/bin/pip pip /usr/local/bin/pip3.14 100 \
     && python3 -c "import ssl; print('SSL module loaded successfully')" \
     && python --version \
     && python3 --version \
-    && pip --version \
-    && pip3 --version \
     && yum remove -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel sqlite-devel \
     && yum clean all \
     && rm -rf /tmp/* /root/.cache
@@ -161,6 +157,8 @@ RUN microdnf --nodocs -y install \
     && microdnf reinstall -y openssl-libs \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
+    && python3 -m pip uninstall -y pip \
+    && python3 -c "import confluent.docker_utils, requests, urllib3; print('urllib3', urllib3.__version__)" \
     && microdnf clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
