@@ -158,7 +158,6 @@ RUN microdnf --nodocs -y install \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && python3 -m pip uninstall -y pip \
-    && python3 -c "import confluent.docker_utils, requests, urllib3; print('urllib3', urllib3.__version__)" \
     && microdnf clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
