@@ -179,6 +179,22 @@ RUN microdnf --nodocs -y install yum \
 ARG SKIP_SECURITY_UPDATE_CHECK="false"
 RUN yum check-update || "${SKIP_SECURITY_UPDATE_CHECK}"
 
+# Distrust the roots that chain to the compromised eMudhra intermediate CAs
+# (https://emudhra.we-have-a-problem.com/) until the OS trust store drops them.
+# RHEL 8 reads /etc/pki/ca-trust/source/blacklist, RHEL 9 reads /etc/pki/ca-trust/source/blocklist.
+# The build fails if either root is still trusted by the OS trust store or by the JVM.
+COPY include/ca-distrust/ /tmp/ca-distrust/
+RUN d=/etc/pki/ca-trust/source/blocklist; [ -d "$d" ] || d=/etc/pki/ca-trust/source/blacklist; \
+    cp /tmp/ca-distrust/*.pem "$d"/ \
+    && rm -rf /tmp/ca-distrust \
+    && update-ca-trust \
+    && test -s /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    && ! grep -qE "emSign ECC Root CA - G3|AAA Certificate Services" /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    && keytool -list -v -cacerts -storepass changeit > /tmp/cacerts.txt \
+    && grep -q "^Owner: " /tmp/cacerts.txt \
+    && ! grep -qE "^Owner: CN=(emSign ECC Root CA - G3|AAA Certificate Services)," /tmp/cacerts.txt \
+    && rm -f /tmp/cacerts.txt
+
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/doc/* /usr/share/doc/${ARTIFACT_ID}/
 COPY --chown=appuser:appuser target/${ARTIFACT_ID}-${PROJECT_VERSION}-package/share/java/${ARTIFACT_ID}/* /usr/share/java/${ARTIFACT_ID}/
 
