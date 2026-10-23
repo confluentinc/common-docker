@@ -102,6 +102,22 @@ RUN update-crypto-policies --set FIPS && \
     mkdir -p /etc/confluent/docker /usr/logs /licenses && \
     chown ${APP_UID}:${APP_GID} -R /etc/confluent/ /usr/logs
 
+# Distrust the roots that chain to the compromised eMudhra intermediate CAs
+# (https://emudhra.we-have-a-problem.com/) until the OS trust store drops them.
+# RHEL 8 reads /etc/pki/ca-trust/source/blacklist, RHEL 9 reads /etc/pki/ca-trust/source/blocklist.
+# The build fails if either root is still trusted by the OS trust store or by the JVM.
+COPY include/ca-distrust/ /tmp/ca-distrust/
+RUN d=/etc/pki/ca-trust/source/blocklist; [ -d "$d" ] || d=/etc/pki/ca-trust/source/blacklist; \
+    cp /tmp/ca-distrust/*.pem "$d"/ \
+    && rm -rf /tmp/ca-distrust \
+    && update-ca-trust \
+    && test -s /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    && ! grep -qE "emSign ECC Root CA - G3|AAA Certificate Services" /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem \
+    && keytool -list -v -cacerts -storepass changeit > /tmp/cacerts.txt \
+    && grep -q "^Owner: " /tmp/cacerts.txt \
+    && ! grep -qE "^Owner: CN=(emSign ECC Root CA - G3|AAA Certificate Services)," /tmp/cacerts.txt \
+    && rm -f /tmp/cacerts.txt
+
 COPY license.txt /licenses
 
 COPY --from=build-ub-package-dedupe --chown=${APP_UID}:${APP_GID} /go/bin/package_dedupe /usr/bin/package_dedupe
