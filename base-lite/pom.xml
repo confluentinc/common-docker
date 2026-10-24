@@ -75,6 +75,21 @@
                                         <include>docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar</include>
                                     </includes>
                                 </resource>
+                                <resource>
+                                    <directory>${basedir}/../base/include</directory>
+                                    <targetPath>include</targetPath>
+                                    <includes>
+                                        <include>etc/confluent/docker/bash-config</include>
+                                        <include>etc/confluent/docker/mesos-setup.sh</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../base/include/etc/cp-base-new</directory>
+                                    <targetPath>include/etc/cp-base-lite</targetPath>
+                                    <includes>
+                                        <include>log4j.properties</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
