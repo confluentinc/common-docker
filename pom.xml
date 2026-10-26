@@ -91,7 +91,7 @@
         <ubi8-minimal.zulu11-ca-jdk-headless.version>11.0.33-3</ubi8-minimal.zulu11-ca-jdk-headless.version>
 
         <!-- Python Runtime Versions -->
-        <python-runtime.3-14.version>3.14.9</python-runtime.3-14.version>
+        <python-runtime.3-14.version>3.14.10</python-runtime.3-14.version>
 
         <!-- PyPI Package Versions -->
         <python.setuptools.version>84.2.1</python.setuptools.version>
