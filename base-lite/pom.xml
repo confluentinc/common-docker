@@ -75,6 +75,14 @@
                                         <include>docker-utils-${CONFLUENT_VERSION}-jar-with-dependencies.jar</include>
                                     </includes>
                                 </resource>
+                                <resource>
+                                    <directory>${basedir}/../base/include</directory>
+                                    <targetPath>include</targetPath>
+                                    <includes>
+                                        <include>etc/confluent/docker/bash-config</include>
+                                        <include>etc/confluent/docker/mesos-setup.sh</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
