@@ -60,15 +60,16 @@ RUN echo "installing temurin-21-jre:${TEMURIN_JDK_VERSION}" \
     && microdnf install -y crypto-policies-scripts${CRYPTO_POLICIES_SCRIPTS_VERSION} \
     && microdnf install -y findutils${FINDUTILS_VERSION} \
     && microdnf install -y hostname${HOSTNAME_VERSION} \
+    # Set the FIPS crypto policy, then remove crypto-policies-scripts and the python3 it pulls in, so the
+    # image keeps the policy without python3. microdnf keeps unused dependencies, so they are listed explicitly.
+    && update-crypto-policies --set FIPS \
+    && microdnf remove -y crypto-policies-scripts python3 python3-libs python3-pip-wheel python3-setuptools-wheel python-unversioned-command expat \
     && microdnf clean all \
     && useradd --no-log-init --create-home --shell /bin/bash appuser \
     && mkdir -p /etc/confluent/docker /usr/logs \
     && chown appuser:appuser -R /etc/confluent/ /usr/logs \
     && mkdir /licenses \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
-
-# enable FIPS in docker image, this will only work if underlying OS has FIPS enabled as well else is a NO OP.
-RUN update-crypto-policies --set FIPS
 
 # Distrust the roots that chain to the compromised eMudhra intermediate CAs
 # (https://emudhra.we-have-a-problem.com/) until the OS trust store drops them.
