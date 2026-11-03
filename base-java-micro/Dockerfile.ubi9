@@ -46,6 +46,10 @@ RUN echo "Installing temurin-25-jre:${TEMURIN_JDK_VERSION}" \
        findutils${FINDUTILS_VERSION} \
        hostname${HOSTNAME_VERSION} \
        shadow-utils${SHADOW_UTILS_VERSION} \
+    # Set the FIPS crypto policy in the rootfs, then remove crypto-policies-scripts and
+    # the python3 it pulls in, so the final image keeps the policy without python3.
+    && chroot /microdir update-crypto-policies --set FIPS \
+    && dnf remove --installroot=/microdir -y crypto-policies-scripts \
     && dnf --installroot=/microdir clean all \
     && rm -rf /microdir/var/cache/* /microdir/var/log/dnf* /microdir/var/log/yum.* \
     && rm /etc/yum.repos.d/adoptium.repo # Remove temurin-jdk repo to reduce intermittent build failures
@@ -87,8 +91,7 @@ ENV UB_DEFAULT_CLASSPATH=/usr/share/java/cp-base-java-micro/*
 
 COPY --from=jdk-builder /microdir/ /
 
-RUN update-crypto-policies --set FIPS && \
-    mkdir -p /etc/confluent/docker /usr/logs /licenses && \
+RUN mkdir -p /etc/confluent/docker /usr/logs /licenses && \
     chown ${APP_UID}:${APP_GID} -R /etc/confluent/ /usr/logs
 
 # Distrust the roots that chain to the compromised eMudhra intermediate CAs
