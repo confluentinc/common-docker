@@ -151,7 +151,9 @@ RUN microdnf --nodocs install yum \
     && python3 -m pip install --upgrade "setuptools${PYTHON_SETUPTOOLS_VERSION}" \
     && python3 -m pip install --prefer-binary --prefix=/usr/local --upgrade "${PYTHON_CONFLUENT_DOCKER_UTILS_INSTALL_SPEC}" \
     && python3 -m pip uninstall -y pip \
-    && yum remove -y git \
+    && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled \
+    && yum remove -y git platform-python-pip \
+    && rpm -e --nodeps python3-pip-wheel \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
