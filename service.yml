@@ -81,6 +81,14 @@ semaphore:
           options:
             - 'True'
             - 'False'
+sonarqube:
+  enable: true
+  coverage_exclusions:
+    - '**/*.pb.*'
+    - '**/mk-include/**/*'
+    - '**/test/**/*'
+    - '**/tests/**/*'
+    - '**/*Test.java'
 code_artifact:
   enable: true
   package_paths:
