@@ -161,7 +161,6 @@ RUN microdnf --nodocs -y install yum \
     && python3 -m pip uninstall -y pip \
     && rm -rf /usr/local/lib/python3.14/ensurepip/_bundled \
     && yum remove -y git \
-    && rpm -e --nodeps python3-pip-wheel \
     && yum clean all \
     && rm -rf /tmp/* \
     && mkdir -p /etc/confluent/docker /usr/logs \
