@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.confluent.admin.utils.ClusterStatus;
@@ -52,6 +53,13 @@ public class KafkaReadyCommand {
 
   private static final Logger log = LogManager.getLogger(KafkaReadyCommand.class);
   public static final String KAFKA_READY = "kafka-ready";
+  private static final String CONFIG_PROVIDERS_PREFIX = "config.providers";
+
+  // When set to "true", config.providers entries are stripped from the worker config
+  // before running the kafka-ready check. This prevents ClassNotFoundException when
+  // config provider plugin JARs are on the worker's plugin.path but not on the
+  // CUB_CLASSPATH used by kafka-ready. Default: disabled (original behavior).
+  static final String SKIP_CONFIG_PROVIDERS_ENV = "CUB_KAFKA_READY_SKIP_CONFIG_PROVIDERS";
 
   private static ArgumentParser createArgsParser() {
     ArgumentParser kafkaReady = ArgumentParsers
@@ -130,6 +138,11 @@ public class KafkaReadyCommand {
               "Bootstrap servers should be provided through config or bootstrap_servers"
           );
         }
+
+        if (isSkipConfigProvidersEnabled()) {
+          workerProps = stripConfigProviders(workerProps);
+        }
+
         success = ClusterStatus.isKafkaReady(
             workerProps,
             res.getInt("min_expected_brokers"),
@@ -155,5 +168,40 @@ public class KafkaReadyCommand {
     } else {
       System.exit(1);
     }
+  }
+
+  /**
+   * Returns a copy of the properties map with config.providers entries removed.
+   * If no config.providers entries are found, returns the original map unmodified.
+   */
+  static Map<String, String> stripConfigProviders(Map<String, String> props) {
+    boolean hasProviderKeys = false;
+    for (String key : props.keySet()) {
+      if (key.startsWith(CONFIG_PROVIDERS_PREFIX)) {
+        hasProviderKeys = true;
+        break;
+      }
+    }
+    if (!hasProviderKeys) {
+      return props;
+    }
+
+    Map<String, String> result = new HashMap<>(props);
+    int count = 0;
+    Iterator<String> it = result.keySet().iterator();
+    while (it.hasNext()) {
+      String key = it.next();
+      if (key.startsWith(CONFIG_PROVIDERS_PREFIX)) {
+        it.remove();
+        count++;
+      }
+    }
+    log.info("Stripped {} config.providers properties from kafka-ready config ({}=true).",
+        count, SKIP_CONFIG_PROVIDERS_ENV);
+    return result;
+  }
+
+  static boolean isSkipConfigProvidersEnabled() {
+    return "true".equalsIgnoreCase(System.getenv(SKIP_CONFIG_PROVIDERS_ENV));
   }
 }
